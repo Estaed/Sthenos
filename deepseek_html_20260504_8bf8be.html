@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Kalistenik Programı</title>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Kalistenik%20Program%C4%B1%22%2C%22short_name%22%3A%22Calisthenics%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23121212%22%2C%22theme_color%22%3A%22%2334a853%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI%2BPHJlY3QgZmlsbD0iIzM0YTg1MyIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIyMCIvPjx0ZXh0IHg9IjUwIiB5PSI2OCIgZm9udC1zaXplPSI1MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCI%2BK0M8L3RleHQ%2BPC9zdmc%2B%22%2C%22sizes%22%3A%22100x100%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
+<!-- iOS Safari PWA desteği -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Calisthenics">
+
+<!-- Tema rengi -->
+<meta name="theme-color" content="#34a853">
+
+<style>
+:root {
+  --bg: #121212;
+  --card: #1e1e1e;
+  --text: #e8eaed;
+  --text2: #9aa0a6;
+  --border: #333;
+  --green: #34a853;
+  --green-bg: #1a3520;
+  --orange: #f9ab00;
+  --orange-bg: #3e2f14;
+  --radius: 10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:12px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:720px;margin:0 auto}
+.stages{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.sbtn{padding:10px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:14px;font-weight:500;cursor:pointer}
+.sbtn.s0.on{background:var(--green-bg);color:var(--green);border-color:#2e7d32}
+.sbtn.s1.on{background:var(--orange-bg);color:var(--orange);border-color:#b45309}
+.sbtn.s2.on{background:#381c1c;color:#ea4335;border-color:#c5221f}
+.card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:14px 16px;margin-bottom:14px}
+.pill-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;scrollbar-width:none}
+.pill-row::-webkit-scrollbar{display:none}
+.pill,.dpill{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.pill.on,.dpill.on{background:#333;border-color:#555;color:var(--text);font-weight:bold}
+.pill.done,.dpill.done{background:var(--green-bg);border-color:#2e7d32;color:var(--green)}
+.pill.partial,.dpill.partial{background:var(--orange-bg);border-color:#b45309;color:var(--orange)}
+.wfocus{font-size:17px;font-weight:600;margin-bottom:4px}
+.wnote{font-size:14px;color:var(--text2);line-height:1.6}
+.wbtn{width:100%;text-align:left;padding:12px 0;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:14px;cursor:pointer;display:flex;justify-content:space-between}
+.wlist{display:none;padding:8px 0;margin-bottom:8px}
+.wlist.open{display:block}
+.wi{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px solid var(--border)}
+.win{color:var(--text2)}.wid{color:var(--text);font-size:13px;text-align:right;max-width:55%}
+.et{width:100%;border-collapse:collapse;margin-top:6px}
+.et th{font-size:12px;color:var(--text2);text-align:left;padding:8px 4px;border-bottom:1px solid var(--border);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.et td{padding:10px 4px;border-bottom:1px solid var(--border);vertical-align:top;font-size:14px}
+.en{font-weight:600}
+.emile{font-size:13px;color:var(--green);margin-top:2px;font-weight:500}
+.et input[type=checkbox]{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
+.dinfo{font-size:13px;color:var(--text2);margin-bottom:12px;font-style:italic}
+.luc{font-size:14px;padding:5px 0;display:flex;gap:8px;align-items:flex-start;border-bottom:1px solid var(--border)}
+.lck{color:var(--green);flex-shrink:0;font-weight:600}
+.done-btn{display:inline-block;margin-top:10px;padding:8px 18px;border-radius:20px;border:1px solid var(--green);background:var(--green-bg);color:var(--green);font-size:13px;font-weight:500;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="stages" id="stages"></div>
+<div class="pill-row" id="weekNav"></div>
+<div style="margin-bottom:12px" id="weekHdr"></div>
+<div class="pill-row" id="dayTabs"></div>
+<div class="dinfo" id="dinfo"></div>
+<button class="wbtn" onclick="toggleW()"><span id="wtit">Isınma</span><span id="warr">↓</span></button>
+<div class="wlist" id="wlist"></div>
+<div class="card" style="margin-top:10px">
+  <table class="et"><thead><tr><th style="width:4%">✓</th><th style="width:55%">Egzersiz</th><th style="width:12%">Set</th><th style="width:17%">Rep/Süre</th></tr></thead><tbody id="exb"></tbody></table>
+  <button class="done-btn" onclick="markDayDone()">✅ Günü Tamamlandı Olarak İşaretle</button>
+</div>
+<div class="card" id="lubox"></div>
+</div>
+
+<script>
+// --- Isınma (prehab dahil) ---
+const WU = {
+  fb:[["Boyun döndürme","5 her yön"],["Omuz çevirme","10 öne+geriye"],["Bilek rutin","2 dk"],["Parmak plank","2×8s"],["Kalça döndürme","10 her yön"],["Bacak sallama","10/t"],["Cat-cow","10"],["Glute bridge","10"],["Yavaş squat","8"]],
+  push:[["Bilek rutin","2 dk"],["Omuz çevirme","1 dk"],["Scapular push-up","2×8"],["Yavaş push-up negatif","3"],["Dead bug","2×5/t"],["Dış rotasyon (bant/hafif dambıl)","2×10"],["Band pull-apart","2×10"],["Wall slide","2×8"]],
+  pull:[["Bilek rutin","2 dk"],["Omuz çevirme","1 dk"],["Scapular retraksiyon","2×6"],["Dead hang","2×15s"],["Active hang","2×10s"],["Bilek curl","2×8"],["Ters bilek curl","2×8"],["Hammer curl","2×8"]],
+  legs:[["Kalça döndürme","10 her yön"],["Bacak sallama","10/t"],["Cat-cow","10"],["Glute bridge","10"],["Yavaş squat","10"],["Kalça fleksör germe","30s/t"],["Jefferson curl (ısınma)","5s×5"]],
+  skill:[["Bilek rutin","2 dk"],["Omuz çevirme","1 dk"],["Scapular pull-up","2×6"],["Scapular elevation (pike)","2×6"],["Hollow body hold","20s"],["Active hang","20s"]]
+};
+const WN={fb:"Tam vücut — 8 dk",push:"Push — 10 dk",pull:"Pull — 10 dk",legs:"Bacak+Core — 10 dk",skill:"Beceri — 8 dk"};
+
+// --- AŞAMALAR ---
+const ST = [
+  { name:"NEWBIE",lbl:"Temel Atma",dur:"Hafta 1–4",sch:"3 gün/hafta · Pzt/Çar/Cum · Her gün aynı tam vücut",
+    desc:"Tekniğe odaklan. Ağırlık değil form. Scapular mekanik, vücut gerilimi. Pull-up/dip hafif ağırlıklı. CaliHoss: Scapular Control & Body Tension.",
+    lu:["5 pull-up +5kg","6 dip +5kg","8 push-up (scap)","30s plank","3 Nordic eccentric 5s"],
+    weeks:[
+      {n:1,f:"Scapular mekanik öğrenme",note:"CaliHoss Scapular Control: Aktif asılışta kürek kemiklerini deprese et, push-up'ta protrakte et.",days:[{l:"Gün A",i:"Pzt/Çar/Cum",w:"fb",ex:[
+        ["Scapular Pull-up","2","8","Kollar düz, sadece skapula"],
+        ["Pull-up (teknik)","2","3","Active hang ile başla"],
+        ["Push-up (3s iniş)","2","5","Çıkışta omuzu öne it"],
+        ["Scapular Elevation (pike)","2","6","Kulaklara doğru skapula"],
+        ["Dip Support Hold","2","10s","Skapula depresyonda"],
+        ["Plank","2","20s","Gövde gergin, bel çökmesin"],
+        ["Yan Plank","2","15s/t",""],
+        ["Squat","2","8","Tam derinlik, topuk yerde"],
+        ["RDL @40kg","2","8","Bel düz, kalçadan katlan"],
+        ["Back Extension @7.5kg","2","10","4s iniş, 1s tepe"],
+        ["Nordic Eccentric 5s","2","3",""]
+      ]}]},
+      {n:2,f:"Hacim artışı + L-sit",note:"Her set +1-2 rep. Form bozulursa rep artırma. 'Volume Completion' prensibi.",days:[{l:"Gün A",i:"Pzt/Çar/Cum",w:"fb",ex:[
+        ["Scapular Pull-up","2","10",""],["Pull-up +2.5kg","2","4",""],["Push-up","2","7","3s iniş"],
+        ["Dip Negatif","2","5s hold+3 neg",""],["Pike Push-up","2","5",""],
+        ["Plank","2","25s",""],["Yan Plank","2","20s/t",""],["Squat","2","10",""],
+        ["RDL @42.5kg","2","10",""],["Back Extension @10kg","2","10","4s iniş/1s tepe"],
+        ["Nordic Eccentric 5s","2","4",""],["Tuck L-sit","2","8s","Paralette dizler göğüste"]
+      ]}]},
+      {n:3,f:"Ağırlıklı pull-up + dip",note:"Form sağlamsa ağırlık ekle. 'Progressive Overload' prensibi.",days:[{l:"Gün A",i:"Pzt/Çar/Cum",w:"fb",ex:[
+        ["Pull-up +5kg","2","4",""],["Scapular Pull-up","2","8",""],
+        ["Push-up (ayak yüksek)","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up","2","6",""],
+        ["Plank","2","30s",""],["Ters Plank","2","15s",""],["RDL @45kg","2","8",""],
+        ["Back Extension @10kg","2","10","4s iniş/1s tepe"],["Nordic Eccentric 5s","2","5",""],
+        ["Tuck L-sit","2","10s",""]
+      ]}]},
+      {n:4,f:"Level-up testi",note:"Kriterleri 2 sette test et. Başarırsan Beginner'a geç.",days:[{l:"Gün A (test)",i:"Pzt/Çar/Cum",w:"fb",ex:[
+        ["Pull-up +5kg","2","5","✓ 5 rep"],["Dip +5kg","2","6","✓ 6 rep"],
+        ["Push-up","2","8",""],["Pike Push-up","2","6",""],["Plank","2","30s","✓ 30s"],
+        ["Squat","2","10",""],["RDL @45kg","2","10",""],["Back Extension @10kg","2","12","4s iniş/1s tepe"],
+        ["Nordic Eccentric 4s","2","5",""],["Tuck L-sit","2","10s",""]
+      ]}]}
+  ]},
+  { name:"BEGINNER",lbl:"Temel Güçlenme",dur:"Hafta 5–16",sch:"4 gün · Pzt:Push · Sal:Pull · Per:Bacak+Core · Cmt:Teknik (48s CNS koruması)",
+    desc:"Hacim tamamlama ile ilerle. Alt sınırla başla, üst sınıra ulaşana kadar ağırlığı/varyasyonu sabit tut. RDL 40'tan 80+ kg'a. L-sit ve pike push-up temel beceriler. Volume Completion yöntemi.",
+    lu:["5 pull-up +20kg","5 dip +20kg","20s L-sit","8 pike push-up duvara","3 HSPU negatif 5s","3 Nordic full"],
+    weeks:[
+      {n:5,f:"PPL alışma — Hacim Tamamlama",note:"Yeni format. Her egzersizde alt sınırdan başla, üst sınıra ulaşana kadar aynı ağırlıkta kal. Sonra +2.5kg veya zor varyasyon.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up","2","3-5/t"],["Push-up (ayak yüksek)","3","6-8"],["Pike Push-up","3","4-6"],["Weighted Dip +5kg","3","6-8"],["Side Raise @8kg","3","10-12"],["Dip Support Hold","2","15-20s"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +5kg","3","4-6"],["Inverted Row","3","6-8"],["Scapular Pull-up","2","8-10"],["Dead Hang","3","20-30s"],["Rev. Peck Deck @40kg","2","8-10"],["Wrist Curl @10kg","3","12-15"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @45kg","3","5-7"],["RDL @40kg","3","6-8"],["Back Extension @10kg","3","8-10","4s iniş/1s tepe"],["Nordic Eccentric 4s","3","3-5"],["Jefferson Curl @12.5kg","3","10"],["Calf Raise @85kg","3","10-12"],["Plank","3","25-30s"],["Copenhagen Plank","2","12-15s/t"],["Tuck L-sit","3","8-12s"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","15-20s"],["Hollow Body","2","15-20s"],["Dead Hang","2","30-40s"],["Pistol Squat (kutu)","2","4-5/t"],["Straight-arm kond.","2","10-15s","German hang hazırlık"]]}
+      ]},
+      {n:6,f:"Ağırlık başlangıcı",note:"Pull-up +7.5, Dip +7.5. Hacim tamamlama devrede.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up","2","4-6/t"],["Push-up","3","6-8"],["Pike Push-up","3","4-6"],["Weighted Dip +7.5kg","3","5-7"],["Side Raise @10kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +7.5kg","3","4-6"],["Inverted Row","3","6-8"],["Dead Hang","3","30-35s"],["Rev. Peck Deck @42.5kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @47.5kg","3","5-7"],["RDL @42.5kg","3","6-8"],["Back Extension @12.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Eccentric 4s","3","3-5"],["Jefferson Curl @15kg","3","10"],["Plank","3","30-35s"],["L-sit (tuck)","3","10-15s"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","20-25s"],["Pistol Squat","2","5-6/t"],["Straight-arm kond.","2","12-18s"]]}
+      ]},
+      {n:7,f:"Pull-up +10kg giriş",note:"Ağırlıklı pull-up'ta ilk büyük sıçrama. 3-5 rep ile başla, 5 temiz olunca artır.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up","3","4-6/t"],["Pike Push-up","3","5-7"],["Weighted Dip +10kg","3","5-7"],["Side Raise @10kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +10kg","3","3-5"],["Inverted Row","3","6-8"],["Dead Hang","3","30-40s"],["Rev. Peck Deck @42.5kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @50kg","3","5-7"],["RDL @45kg","3","6-8"],["Back Extension @15kg","3","8-10","4s iniş/1s tepe"],["Nordic Eccentric 3s","3","3-5","Daha yavaş iniş"],["Jefferson Curl @15kg","3","10"],["Plank","3","30-40s"],["L-sit","3","10-15s"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","25-30s"],["Pistol Squat","2","5-7/t"],["Straight-arm kond.","2","15-20s"]]}
+      ]},
+      {n:8,f:"RDL 50kg — Posterior zincir",note:"RDL ve squat paralel ilerliyor. Bel ağrısı yoksa bel pozisyonu sağlam. Hip Hinge tekniği.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up","3","5-7/t"],["Pike Push-up","3","6-8"],["Weighted Dip +10kg","3","6-8"],["Side Raise @10kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +10kg","3","5-7"],["Inverted Row (dik)","3","6-8"],["Dead Hang","3","35-45s"],["Rev. Peck Deck @45kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @52.5kg","3","5-7"],["RDL @47.5kg","3","6-8"],["Back Extension @17.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Eccentric 3s","3","4-6"],["Jefferson Curl @17.5kg","3","10"],["L-sit","3","12-18s"],["Dragon Flag Tuck","2","3-5"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","35-45s"],["Dragon Flag Tuck","2","4-6"],["Straight-arm kond.","2","15-25s"]]}
+      ]},
+      {n:9,f:"One-arm Push-up giriş",note:"Archer'ı bırak, one-arm progression başla. Destek elini uzağa koy. Pushing Progressions.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up prog.","2","3-5/t"],["Archer Push-up","2","5-6/t"],["Pike Push-up (steep)","3","6-8"],["Weighted Dip +12.5kg","3","5-7"],["Side Raise @10kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +12.5kg","3","4-6"],["Inverted Row tek kol asiste","2","4-5/t"],["Dead Hang","3","40-50s"],["Rev. Peck Deck @45kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @55kg","3","5-7"],["RDL @50kg","3","6-8"],["Back Extension @20kg","3","8-10","4s iniş/1s tepe"],["Nordic Eccentric 3s","3","4-6"],["Jefferson Curl @20kg","3","10"],["L-sit","3","15-20s"],["Dragon Flag Tuck","2","5-7"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","40-50s"],["Pistol Squat","2","7-8/t"],["Straight-arm kond.","2","18-25s"]]}
+      ]},
+      {n:10,f:"Nordic tam rep dene",note:"Nordic eccentric 6 temiz olunca, 1-2 tam Nordic curl dene. Nordic Curl.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up","2","4-6/t"],["Pike Push-up","3","6-8"],["Weighted Dip +12.5kg","3","6-8"],["Side Raise @10kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +12.5kg","3","5-7"],["Inverted Row tek kol","2","5-6/t"],["Dead Hang","3","45-50s"],["Rev. Peck Deck @47.5kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @57.5kg","3","5-7"],["RDL @52.5kg","3","6-8"],["Back Extension @20kg","3","8-10","4s iniş/1s tepe"],["Nordic → Full","3","4-6"],["Jefferson Curl @20kg","3","10"],["L-sit","3","18-20s"],["Dragon Flag Tuck","2","6-8"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","45-55s"],["Pistol Squat","2","8-10/t"],["Straight-arm kond.","2","20-30s"]]}
+      ]},
+      {n:11,f:"L-sit 20s hedefi",note:"L-sit 20 saniye bu bloğun en önemli hedefi. L-sit.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up","2","5-7/t"],["Pike Push-up (duvara)","3","6-8"],["Weighted Dip +15kg","3","5-7"],["Side Raise @12kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +15kg","3","4-6"],["Inverted Row tek kol","2","5-7/t"],["Dead Hang","3","50-55s"],["Rev. Peck Deck @47.5kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @60kg","3","5-7"],["RDL @55kg","3","6-8"],["Back Extension @22.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","3-5"],["Jefferson Curl @22.5kg","3","10"],["L-sit","3","18-20s","✓ 20s hedefi"],["Dragon Flag Tuck","2","6-8"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","50-60s"],["Dragon Flag Tuck","2","7-9"],["Straight-arm kond.","2","20-30s"]]}
+      ]},
+      {n:12,f:"L-sit 20s teyit — Nordic 5 full",note:"Milestone teyit haftası. L-sit 20s, Nordic 5 tam.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up","2","5-7/t"],["Pike Push-up","3","6-8"],["Weighted Dip +15kg","3","6-8"],["Side Raise @12kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +15kg","3","5-7"],["Inverted Row tek kol","2","6-8/t"],["Dead Hang","3","55-60s"],["Rev. Peck Deck @50kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @62.5kg","3","5-7"],["RDL @57.5kg","3","6-8"],["Back Extension @22.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","4-6"],["Jefferson Curl @22.5kg","3","10"],["L-sit","3","20-25s","✓"],["Dragon Flag Tuck","2","8-10"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","55-65s"],["Dragon Flag","2","5-7"],["Straight-arm kond.","2","25-30s"]]}
+      ]},
+      {n:13,f:"HSPU negatif + RDL 60kg",note:"HSPU negatif: Duvara sırt dönük, ayakları duvara tırman, 5s iniş. HSPU.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up","2","6-8/t"],["Pike Push-up (steep)","3","6-8"],["HSPU Negatif","2","3-5","5s iniş"],["Weighted Dip +17.5kg","3","5-7"],["Side Raise @12kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +17.5kg","3","4-6"],["One-arm asılı","2","10-15s/t"],["Dead Hang","3","60s"],["Rev. Peck Deck @50kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @65kg","3","5-7"],["RDL @60kg","3","5-7"],["Back Extension @25kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","4-6"],["Jefferson Curl @25kg","3","10"],["L-sit","3","20-25s"],["Dragon Flag","2","6-8"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand","3","60s"],["Freestanding HS kick-up","5","deneme"],["Dragon Flag","2","7-9"],["Straight-arm kond.","2","25-30s"]]}
+      ]},
+      {n:14,f:"Pull-up +17.5kg × 6",note:"Pull-up'ta hacim tamamlama ile ilerleme sürüyor. Form daima önce.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up","2","6-8/t"],["Pike Push-up","3","6-8"],["HSPU Negatif","2","4-6"],["Weighted Dip +17.5kg","3","6-8"],["Side Raise @12kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +17.5kg","3","5-7"],["One-arm asılı","2","12-18s/t"],["Dead Hang","3","60s"],["Rev. Peck Deck @52.5kg","2","8-10"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @67.5kg","3","5-7"],["RDL @62.5kg","3","5-7"],["Back Extension @27.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","5-7"],["Jefferson Curl @27.5kg","3","10"],["L-sit","3","20-25s"],["Dragon Flag","2","8-10"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS kick-up","7",""],["Wall Handstand","2","60s"],["Dragon Flag","2","8-10"],["Straight-arm kond.","2","25-30s"]]}
+      ]},
+      {n:15,f:"Zirve başlangıcı",note:"+20kg pull-up ve dip hedefi yakın. Acele etme.",days:[
+        {l:"Push",i:"Pazartesi",w:"push",ex:[["Pike Push-up (duvara)","3","6-8"],["HSPU Negatif","2","4-6"],["Weighted Dip +20kg","3","5-7"],["Side Raise @12kg","3","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +20kg","3","4-6","✓ kriter yakın"],["One-arm asılı","2","15-20s/t"],["Dead Hang","3","60s"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @70kg","3","5-7"],["RDL @65kg","3","5-7"],["Back Extension @30kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","5-7"],["Jefferson Curl @30kg","3","10"],["L-sit","3","20-25s"],["Dragon Flag","2","8-10"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS","8","deneme"],["Dragon Flag","2","8-10"],["Straight-arm kond.","2","30s"]]}
+      ]},
+      {n:16,f:"Stage 2 Final Testi",note:"Tüm kriterleri test et. 5 pull-up +20kg, 5 dip +20kg, 20s L-sit, 3 HSPU negatif, 3 Nordic full → Intermediate.",days:[
+        {l:"Push (test)",i:"Pazartesi",w:"push",ex:[["HSPU Negatif","2","3-5","✓ 5s"],["Pike Push-up","3","6-8"],["Weighted Dip +20kg","3","5-7","✓"],["Side Raise @12kg","3","10-12"]]},
+        {l:"Pull (test)",i:"Salı",w:"pull",ex:[["Pull-up +20kg","3","4-6","✓"],["One-arm asılı","2","15-20s/t"],["Dead Hang","3","60s"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @72.5kg","3","5-7"],["RDL @67.5kg","3","5-7"],["Back Extension @30kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","3-5","✓"],["Jefferson Curl @30kg","3","10"],["L-sit","3","20-25s","✓"],["Dragon Flag","2","8-10"]]},
+        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS","10","deneme"],["Dragon Flag","3","8-10"],["Straight-arm kond.","2","30s"]]}
+      ]}
+  ]},
+  { name:"INTERMEDIATE",lbl:"Beceri Geliştirme",dur:"Hafta 17–28",sch:"5 gün · Pzt:Push+HS · Sal:Pull+FL · Çar:Bacak · Per:Dinlenme · Cum:Skill+Core · Cmt:Güç",
+    desc:"Beceri odaklı. CNS koruması: bacak ile beceri arası 48s. Front lever, handstand, HSPU, dragon flag. Straight-arm kondisyon. Skill Integration.",
+    lu:["1 dk freestanding HS","3 HSPU","20s adv tuck FL","Full dragon flag 3×10","30s L-sit","Pull-up +35kg","RDL 80+kg"],
+    weeks:[
+      {n:17,f:"Skill split geçişi",note:"PPL'den beceri split'ine. Front lever tuck başlangıç. Handstand her gün. Front Lever.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand","3","40-50s"],["Freestanding kick-up","5",""],["HSPU Negatif","3","3-5"],["Weighted Dip +20kg","3","5-7"],["One-arm Push-up","2","5-7/t"],["Side Raise @12kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Tuck Front Lever","3","10-15s"],["Pull-up +20kg","3","5-7"],["One-arm asılı","2","12-18s/t"],["Rev. Peck Deck @52.5kg","2","8-10"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @65kg","4","5-7"],["RDL @60kg","4","5-7"],["Back Extension @32.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","4-6"],["Jefferson Curl @30kg","3","10"],["Pistol Squat","2","6-8/t"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","6-8"],["L-sit","3","20-25s"],["Freestanding HS","10",""],["Copenhagen","2","35-45s/t"],["Hollow Body","2","25-30s"],["Straight-arm kond.","3","20-30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +22.5kg","3","4-6"],["Weighted Dip +22.5kg","3","4-6"],["Pike Push-up","3","6-8"],["Side Raise @14kg","3","10-12"]]}
+      ]},
+      {n:18,f:"Tuck FL 15s + HS 55s",note:"Front lever süresini artır. Front Lever.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand","3","50-55s"],["Freestanding HS","7",""],["HSPU Negatif","3","4-6"],["Weighted Dip +22.5kg","3","5-7"],["Side Raise @14kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Tuck Front Lever","3","12-18s"],["Pull-up +22.5kg","3","4-6"],["One-arm asılı","2","15-20s/t"],["Rev. Peck Deck @55kg","2","8-10"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @67.5kg","4","5-7"],["RDL @62.5kg","4","5-7"],["Back Extension @35kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","5-7"],["Jefferson Curl @32.5kg","3","10"],["Pistol Squat","2","7-9/t"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","7-9"],["L-sit","3","22-28s"],["Freestanding HS","8",""],["Copenhagen","2","40-50s/t"],["Straight-arm kond.","3","25-30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +25kg","3","4-6"],["Weighted Dip +25kg","3","4-6"],["Pike Push-up","3","6-8"],["Side Raise @14kg","3","10-12"]]}
+      ]},
+      {n:19,f:"HSPU ilk tam rep",note:"Wall HS 60s varsa tam HSPU dene. 1-2 yeter. HSPU First Rep.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall HS","2","60s"],["Freestanding HS","8",""],["HSPU","2","1-3","✓"],["HSPU Negatif","2","3-5"],["Weighted Dip +25kg","3","5-7"],["Side Raise @14kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Advanced Tuck FL","3","10-15s"],["Pull-up +25kg","3","4-6"],["One-arm asılı","2","18-25s/t"],["Rev. Peck Deck @55kg","2","8-10"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @70kg","4","5-7"],["RDL @65kg","4","5-7"],["Back Extension @37.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","6-8"],["Jefferson Curl @35kg","3","10"],["Pistol Squat","2","8-10/t"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","8-10"],["L-sit","3","25-30s"],["Freestanding HS","10",""],["Hollow Body","2","35-40s"],["Straight-arm kond.","3","25-30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +27.5kg","3","4-6"],["Weighted Dip +27.5kg","3","4-6"],["Pike Push-up","3","6-8"],["Side Raise @14kg","3","10-12"]]}
+      ]},
+      {n:20,f:"Squat 75kg — arka zincir",note:"Arka zincir (RDL, back ext) sayesinde squat açıldı.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS","10",""],["HSPU","2","2-4"],["Weighted Dip +27.5kg","3","5-7"],["Side Raise @14kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Advanced Tuck FL","3","12-18s"],["Pull-up +27.5kg","3","4-6"],["One-arm asılı","2","20-25s/t"],["Rev. Peck Deck @57.5kg","2","8-10"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @72.5kg","4","5-7"],["RDL @67.5kg","4","5-7"],["Back Extension @40kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","6-8"],["Jefferson Curl @37.5kg","3","10"],["Pistol Squat","2","9-11/t"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","9-11"],["L-sit","3","25-30s"],["Freestanding HS","10",""],["Copenhagen","2","45-55s/t"],["Straight-arm kond.","3","25-30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +30kg","3","4-6"],["Weighted Dip +30kg","3","4-6"],["Pike Push-up","3","6-8"],["Side Raise @16kg","3","10-12"]]}
+      ]},
+      {n:21,f:"Straddle FL",note:"Bacakları yana aç, tork azalır. Straddle Front Lever.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS","12",""],["HSPU","3","2-4"],["Weighted Dip +30kg","3","4-6"],["Side Raise @16kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Straddle Front Lever","3","6-10s"],["Pull-up +30kg","3","4-6"],["One-arm asılı","2","25-30s/t"],["Rev. Peck Deck @60kg","2","8-10"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @75kg","4","5-7"],["RDL @70kg","4","5-7"],["Back Extension @42.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","7-9"],["Jefferson Curl @40kg","3","10"],["Pistol Squat +5kg","2","5-7/t"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","10-12"],["L-sit","3","28-32s"],["Freestanding HS","12",""],["Hollow Body","2","40-45s"],["Straight-arm kond.","3","25-30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +32.5kg","3","3-5"],["Weighted Dip +32.5kg","3","3-5"],["Pike Push-up","3","6-8"],["Side Raise @16kg","3","10-12"]]}
+      ]},
+      {n:22,f:"HSPU 3 rep · L-sit 30s",note:"İki büyük milestone. L-sit'te V-sit için bacakları hafif yükselt. HSPU & L-sit.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS","15",""],["HSPU","3","2-4","✓ 3 rep"],["Weighted Dip +32.5kg","3","4-6"],["Side Raise @16kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Straddle FL","3","8-12s"],["Pull-up +32.5kg","3","4-6"],["One-arm asılı","2","28-35s/t"],["Rev. Peck Deck @62.5kg","2","8-10"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @77.5kg","4","5-7"],["RDL @72.5kg","4","5-7"],["Back Extension @45kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","7-9"],["Jefferson Curl @42.5kg","3","10"],["Pistol Squat +7.5kg","2","5-7/t"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","10-12"],["L-sit","3","30s","✓"],["Freestanding HS","12",""],["Copenhagen","2","50-60s/t"],["Straight-arm kond.","3","30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +35kg","3","3-5","✓ +35kg"],["Weighted Dip +35kg","3","3-5"],["Pike Push-up","3","6-8"],["Side Raise @16kg","3","10-12"]]}
+      ]},
+      {n:23,f:"Freestanding HS 5s",note:"Denge anlık. Her gün kick-up dene. Handstand.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS","15",""],["HSPU","3","3-5"],["Weighted Dip +35kg","3","4-6"],["Side Raise @16kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Straddle FL","3","10-15s"],["Pull-up +35kg","3","4-6"],["One-arm asılı","2","28-35s/t"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @80kg","4","5-7"],["RDL @75kg","4","5-7"],["Back Extension @47.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","8-10"],["Jefferson Curl @45kg","3","10"],["Pistol Squat +10kg","2","5-7/t"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag Full","3","10-12"],["L-sit","3","30s"],["Freestanding HS","15",""],["Straight-arm kond.","3","30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +37.5kg","3","3-5"],["Weighted Dip +37.5kg","3","3-5"],["Pike Push-up","3","6-8"]]}
+      ]},
+      {n:24,f:"Full FL denemesi",note:"Full front lever 5-10s çok iyi. Full Front Lever.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS","15",""],["HSPU","3","3-5"],["Weighted Dip +37.5kg","3","4-6"],["Side Raise @16kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Full Front Lever dene","3","5-10s","✓"],["Straddle FL","2","12-15s"],["Pull-up +37.5kg","3","3-5"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @82.5kg","4","5-7"],["RDL @77.5kg","4","5-7"],["Back Extension @50kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","8-10"],["Jefferson Curl @47.5kg","3","10"],["Pistol Squat +10kg","2","6-8/t"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","10-12"],["L-sit","3","30s"],["Freestanding HS","15",""],["Hollow Body","2","45-50s"],["Straight-arm kond.","3","30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +40kg","3","3-5"],["Weighted Dip +40kg","3","3-5"],["Pike Push-up","3","6-8"]]}
+      ]},
+      {n:25,f:"Konsolidasyon",note:"Ağırlık artırma, form ve süreye odaklan.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS","20",""],["HSPU","3","3-5"],["Weighted Dip +40kg","3","3-5"],["Side Raise @16kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Full Front Lever","3","8-15s"],["Pull-up +40kg","3","3-5"],["One-arm asılı","2","30-40s/t"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @85kg","4","5-7"],["RDL @80kg","4","5-7"],["Back Extension @50kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","9-11"],["Jefferson Curl @50kg","3","10"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","10-12"],["L-sit","3","30s"],["Freestanding HS","18",""],["Copenhagen","2","50-60s/t"],["Straight-arm kond.","3","30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +42.5kg","3","3-5"],["Weighted Dip +42.5kg","3","3-5"],["Pike Push-up","3","6-8"]]}
+      ]},
+      {n:26,f:"Deload",note:"Ağırlıklar -30%, rep -20%. Tendon ve CNS dinlenir. Deload.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand","3","60s"],["HSPU","2","2-3"],["Weighted Dip +25kg","2","5-7"],["Side Raise @10kg","2","12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Tuck Front Lever","2","15s"],["Pull-up +20kg","2","5-7"],["Dead Hang","3","60s"]]},
+        {l:"Bacak+Mobilite",i:"Çarşamba",w:"legs",ex:[["Squat @60kg","3","5-7"],["RDL @55kg","3","6-8"],["Jefferson Curl @30kg","3","10"],["Tam Vücut Mobilite","1","25 dk"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","2","6-8"],["L-sit","2","25s"],["Freestanding HS","10",""],["Straight-arm kond.","2","20-30s"]]},
+        {l:"Hafif Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +15kg","2","6-8"],["Weighted Dip +15kg","2","6-8"],["Pike Push-up","2","6-8"]]}
+      ]},
+      {n:27,f:"Yeniden yükleme",note:"Deload sonrası süperkompanzasyon. Güç taze.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS","20",""],["HSPU","3","3-5"],["Weighted Dip +42.5kg","3","3-5"],["Side Raise @16kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Full Front Lever","3","10-18s"],["Pull-up +42.5kg","3","3-5"],["One-arm asılı","2","30-40s/t"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @87.5kg","4","5-7"],["RDL @82.5kg","4","5-7"],["Back Extension @52.5kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","9-11"],["Jefferson Curl @52.5kg","3","10"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag","3","11-13"],["L-sit","3","30s"],["Freestanding HS","18",""],["Straight-arm kond.","3","30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +45kg","3","3-5"],["Weighted Dip +45kg","3","3-5"],["Pike Push-up","3","6-8"]]}
+      ]},
+      {n:28,f:"Program sonu",note:"60kg squat → 90kg, 50kg RDL → 85kg, sıfırdan full FL ve HSPU. Asıl yolculuk şimdi başlıyor. Next Steps.",days:[
+        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS max","5",""],["HSPU","3","4-6","✓"],["Weighted Dip +45kg","3","3-5"],["Side Raise @16kg","3","10-12"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Full Front Lever","3","15-20s","✓"],["Pull-up +45kg","3","3-5"],["One-arm asılı","2","35-40s/t"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @90kg","4","5-7"],["RDL @85kg","4","5-7","✓ 80+kg"],["Back Extension @55kg","3","8-10","4s iniş/1s tepe"],["Nordic Full","3","10-12"],["Jefferson Curl @55kg","3","10"]]},
+        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag Full","3","10-12","✓"],["L-sit","3","30s","✓"],["Freestanding HS","20",""],["Straight-arm kond.","3","30s"]]},
+        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +47.5kg","3","3-5"],["Weighted Dip +47.5kg","3","3-5"],["Pike Push-up","3","6-8"]]}
+      ]}
+  ]}
+];
+
+let si=0, wi=0, di=0, wuOpen=false;
+
+// localStorage
+function getKey(s,w,d,ex){ return `cali_${s}_${w}_${d}_${ex}`; }
+function isChecked(s,w,d,ex){ return localStorage.getItem(getKey(s,w,d,ex))==='1'; }
+function setChecked(s,w,d,ex,val){ localStorage.setItem(getKey(s,w,d,ex),val?'1':'0'); }
+
+function calcWeekStats(s,w){
+  let total=0, done=0;
+  ST[s].weeks[w].days.forEach((d,di)=>{ d.ex.forEach((_,ex)=>{ total++; if(isChecked(s,w,di,ex)) done++; }); });
+  return {total,done};
+}
+function calcDayStats(s,w,d){
+  let total=0, done=0;
+  ST[s].weeks[w].days[d].ex.forEach((_,ex)=>{ total++; if(isChecked(s,w,d,ex)) done++; });
+  return {total,done};
+}
+function markDayDone(){
+  ST[si].weeks[wi].days[di].ex.forEach((_,idx)=>setChecked(si,wi,di,idx,true));
+  render();
+}
+
+function render(){
+  const s=ST[si], w=s.weeks[wi], d=w.days[Math.min(di,w.days.length-1)];
+  document.getElementById('weekNav').innerHTML = s.weeks.map((wk,i)=>{
+    const stat=calcWeekStats(si,i);
+    let cls='pill'; if(i===wi) cls+=' on';
+    if(stat.total>0 && stat.done===stat.total) cls+=' done';
+    else if(stat.done>0) cls+=' partial';
+    return `<button class="${cls}" onclick="selW(${i})">H${wk.n}</button>`;
+  }).join('');
+  document.getElementById('dayTabs').innerHTML = w.days.map((day,j)=>{
+    const stat=calcDayStats(si,wi,j);
+    let cls='dpill'; if(j===di) cls+=' on';
+    if(stat.total>0 && stat.done===stat.total) cls+=' done';
+    else if(stat.done>0) cls+=' partial';
+    return `<button class="${cls}" onclick="selD(${j})">${day.l}</button>`;
+  }).join('');
+  document.getElementById('dinfo').textContent = d.i;
+  document.getElementById('weekHdr').innerHTML = `<div class="wfocus">${w.f}</div><div class="wnote">${w.note||''}</div>`;
+  document.getElementById('wtit').textContent = 'Isınma — '+WN[d.w];
+  document.getElementById('wlist').innerHTML = WU[d.w].map(([n,det])=>`<div class="wi"><span class="win">${n}</span><span class="wid">${det}</span></div>`).join('');
+  document.getElementById('exb').innerHTML = d.ex.map(([nm,sets,reps,note],idx)=>{
+    const checked = isChecked(si,wi,di,idx);
+    return `<tr>
+      <td><input type="checkbox" ${checked?'checked':''} onchange="setChecked(${si},${wi},${di},${idx},this.checked);render()" id="cb_${idx}"></td>
+      <td><label for="cb_${idx}" class="en">${nm}</label>${note?`<div class="emile" style="font-size:12px;color:var(--text2)">${note}</div>`:''}</td>
+      <td style="color:var(--text2)">${sets}</td>
+      <td style="font-weight:500">${reps}</td>
+    </tr>`;
+  }).join('');
+  renderLu();
+}
+function renderLu(){
+  const s=ST[si];
+  document.getElementById('lubox').innerHTML=`
+    <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Level-up Kriterleri</div>
+    ${s.lu.map(c=>`<div class="luc"><span class="lck">✓</span><span>${c}</span></div>`).join('')}`;
+}
+
+function selW(i){wi=i;di=0;render();}
+function selD(i){di=i;render();}
+function toggleW(){wuOpen=!wuOpen;document.getElementById('wlist').className='wlist'+(wuOpen?' open':'');document.getElementById('warr').textContent=wuOpen?'↑':'↓';}
+function selS(i){si=i;wi=0;di=0;document.querySelectorAll('.sbtn').forEach((b,j)=>{b.className=`sbtn s${j}${j===i?' on':''}`;});render();}
+
+document.getElementById('stages').innerHTML=ST.map((s,i)=>`<button class="sbtn s${i}${i===0?' on':''}" onclick="selS(${i})"><strong>${s.name}</strong> — ${s.lbl}</button>`).join('');
+render();
+</script>
+</body>
+</html>
