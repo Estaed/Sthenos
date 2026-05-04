@@ -6,7 +6,7 @@
 <title>Kalistenik Programı</title>
 
 <!-- PWA Manifest -->
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Kalistenik%20Program%C4%B1%22%2C%22short_name%22%3A%22Calisthenics%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23121212%22%2C%22theme_color%22%3A%22%2334a853%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI%2BPHJlY3QgZmlsbD0iIzM0YTg1MyIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIyMCIvPjx0ZXh0IHg9IjUwIiB5PSI2OCIgZm9udC1zaXplPSI1MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCI%2BK0M8L3RleHQ%2BPC9zdmc%2B%22%2C%22sizes%22%3A%22100x100%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<link rel="manifest" href="manifest.json">
 
 <!-- iOS Safari PWA desteği -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -365,6 +365,11 @@ function selS(i){si=i;wi=0;di=0;document.querySelectorAll('.sbtn').forEach((b,j)
 
 document.getElementById('stages').innerHTML=ST.map((s,i)=>`<button class="sbtn s${i}${i===0?' on':''}" onclick="selS(${i})"><strong>${s.name}</strong> — ${s.lbl}</button>`).join('');
 render();
+</script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
 </script>
 </body>
 </html>
