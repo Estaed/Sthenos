@@ -3,102 +3,322 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<title>Kalistenik Programı</title>
-
-<!-- PWA Manifest -->
+<meta name="theme-color" content="#34a853">
+<title>Calisthenic Program</title>
 <link rel="manifest" href="manifest.json">
-
-<!-- iOS Safari PWA desteği -->
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Calisthenics">
 
-<!-- Tema rengi -->
-<meta name="theme-color" content="#34a853">
-
 <style>
 :root {
-  --bg: #121212;
-  --card: #1e1e1e;
+  --bg: #0f0f0f;
+  --card: #1a1a1a;
+  --card2: #222;
   --text: #e8eaed;
   --text2: #9aa0a6;
-  --border: #333;
+  --border: #2a2a2a;
   --green: #34a853;
-  --green-bg: #1a3520;
+  --green-bg: #152b1c;
   --orange: #f9ab00;
-  --orange-bg: #3e2f14;
-  --radius: 10px;
+  --orange-bg: #2d2010;
+  --blue: #4a9eff;
+  --blue-bg: #0d1f33;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:12px;line-height:1.5;-webkit-tap-highlight-color:transparent}
-.wrap{max-width:720px;margin:0 auto}
-.stages{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.sbtn{padding:10px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:14px;font-weight:500;cursor:pointer}
-.sbtn.s0.on{background:var(--green-bg);color:var(--green);border-color:#2e7d32}
-.sbtn.s1.on{background:var(--orange-bg);color:var(--orange);border-color:#b45309}
-.sbtn.s2.on{background:#381c1c;color:#ea4335;border-color:#c5221f}
-.card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:14px 16px;margin-bottom:14px}
-.pill-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;scrollbar-width:none}
-.pill-row::-webkit-scrollbar{display:none}
-.pill,.dpill{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.pill.on,.dpill.on{background:#333;border-color:#555;color:var(--text);font-weight:bold}
-.pill.done,.dpill.done{background:var(--green-bg);border-color:#2e7d32;color:var(--green)}
-.pill.partial,.dpill.partial{background:var(--orange-bg);border-color:#b45309;color:var(--orange)}
-.wfocus{font-size:17px;font-weight:600;margin-bottom:4px}
-.wnote{font-size:14px;color:var(--text2);line-height:1.6}
-.wbtn{width:100%;text-align:left;padding:12px 0;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:14px;cursor:pointer;display:flex;justify-content:space-between}
-.wlist{display:none;padding:8px 0;margin-bottom:8px}
-.wlist.open{display:block}
-.wi{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px solid var(--border)}
-.win{color:var(--text2)}.wid{color:var(--text);font-size:13px;text-align:right;max-width:55%}
-.et{width:100%;border-collapse:collapse;margin-top:6px}
-.et th{font-size:12px;color:var(--text2);text-align:left;padding:8px 4px;border-bottom:1px solid var(--border);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
-.et td{padding:10px 4px;border-bottom:1px solid var(--border);vertical-align:top;font-size:14px}
-.en{font-weight:600}
-.emile{font-size:13px;color:var(--green);margin-top:2px;font-weight:500}
-.et input[type=checkbox]{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
-.dinfo{font-size:13px;color:var(--text2);margin-bottom:12px;font-style:italic}
-.luc{font-size:14px;padding:5px 0;display:flex;gap:8px;align-items:flex-start;border-bottom:1px solid var(--border)}
-.lck{color:var(--green);flex-shrink:0;font-weight:600}
-.done-btn{display:inline-block;margin-top:10px;padding:8px 18px;border-radius:20px;border:1px solid var(--green);background:var(--green-bg);color:var(--green);font-size:13px;font-weight:500;cursor:pointer}
-.caliref{font-size:13px;color:var(--orange);margin-top:4px;font-weight:500}
-.tipbox{background:#1e2a3a;border:1px solid #2e4a6e;border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;font-size:13px;color:#c0d0e0}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+  padding-bottom: calc(72px + var(--safe-bottom));
+}
+
+.scroll-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 12px 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background: var(--bg);
+}
+.scroll-row::-webkit-scrollbar { display: none; }
+
+.stage-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+}
+.stage-bar .scroll-row { padding: 0; background: transparent; }
+
+.sbtn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.sbtn.s0.on { background: var(--green-bg); color: var(--green); border-color: #2e7d32; }
+.sbtn.s1.on { background: var(--orange-bg); color: var(--orange); border-color: #b45309; }
+.sbtn.s2.on { background: #2a1515; color: #ea4335; border-color: #c5221f; }
+
+.week-nav-wrap {
+  position: sticky;
+  top: 49px;
+  z-index: 30;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.pill, .dpill {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.pill.on, .dpill.on {
+  background: #2a2a2a;
+  border-color: #555;
+  color: var(--text);
+  font-weight: 700;
+}
+.pill.done, .dpill.done { background: var(--green-bg); border-color: #2e7d32; color: var(--green); }
+.pill.partial, .dpill.partial { background: var(--orange-bg); border-color: #b45309; color: var(--orange); }
+
+.content { padding: 0 12px; }
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.tipbox {
+  background: var(--blue-bg);
+  border: 1px solid #1e3d6e;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #b8d0f0;
+  line-height: 1.6;
+}
+.tipbox strong { color: #90c0ff; }
+.cali-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #1a3a5c;
+  border: 1px solid #2e5c94;
+  border-radius: 20px;
+  padding: 4px 10px;
+  color: #7eb8ff;
+  font-weight: 600;
+  font-size: 12px;
+  text-decoration: none;
+  margin: 6px 0 8px;
+}
+.cali-link:hover { background: #254d7a; }
+
+.week-hdr { margin-bottom: 12px; }
+.wfocus { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.wnote { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.caliref {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--orange);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 12px;
+}
+.caliref:hover { text-decoration: underline; }
+
+.warmup-btn {
+  width: 100%;
+  text-align: left;
+  padding: 13px 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.warmup-btn span:first-child { font-weight: 500; }
+.warmup-arrow { font-size: 16px; transition: transform .2s; }
+.warmup-arrow.open { transform: rotate(180deg); }
+.wlist { display: none; padding: 8px 0 4px; margin-bottom: 8px; }
+.wlist.open { display: block; }
+.wi {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.win { color: var(--text2); flex: 1; }
+.wid { color: var(--text); font-size: 13px; text-align: right; max-width: 45%; }
+
+.day-info { font-size: 13px; color: var(--text2); margin-bottom: 10px; font-style: italic; }
+.day-done-badge {
+  display: inline-block;
+  background: var(--green-bg);
+  color: var(--green);
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.et { width: 100%; border-collapse: collapse; margin-top: 6px; }
+.et th {
+  font-size: 11px;
+  color: var(--text2);
+  text-align: left;
+  padding: 8px 6px 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.et th:first-child { width: 36px; }
+.et th:nth-child(2) { width: 99%; }
+.et th:nth-child(3) { width: 34px; white-space: nowrap; }
+.et th:nth-child(4) { width: 60px; white-space: nowrap; }
+
+.et td { padding: 11px 6px 11px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.et td:first-child { padding-left: 0; }
+
+.et input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ex-name { font-weight: 600; font-size: 14px; }
+.ex-note { font-size: 12px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+.ex-check-note { font-size: 12px; color: var(--green); margin-top: 2px; font-weight: 500; }
+.et td:nth-child(3) { color: var(--text2); font-size: 13px; }
+.et td:nth-child(4) { font-size: 13px; font-weight: 500; }
+
+.lu-title {
+  font-size: 11px;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 10px;
+}
+.luc {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.luc:last-child { border-bottom: none; }
+.lck { color: var(--green); flex-shrink: 0; font-weight: 700; margin-top: 1px; }
+
+.sp { height: 8px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-<div class="tipbox">
-💡 <strong>Antrenman İpuçları:</strong><br>
-• Setler arası: 3-5 tekrar aralığında 3-4 dakika, 6-12 tekrar aralığında 2-3 dakika dinlenin.<br>
-• Tüm egzersizlerde kontrollü iniş (2-3 saniye) – patlayıcı çıkış (1 saniye) uygulayın.
-</div>
-<div class="stages" id="stages"></div>
-<div class="pill-row" id="weekNav"></div>
-<div style="margin-bottom:12px" id="weekHdr"></div>
-<div class="pill-row" id="dayTabs"></div>
-<div class="dinfo" id="dinfo"></div>
-<button class="wbtn" onclick="toggleW()"><span id="wtit">Isınma</span><span id="warr">↓</span></button>
-<div class="wlist" id="wlist"></div>
-<div class="card" style="margin-top:10px">
-  <table class="et"><thead><tr><th style="width:4%">✓</th><th style="width:55%">Egzersiz</th><th style="width:12%">Set</th><th style="width:17%">Rep/Süre</th></tr></thead><tbody id="exb"></tbody></table>
-  <button class="done-btn" onclick="markDayDone()">✅ Günü Tamamlandı Olarak İşaretle</button>
-</div>
-<div class="card" id="lubox"></div>
+
+<div class="content">
+
+  <div class="tipbox" style="margin-top:12px">
+    💡 <strong>Antrenman İpuçları</strong><br>
+    • Setler arası: 3-5 tekrar → 3-4 dk, 6-12 tekrar → 2-3 dk dinlenin.<br>
+    • Kontrollü iniş (2-3s) – patlayıcı çıkış (1s). Form her zaman ağırlıktan önce.<br>
+    <a class="cali-link" href="https://calihoss.me/learn/calisthenics" target="_blank" rel="noopener">
+      📚 Calihoss Kalistenik Kursu
+    </a>
+  </div>
+
+  <div class="stage-bar">
+    <div class="scroll-row" id="stages"></div>
+  </div>
+
+  <div class="week-nav-wrap">
+    <div class="scroll-row" id="weekNav"></div>
+  </div>
+
+  <div class="week-hdr" id="weekHdr"></div>
+
+  <div class="scroll-row" style="padding:0 0 10px" id="dayTabs"></div>
+  <div class="day-info" id="dinfo"></div>
+
+  <button class="warmup-btn" onclick="toggleW()">
+    <span id="wtit">Isınma</span>
+    <span class="warmup-arrow" id="warr">▼</span>
+  </button>
+  <div class="wlist" id="wlist"></div>
+
+  <div class="card" style="margin-top:10px">
+    <table class="et">
+      <thead>
+        <tr>
+          <th>✓</th>
+          <th>Egzersiz</th>
+          <th>Set</th>
+          <th>Rep/Süre</th>
+        </tr>
+      </thead>
+      <tbody id="exb"></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="lubox"></div>
+
+  <div class="sp"></div>
 </div>
 
 <script>
-// --- Isınma (prehab dahil) ---
+// ── Isınma ──
 const WU = {
-  fb:[["Boyun döndürme","5 her yön"],["Omuz çevirme","10 öne+geriye"],["Bilek rutin","2 dk"],["Parmak plank","2×8s"],["Kalça döndürme","10 her yön"],["Bacak sallama","10/t"],["Cat-cow","10"],["Glute bridge","10"],["Yavaş squat","8"]],
-  push:[["Bilek rutin","2 dk"],["Omuz çevirme","1 dk"],["Scapular push-up","2×8"],["Yavaş push-up negatif","3"],["Dead bug","2×5/t"],["Dış rotasyon (bant/hafif dambıl)","2×10"],["Band pull-apart","2×10"],["Wall slide","2×8"]],
-  pull:[["Bilek rutin","2 dk"],["Omuz çevirme","1 dk"],["Scapular retraksiyon","2×6"],["Dead hang","2×15s"],["Active hang","2×10s"],["Bilek curl","2×8"],["Ters bilek curl","2×8"],["Hammer curl","2×8"]],
-  legs:[["Kalça döndürme","10 her yön"],["Bacak sallama","10/t"],["Cat-cow","10"],["Glute bridge","10"],["Yavaş squat","10"],["Kalça fleksör germe","30s/t"],["Jefferson curl (ısınma)","5s×5"]],
+  fb:[["Boyun döndürme","5 her yön"],["Omuz çevirme","10 öne+geriye"],["Bilek rutin","2 dk"],["Parmak plank","2×8s"],["Kalça döndürme","10 her yön"],["Bacak sallama","10/t"],["Cat-cow","10"],["Glute bridge","10"],["Trap Shrug","2×12"],["Yavaş squat","8"]],
+  push:[["Bilek rutin","2 dk"],["Omuz çevirme","1 dk"],["Trap Shrug","2×12"],["Scapular push-up","2×8"],["Yavaş push-up negatif","3"],["Dead bug","2×5/t"],["Dış rotasyon (bant/hafif dambıl)","2×10"],["Band pull-apart","2×10"],["Wall slide","2×8"]],
+  pull:[["Bilek rutin","2 dk"],["Omuz çevirme","1 dk"],["Trap Shrug","2×12"],["Scapular retraksiyon","2×6"],["Dead hang","2×15s"],["Active hang","2×10s"],["Bilek curl","2×8"],["Ters bilek curl","2×8"],["Hammer curl","2×8"]],
+  legs:[["Kalça döndürme","10 her yön"],["Bacak sallama","10/t"],["Cat-cow","10"],["Glute bridge","10"],["Single-leg Glute Bridge","2×10/t"],["Yavaş squat","10"],["Kalça fleksör germe","30s/t"],["Jefferson curl (ısınma)","5s×5"]],
   skill:[["Bilek rutin","2 dk"],["Omuz çevirme","1 dk"],["Scapular pull-up","2×6"],["Scapular elevation (pike)","2×6"],["Hollow body hold","20s"],["Active hang","20s"]]
 };
 const WN={fb:"Tam vücut — 8 dk",push:"Push — 10 dk",pull:"Pull — 10 dk",legs:"Bacak+Core — 10 dk",skill:"Beceri — 8 dk"};
 
-// --- AŞAMALAR (tüm haftalar tam, core dengelenmiş, BW eklenmiş) ---
+// ── AŞAMALAR ──
 const ST = [
   { name:"NEWBIE",lbl:"Temel Atma",dur:"Hafta 1–4",sch:"3 gün/hafta · Pzt/Çar/Cum · Her gün aynı tam vücut",
     desc:"Tekniğe odaklan. Ağırlık değil form. Scapular mekanik, vücut gerilimi. Pull-up/dip hafif ağırlıklı.",
@@ -306,7 +526,7 @@ const ST = [
   ]}
 ];
 
-// --- localStorage'dan durumu yükle ---
+// ── State ──
 let si = parseInt(localStorage.getItem('si') || '0');
 let wi = parseInt(localStorage.getItem('wi') || '0');
 let di = parseInt(localStorage.getItem('di') || '0');
@@ -333,13 +553,10 @@ function calcDayStats(s,w,d){
   ST[s].weeks[w].days[d].ex.forEach((_,ex)=>{ total++; if(isChecked(s,w,d,ex)) done++; });
   return {total,done};
 }
-function markDayDone(){
-  ST[si].weeks[wi].days[di].ex.forEach((_,idx)=>setChecked(si,wi,di,idx,true));
-  render();
-}
 
 function render(){
   const s=ST[si], w=s.weeks[wi], d=w.days[Math.min(di, w.days.length-1)];
+
   document.getElementById('weekNav').innerHTML = s.weeks.map((wk,i)=>{
     const stat=calcWeekStats(si,i);
     let cls='pill'; if(i===wi) cls+=' on';
@@ -347,6 +564,7 @@ function render(){
     else if(stat.done>0) cls+=' partial';
     return `<button class="${cls}" onclick="selW(${i})">H${wk.n}</button>`;
   }).join('');
+
   document.getElementById('dayTabs').innerHTML = w.days.map((day,j)=>{
     const stat=calcDayStats(si,wi,j);
     let cls='dpill'; if(j===di) cls+=' on';
@@ -354,55 +572,71 @@ function render(){
     else if(stat.done>0) cls+=' partial';
     return `<button class="${cls}" onclick="selD(${j})">${day.l}</button>`;
   }).join('');
-  document.getElementById('dinfo').textContent = d.i;
+
+  const allChecked = d.ex.every((_,idx) => isChecked(si,wi,di,idx));
+  const doneBadge = allChecked ? '<span class="day-done-badge">✅ Gün Tamamlandı</span>' : '';
+  document.getElementById('dinfo').innerHTML = d.i + doneBadge;
+
   let noteHtml = (w.note||'').replace(/\n/g,'<br>');
-  noteHtml = noteHtml.replace(/📺 (Calihoss:.*)/g, '<span class="caliref">📺 $1</span>');
-  document.getElementById('weekHdr').innerHTML = `<div class="wfocus">${w.f}</div><div class="wnote">${noteHtml||''}</div>`;
+  noteHtml = noteHtml.replace(/📺 (Calihoss:[^\n<]*)/g,
+    '<a class="caliref" href="https://calihoss.me/learn/calisthenics" target="_blank" rel="noopener">📺 $1</a>');
+  document.getElementById('weekHdr').innerHTML =
+    `<div class="wfocus">${w.f}</div><div class="wnote">${noteHtml||''}</div>`;
+
   document.getElementById('wtit').textContent = 'Isınma — '+WN[d.w];
-  document.getElementById('wlist').innerHTML = WU[d.w].map(([n,det])=>`<div class="wi"><span class="win">${n}</span><span class="wid">${det}</span></div>`).join('');
+  document.getElementById('wlist').innerHTML = WU[d.w].map(([n,det])=>
+    `<div class="wi"><span class="win">${n}</span><span class="wid">${det}</span></div>`
+  ).join('');
+
   document.getElementById('exb').innerHTML = d.ex.map(([nm,sets,reps,note],idx)=>{
     const checked = isChecked(si,wi,di,idx);
+    const noteHtml2 = note
+      ? (note.startsWith('✓')
+          ? `<div class="ex-check-note">${note}</div>`
+          : `<div class="ex-note">${note}</div>`)
+      : '';
     return `<tr>
       <td><input type="checkbox" ${checked?'checked':''} onchange="setChecked(${si},${wi},${di},${idx},this.checked);render()" id="cb_${idx}"></td>
-      <td><label for="cb_${idx}" class="en">${nm}</label>${note?`<div class="emile" style="font-size:12px;color:var(--text2)">${note}</div>`:''}</td>
-      <td style="color:var(--text2)">${sets}</td>
-      <td style="font-weight:500">${reps}</td>
+      <td><label for="cb_${idx}" class="ex-name">${nm}</label>${noteHtml2}</td>
+      <td>${sets}</td>
+      <td>${reps}</td>
     </tr>`;
   }).join('');
-  renderLu();
-}
-function renderLu(){
-  const s=ST[si];
-  document.getElementById('lubox').innerHTML=`
-    <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Level-up Kriterleri</div>
+
+  document.getElementById('lubox').innerHTML = `
+    <div class="lu-title">Level-up Kriterleri</div>
     ${s.lu.map(c=>`<div class="luc"><span class="lck">✓</span><span>${c}</span></div>`).join('')}`;
 }
 
 function selW(i){wi=i;di=0;saveState();render();}
 function selD(i){di=i;saveState();render();}
-function toggleW(){wuOpen=!wuOpen;document.getElementById('wlist').className='wlist'+(wuOpen?' open':'');document.getElementById('warr').textContent=wuOpen?'↑':'↓';saveState();}
+
+function toggleW(){
+  wuOpen=!wuOpen;
+  document.getElementById('wlist').className='wlist'+(wuOpen?' open':'');
+  document.getElementById('warr').className='warmup-arrow'+(wuOpen?' open':'');
+  saveState();
+}
+
 function selS(i){
   si=i; wi=0; di=0;
   document.querySelectorAll('.sbtn').forEach((b,j)=>{
-    b.className = `sbtn s${j}${j===i?' on':''}`;
+    b.className=`sbtn s${j}${j===i?' on':''}`;
   });
   saveState();
   render();
 }
 
-// Sayfa yüklendiğinde stage butonlarını doğru ayarla ve son kaldığı yeri yükle
-document.getElementById('stages').innerHTML = ST.map((s,i)=>`<button class="sbtn s${i}${i===si?' on':''}" onclick="selS(${i})"><strong>${s.name}</strong> — ${s.lbl}</button>`).join('');
+document.getElementById('stages').innerHTML = ST.map((s,i)=>
+  `<button class="sbtn s${i}${i===si?' on':''}" onclick="selS(${i})"><strong>${s.name}</strong> — ${s.lbl}</button>`
+).join('');
 
-if (wuOpen) {
-  document.getElementById('wlist').className = 'wlist open';
-  document.getElementById('warr').textContent = '↑';
-}
+if(wuOpen){ document.getElementById('wlist').className='wlist open'; document.getElementById('warr').className='warmup-arrow open'; }
+
 render();
 </script>
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
 </html>
