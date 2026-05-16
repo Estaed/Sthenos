@@ -311,212 +311,209 @@ body {
 </div>
 
 <script>
-// ── Kısaltılmış Isınma ──
 const WU = {
-  fb:[["Boyun & Omuz","30s her yön"],["Bilek rutin","1 dk"],["Cat-cow","10"],["Glute bridge + tek bacak","10"],["Yavaş squat","8"],["Scapular pull-up (aktif asılı)","5"]],
-  push:[["Bilek-Omuz ısınma","1 dk"],["Scapular push-up","2×8"],["Dead bug","2×5/t"],["Band pull-apart / yan açış","2×10"],["Wall slide","2×8"]],
-  pull:[["Bilek-Omuz","1 dk"],["Scapular retraksiyon","2×6"],["Dead hang","2×20s"],["Bilek curl","2×8"],["Hammer curl","2×8"]],
-  legs:[["Kalça sirkülasyonu","1 dk"],["Cat-cow","10"],["Glute bridge (tek bacak)","2×8/t"],["Yavaş squat","8"],["Jefferson curl (ısınma)","5s×5"]],
-  skill:[["Bilek-Omuz","1 dk"],["Scapular pull-up","2×6"],["Hollow body hold","20s"],["Active hang","20s"],["Scapular elevation","5"]]
+  fb: [["Bilek Mobilizasyonu", "1 dk"], ["Scapular Push-up", "10"], ["Active Hang", "20s"], ["Glute Bridge", "10 (2s tepe)"], ["McGill Curl-up", "3×10s"]],
+  push: [["Bilek Mobilizasyonu", "1 dk"], ["Scapular Push-up", "10"], ["Band Pull-apart", "15"]],
+  pull: [["Active Hang", "20s"], ["Dead Hang", "30s"], ["Prone Y-Raise", "12"]],
+  legs: [["90/90 Kalça Rotasyonu", "8/yön"], ["Glute Bridge", "10 (2s tepe)"], ["McGill Curl-up", "3×10s"]],
+  skill: [["Bilek Mobilizasyonu", "1 dk"], ["Scapular Push-up", "10"], ["Dead Hang", "30s"], ["Band Pull-apart", "15"]]
 };
-const WN={fb:"Tam vücut — 5 dk",push:"Push — 5 dk",pull:"Pull — 5 dk",legs:"Bacak+Core — 5 dk",skill:"Beceri — 5 dk"};
+const WN={fb:"Tam Vücut İzole — 5 dk",push:"İtiş Spesifik — 4 dk",pull:"Çekiş Spesifik — 4 dk",legs:"Alt Vücut+Core — 5 dk",skill:"Beceri Hazırlık — 4 dk"};
 
-// ── AŞAMALAR (Nordic kaldırıldı, Back Extension güncellendi) ──
 const ST = [
   { name:"NEWBIE",lbl:"Temel Atma",dur:"Hafta 1–4",sch:"3 gün/hafta · Pzt/Çar/Cum · Her gün aynı tam vücut",
     desc:"Tekniğe odaklan. Ağırlık değil form. Scapular mekanik, vücut gerilimi. Pull-up/dip hafif ağırlıklı.",
-    lu:["5 pull-up +5kg","6 dip +5kg","8 push-up (scap)","30s plank","3 Nordic eccentric 5s"],
+    lu:["5 pull-up +5kg","6 dip +5kg","8 push-up (scap)","30s plank","Machine Hip Thrust 45kg"],
     weeks:[
       {n:1,f:"Scapular mekanik öğrenme",note:"Aktif asılışta kürek kemiklerini deprese et, push-up'ta protrakte et.\n📺 Calihoss: Playlist 1 – Foundation (Scapular control basics)\n📺 Calihoss: Playlist 12 – Pull-ups (Scapular pull-ups technique)\n📺 Calihoss: Playlist 15 – Pike (Scapular elevations technique)",days:[
-        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8","Kollar düz, sadece skapula"],["Pull-up BW (teknik)","2","3","Active hang ile başla"],["Inverted Row BW","2","6-8","Göğüs yüksekliğinde bar"],["Push-up BW (3s iniş)","2","5","Çıkışta omuzu öne it"],["Scapular Elevation (pike) BW","2","6","Kulaklara doğru skapula"],["Dip Support Hold BW","2","10s","Skapula depresyonda"],["Plank BW","2","20s","Gövde gergin, bel çökmesin"],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12","Kalça tam ekstansiyon"],["Squat BW","2","8","Tam derinlik, topuk yerde"],["RDL @40kg","2","8","Bel düz, kalçadan katlan"],["Back Extension @5kg","2","6-8","4s iniş, 1s tepe"]]},
-        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8",""],["Pull-up BW (teknik)","2","3",""],["Inverted Row BW","2","6-8",""],["Push-up BW (3s iniş)","2","5",""],["Scapular Elevation (pike) BW","2","6",""],["Dip Support Hold BW","2","10s",""],["Plank BW","2","20s",""],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12",""],["Squat BW","2","8",""],["RDL @40kg","2","8",""],["Back Extension @5kg","2","6-8","4s iniş, 1s tepe"]]},
-        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8",""],["Pull-up BW (teknik)","2","3",""],["Inverted Row BW","2","6-8",""],["Push-up BW (3s iniş)","2","5",""],["Scapular Elevation (pike) BW","2","6",""],["Dip Support Hold BW","2","10s",""],["Plank BW","2","20s",""],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12",""],["Squat BW","2","8",""],["RDL @40kg","2","8",""],["Back Extension @5kg","2","6-8","4s iniş, 1s tepe"]]}
+        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8","Kollar düz, sadece skapula"],["Pull-up BW (teknik)","2","3","Active hang ile başla"],["Inverted Row BW","2","6-8","Göğüs yüksekliğinde bar"],["Push-up BW (3s iniş)","2","5","Çıkışta omuzu öne it"],["Scapular Elevation (pike) BW","2","6","Kulaklara doğru skapula"],["Dip Support Hold BW","2","10s","Skapula depresyonda"],["Plank BW","2","20s","Gövde gergin, bel çökmesin"],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12","Kalça tam ekstansiyon"],["Squat BW","2","8","Tam derinlik, topuk yerde"],["Machine Hip Thrust @40kg","2","8-12","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8",""],["Pull-up BW (teknik)","2","3",""],["Inverted Row BW","2","6-8",""],["Push-up BW (3s iniş)","2","5",""],["Scapular Elevation (pike) BW","2","6",""],["Dip Support Hold BW","2","10s",""],["Plank BW","2","20s",""],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12",""],["Squat BW","2","8",""],["Machine Hip Thrust @40kg","2","8-12","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8",""],["Pull-up BW (teknik)","2","3",""],["Inverted Row BW","2","6-8",""],["Push-up BW (3s iniş)","2","5",""],["Scapular Elevation (pike) BW","2","6",""],["Dip Support Hold BW","2","10s",""],["Plank BW","2","20s",""],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12",""],["Squat BW","2","8",""],["Machine Hip Thrust @40kg","2","8-12","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]}
       ]},
       {n:2,f:"Hacim artışı + L-sit",note:"Her set +1-2 rep. Form bozulursa rep artırma.\n📺 Calihoss: Playlist 1 – Foundation (Progressive overload basics)",days:[
-        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["RDL @42.5kg","2","10",""],["Back Extension @5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","8s","Paralette dizler göğüste"]]},
-        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["RDL @42.5kg","2","10",""],["Back Extension @5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","8s",""]]},
-        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["RDL @42.5kg","2","10",""],["Back Extension @5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","8s",""]]}
+        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["Machine Hip Thrust @42.5kg","2","10-12","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","8s","Paralette dizler göğüste"],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["Machine Hip Thrust @42.5kg","2","10-12","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","8s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["Machine Hip Thrust @42.5kg","2","10-12","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","8s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]}
       ]},
       {n:3,f:"Ağırlıklı pull-up + dip",note:"Form sağlamsa ağırlık ekle.\n📺 Calihoss: Playlist 1 – Foundation (Progressive overload)",days:[
-        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["RDL @45kg","2","8",""],["Back Extension @7.5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","10s",""]]},
-        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["RDL @45kg","2","8",""],["Back Extension @7.5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","10s",""]]},
-        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["RDL @45kg","2","8",""],["Back Extension @7.5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","10s",""]]}
+        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["Machine Hip Thrust @45kg","2","8-10","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["Machine Hip Thrust @45kg","2","8-10","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["Machine Hip Thrust @45kg","2","8-10","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]}
       ]},
       {n:4,f:"Level-up testi",note:"Kriterleri 2 sette test et. Başarırsan Beginner'a geç.",days:[
-        {l:"Pazartesi (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5","✓ 5 rep"],["Dip +5kg","2","6","✓ 6 rep"],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s","✓ 30s"],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["RDL @45kg","2","10",""],["Back Extension @7.5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","10s",""]]},
-        {l:"Çarşamba (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5",""],["Dip +5kg","2","6",""],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["RDL @45kg","2","10",""],["Back Extension @7.5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","10s",""]]},
-        {l:"Cuma (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5",""],["Dip +5kg","2","6",""],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["RDL @45kg","2","10",""],["Back Extension @7.5kg","2","6-8","4s iniş/1s tepe"],["Tuck L-sit BW","2","10s",""]]}
+        {l:"Pazartesi (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5","✓ 5 rep"],["Dip +5kg","2","6","✓ 6 rep"],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s","✓ 30s"],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["Machine Hip Thrust @45kg","2","10","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Çarşamba (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5",""],["Dip +5kg","2","6",""],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["Machine Hip Thrust @45kg","2","10","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Cuma (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5",""],["Dip +5kg","2","6",""],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["Machine Hip Thrust @45kg","2","10","Lomber kilitli izometrik"],["Ağırlıklı Bird-Dog","2","6-8","Dambıl ile, 10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]}
       ]}
   ]},
   { name:"BEGINNER",lbl:"Temel Güçlenme",dur:"Hafta 5–16",sch:"4 gün · Pzt:Push · Sal:Pull · Per:Bacak+Core · Cmt:Teknik (48s CNS koruması)",
-    desc:"Hacim tamamlama ile ilerle. Alt sınırla başla, üst sınıra ulaşana kadar ağırlığı/varyasyonu sabit tut. RDL 40'tan 80+ kg'a. L-sit ve pike push-up temel beceriler.",
-    lu:["5 pull-up +20kg","5 dip +20kg","20s L-sit","8 pike push-up duvara","3 HSPU negatif 5s","3 Nordic full"],
+    desc:"Hacim tamamlama ile ilerle. Alt sınırla başla, üst sınıra ulaşana kadar ağırlığı/varyasyonu sabit tut. L-sit ve pike push-up temel beceriler.",
+    lu:["5 pull-up +20kg","5 dip +20kg","20s L-sit","8 pike push-up duvara","3 HSPU negatif 5s","Machine Hip Thrust 100kg"],
     weeks:[
-      {n:5,f:"PPL alışma — Hacim Tamamlama",note:"Yeni format. Her egzersizde alt sınırdan başla, üst sınıra ulaşana kadar aynı ağırlıkta kal. Sonra +2.5kg veya zor varyasyon.\n📺 Calihoss: Playlist 1 – Foundation (Programming basics & Volume completion)",days:[
+      {n:5,f:"PPL alışma — Hacim Tamamlama",note:"Yeni format.\n📺 Calihoss: Playlist 1 – Foundation (Programming basics & Volume completion)",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up BW","2","3-5/t"],["Push-up (ayak yüksek) BW","2","6-8"],["Pike Push-up BW","2","4-6"],["Weighted Dip +5kg","2","6-8"],["Side Raise @8kg","2","10-12"],["Dip Support Hold BW","2","15-20s"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +5kg","2","4-6"],["Inverted Row BW","2","6-8"],["Scapular Pull-up BW","2","8-10"],["Dead Hang BW","2","20-30s"],["Rev. Peck Deck @40kg","2","8-10"],["Wrist Curl @10kg","2","12-15"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @45kg","2","5-7"],["RDL @40kg","2","6-8"],["Back Extension @10kg","2","8-10","4s iniş/1s tepe"],["Nordic Eccentric 4s","2","3-5"],["Jefferson Curl @12.5kg","2","10"],["Calf Raise @85kg","2","10-12"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +5kg","2","4-6"],["Inverted Row BW","2","6-8"],["Scapular Pull-up BW","2","8-10"],["Dead Hang BW","2","20-30s"],["Rev. Peck Deck @40kg","2","8-10"],["Dumbbell Bicep Curl @10kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @100kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @50kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @30kg","2","8-10"],["Suitcase Carry @16kg","2","40m/t","Anti-lateral fleksiyon"],["Calf Raise @85kg","2","10-12"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","15-20s"],["Hollow Body BW","2","15-20s"],["Dead Hang BW","2","30-40s"],["Pistol Squat (kutu) BW","2","4-5/t"],["Tuck L-sit BW","2","8-12s"],["Plank BW","2","25-30s"],["Copenhagen Plank BW","2","12-15s/t"]]}
       ]},
       {n:6,f:"Ağırlık başlangıcı",note:"Pull-up +7.5, Dip +7.5. Hacim tamamlama devrede.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up BW","2","4-6/t"],["Push-up BW","2","6-8"],["Pike Push-up BW","2","4-6"],["Weighted Dip +7.5kg","2","5-7"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +7.5kg","2","4-6"],["Inverted Row BW","2","6-8"],["Dead Hang BW","2","30-35s"],["Rev. Peck Deck @42.5kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @47.5kg","2","5-7"],["RDL @42.5kg","2","6-8"],["Back Extension @12.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Eccentric 4s","2","3-5"],["Jefferson Curl @15kg","2","10"],["Plank BW","2","30-35s"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +7.5kg","2","4-6"],["Inverted Row BW","2","6-8"],["Dead Hang BW","2","30-35s"],["Rev. Peck Deck @42.5kg","2","8-10"],["Dumbbell Bicep Curl @10kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @105kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @55kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @32.5kg","2","8-10"],["Suitcase Carry @18kg","2","40m/t","Anti-lateral fleksiyon"],["Plank BW","2","30-35s"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","20-25s"],["Pistol Squat BW","2","5-6/t"],["Straight-arm kond. BW","2","12-18s"],["L-sit (tuck) BW","2","10-15s"]]}
       ]},
       {n:7,f:"Pull-up +10kg giriş",note:"Ağırlıklı pull-up'ta ilk büyük sıçrama. 3-5 rep ile başla, 5 temiz olunca artır.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up BW","2","4-6/t"],["Pike Push-up BW","2","5-7"],["Weighted Dip +10kg","2","5-7"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +10kg","2","3-5"],["Inverted Row BW","2","6-8"],["Dead Hang BW","2","30-40s"],["Rev. Peck Deck @42.5kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @50kg","2","5-7"],["RDL @45kg","2","6-8"],["Back Extension @15kg","2","8-10","4s iniş/1s tepe"],["Nordic Eccentric 3s","2","3-5","Daha yavaş iniş"],["Jefferson Curl @15kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +10kg","2","3-5"],["Inverted Row BW","2","6-8"],["Dead Hang BW","2","30-40s"],["Rev. Peck Deck @42.5kg","2","8-10"],["Dumbbell Bicep Curl @10kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @110kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @60kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @35kg","2","8-10"],["Suitcase Carry @20kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","25-30s"],["Pistol Squat BW","2","5-7/t"],["Straight-arm kond. BW","2","15-20s"],["L-sit BW","2","10-15s"],["Plank BW","2","30-40s"]]}
       ]},
-      {n:8,f:"RDL 50kg — Posterior zincir",note:"RDL ve squat paralel ilerliyor. Bel ağrısı yoksa bel pozisyonu sağlam.\n📺 Calihoss: Playlist 8 – Legs (Lower body workout)",days:[
+      {n:8,f:"Arka zincir adaptasyonu",note:"Leg Press ve Hip Thrust paralel ilerliyor.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up BW","2","5-7/t"],["Pike Push-up BW","2","6-8"],["Weighted Dip +10kg","2","6-8"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +10kg","2","5-7"],["Inverted Row (dik) BW","2","6-8"],["Dead Hang BW","2","35-45s"],["Rev. Peck Deck @45kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @52.5kg","2","5-7"],["RDL @47.5kg","2","6-8"],["Back Extension @17.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Eccentric 3s","2","4-6"],["Jefferson Curl @17.5kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +10kg","2","5-7"],["Inverted Row (dik) BW","2","6-8"],["Dead Hang BW","2","35-45s"],["Rev. Peck Deck @45kg","2","8-10"],["Dumbbell Bicep Curl @10kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @115kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @65kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @37.5kg","2","8-10"],["Suitcase Carry @22kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","35-45s"],["Dragon Flag Tuck BW","2","4-6"],["Straight-arm kond. BW","2","15-25s"],["L-sit BW","2","12-18s"]]}
       ]},
-      {n:9,f:"One-arm Push-up giriş",note:"Archer'ı bırak, one-arm progression başla. Destek elini uzağa koy.\n📺 Calihoss: Playlist 13 – Push-ups (One-arm push-up progression & technique)",days:[
+      {n:9,f:"One-arm Push-up giriş",note:"Biceps Curl ağırlığı +12kg'a çıkarıldı.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up prog. BW","2","3-5/t"],["Archer Push-up BW","2","5-6/t"],["Pike Push-up (steep) BW","2","6-8"],["Weighted Dip +12.5kg","2","5-7"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +12.5kg","2","4-6"],["Inverted Row tek kol asiste BW","2","4-5/t"],["Dead Hang BW","2","40-50s"],["Rev. Peck Deck @45kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @55kg","2","5-7"],["RDL @50kg","2","6-8"],["Back Extension @20kg","2","8-10","4s iniş/1s tepe"],["Nordic Eccentric 3s","2","4-6"],["Jefferson Curl @20kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +12.5kg","2","4-6"],["Inverted Row tek kol asiste BW","2","4-5/t"],["Dead Hang BW","2","40-50s"],["Rev. Peck Deck @45kg","2","8-10"],["Dumbbell Bicep Curl @12kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @120kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @70kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @40kg","2","8-10"],["Suitcase Carry @24kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","40-50s"],["Pistol Squat BW","2","7-8/t"],["Straight-arm kond. BW","2","18-25s"],["L-sit BW","2","15-20s"],["Dragon Flag Tuck BW","2","5-7"]]}
       ]},
-      {n:10,f:"Nordic tam rep dene",note:"Nordic eccentric 6 temiz olunca, 1-2 tam Nordic curl dene.\n📺 Calihoss: Playlist 8 – Legs (Knee jump progression / Nordic)",days:[
+      {n:10,f:"Lying Leg Curl Hacim Artışı",note:"Daha yavaş inişler ve izole kasılma.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","4-6/t"],["Pike Push-up BW","2","6-8"],["Weighted Dip +12.5kg","2","6-8"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +12.5kg","2","5-7"],["Inverted Row tek kol BW","2","5-6/t"],["Dead Hang BW","2","45-50s"],["Rev. Peck Deck @47.5kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @57.5kg","2","5-7"],["RDL @52.5kg","2","6-8"],["Back Extension @20kg","2","8-10","4s iniş/1s tepe"],["Nordic → Full","2","4-6"],["Jefferson Curl @20kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +12.5kg","2","5-7"],["Inverted Row tek kol BW","2","5-6/t"],["Dead Hang BW","2","45-50s"],["Rev. Peck Deck @47.5kg","2","8-10"],["Dumbbell Bicep Curl @12kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @125kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @75kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @42.5kg","2","8-10"],["Suitcase Carry @24kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","45-55s"],["Pistol Squat BW","2","8-10/t"],["Straight-arm kond. BW","2","20-30s"],["L-sit BW","2","18-20s"],["Dragon Flag Tuck BW","2","6-8"]]}
       ]},
-      {n:11,f:"L-sit 20s hedefi",note:"L-sit 20 saniye bu bloğun en önemli hedefi.\n📺 Calihoss: Playlist 16 – L-sit (Beginner L-sit workout)",days:[
+      {n:11,f:"L-sit 20s hedefi",note:"L-sit 20 saniye bu bloğun en önemli hedefi.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","5-7/t"],["Pike Push-up (duvara) BW","2","6-8"],["Weighted Dip +15kg","2","5-7"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +15kg","2","4-6"],["Inverted Row tek kol BW","2","5-7/t"],["Dead Hang BW","2","50-55s"],["Rev. Peck Deck @47.5kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @60kg","2","5-7"],["RDL @55kg","2","6-8"],["Back Extension @22.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","3-5"],["Jefferson Curl @22.5kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +15kg","2","4-6"],["Inverted Row tek kol BW","2","5-7/t"],["Dead Hang BW","2","50-55s"],["Rev. Peck Deck @47.5kg","2","8-10"],["Dumbbell Bicep Curl @12kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @130kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @80kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @45kg","2","8-10"],["Suitcase Carry @26kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","50-60s"],["Dragon Flag Tuck BW","2","7-9"],["Straight-arm kond. BW","2","20-30s"],["L-sit BW","2","18-20s","✓ 20s hedefi"]]}
       ]},
-      {n:12,f:"L-sit 20s teyit — Nordic 5 full",note:"Milestone teyit haftası. L-sit 20s, Nordic 5 tam.",days:[
+      {n:12,f:"L-sit 20s teyit",note:"Milestone teyit haftası. L-sit 20s.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","5-7/t"],["Pike Push-up BW","2","6-8"],["Weighted Dip +15kg","2","6-8"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +15kg","2","5-7"],["Inverted Row tek kol BW","2","6-8/t"],["Dead Hang BW","2","55-60s"],["Rev. Peck Deck @50kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @62.5kg","2","5-7"],["RDL @57.5kg","2","6-8"],["Back Extension @22.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","4-6"],["Jefferson Curl @22.5kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +15kg","2","5-7"],["Inverted Row tek kol BW","2","6-8/t"],["Dead Hang BW","2","55-60s"],["Rev. Peck Deck @50kg","2","8-10"],["Dumbbell Bicep Curl @12kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @135kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @85kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @47.5kg","2","8-10"],["Suitcase Carry @26kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","55-65s"],["Dragon Flag BW","2","5-7"],["Straight-arm kond. BW","2","25-30s"],["L-sit BW","2","20-25s","✓"]]}
       ]},
-      {n:13,f:"HSPU negatif + RDL 60kg",note:"HSPU negatif: Duvara sırt dönük, ayakları duvara tırman, 5s iniş.\n📺 Calihoss: Playlist 17 – Handstand (Beginner HSPU workout)\n📺 Calihoss: Playlist 15 – Pike (Pike push-up technique)",days:[
+      {n:13,f:"HSPU negatif + Posterior Zincir",note:"Biceps Curl ağırlığı +14kg'a çıkarıldı.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","6-8/t"],["Pike Push-up (steep) BW","2","6-8"],["HSPU Negatif BW","2","3-5","5s iniş"],["Weighted Dip +17.5kg","2","5-7"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +17.5kg","2","4-6"],["One-arm asılı BW","2","10-15s/t"],["Dead Hang BW","2","60s"],["Rev. Peck Deck @50kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @65kg","2","5-7"],["RDL @60kg","2","5-7"],["Back Extension @25kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","4-6"],["Jefferson Curl @25kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +17.5kg","2","4-6"],["One-arm asılı BW","2","10-15s/t"],["Dead Hang BW","2","60s"],["Rev. Peck Deck @50kg","2","8-10"],["Dumbbell Bicep Curl @14kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @140kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @90kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @50kg","2","8-10"],["Suitcase Carry @28kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","60s"],["Freestanding HS kick-up BW","5","deneme"],["Dragon Flag BW","2","7-9"],["Straight-arm kond. BW","2","25-30s"],["L-sit BW","2","20-25s"]]}
       ]},
-      {n:14,f:"Pull-up +17.5kg × 6",note:"Pull-up'ta hacim tamamlama ile ilerleme sürüyor. Form daima önce.",days:[
+      {n:14,f:"Pull-up +17.5kg × 6",note:"Pull-up'ta hacim tamamlama ile ilerleme sürüyor.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","6-8/t"],["Pike Push-up BW","2","6-8"],["HSPU Negatif BW","2","4-6"],["Weighted Dip +17.5kg","2","6-8"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +17.5kg","2","5-7"],["One-arm asılı BW","2","12-18s/t"],["Dead Hang BW","2","60s"],["Rev. Peck Deck @52.5kg","2","8-10"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @67.5kg","2","5-7"],["RDL @62.5kg","2","5-7"],["Back Extension @27.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","5-7"],["Jefferson Curl @27.5kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +17.5kg","2","5-7"],["One-arm asılı BW","2","12-18s/t"],["Dead Hang BW","2","60s"],["Rev. Peck Deck @52.5kg","2","8-10"],["Dumbbell Bicep Curl @14kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @145kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @95kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @52.5kg","2","8-10"],["Suitcase Carry @30kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS kick-up BW","7",""],["Wall Handstand BW","2","60s"],["Dragon Flag BW","2","8-10"],["Straight-arm kond. BW","2","25-30s"],["L-sit BW","2","20-25s"]]}
       ]},
       {n:15,f:"Zirve başlangıcı",note:"+20kg pull-up ve dip hedefi yakın. Acele etme.",days:[
         {l:"Push",i:"Pazartesi",w:"push",ex:[["Pike Push-up (duvara) BW","2","6-8"],["HSPU Negatif BW","2","4-6"],["Weighted Dip +20kg","2","5-7"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +20kg","2","4-6","✓ kriter yakın"],["One-arm asılı BW","2","15-20s/t"],["Dead Hang BW","2","60s"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @70kg","2","5-7"],["RDL @65kg","2","5-7"],["Back Extension @30kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","5-7"],["Jefferson Curl @30kg","2","10"]]},
+        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +20kg","2","4-6","✓ kriter yakın"],["One-arm asılı BW","2","15-20s/t"],["Dead Hang BW","2","60s"],["Dumbbell Bicep Curl @14kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @150kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @100kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @55kg","2","8-10"],["Suitcase Carry @32kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS BW","8","deneme"],["Dragon Flag BW","2","8-10"],["Straight-arm kond. BW","2","30s"],["L-sit BW","2","20-25s"]]}
       ]},
-      {n:16,f:"Stage 2 Final Testi",note:"Tüm kriterleri test et. 5 pull-up +20kg, 5 dip +20kg, 20s L-sit, 3 HSPU negatif, 3 Nordic full → Intermediate.",days:[
+      {n:16,f:"Stage 2 Final Testi",note:"Tüm kriterleri test et. 5 pull-up +20kg, 5 dip +20kg, 20s L-sit, 3 HSPU negatif, Hip Thrust 100kg → Intermediate.",days:[
         {l:"Push (test)",i:"Pazartesi",w:"push",ex:[["HSPU Negatif BW","2","3-5","✓ 5s"],["Pike Push-up BW","2","6-8"],["Weighted Dip +20kg","2","5-7","✓"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull (test)",i:"Salı",w:"pull",ex:[["Pull-up +20kg","2","4-6","✓"],["One-arm asılı BW","2","15-20s/t"],["Dead Hang BW","2","60s"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Squat @72.5kg","2","5-7"],["RDL @67.5kg","2","5-7"],["Back Extension @30kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","3-5","✓"],["Jefferson Curl @30kg","2","10"]]},
+        {l:"Pull (test)",i:"Salı",w:"pull",ex:[["Pull-up +20kg","2","4-6","✓"],["One-arm asılı BW","2","15-20s/t"],["Dead Hang BW","2","60s"],["Dumbbell Bicep Curl @14kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @155kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @100kg","2","5-7","✓ Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @55kg","2","8-10"],["Suitcase Carry @32kg","2","40m/t","Anti-lateral fleksiyon"]]},
         {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS BW","10","deneme"],["Dragon Flag BW","2","8-10"],["Straight-arm kond. BW","2","30s"],["L-sit BW","2","20-25s","✓"]]}
       ]}
   ]},
   { name:"INTERMEDIATE",lbl:"Beceri Geliştirme",dur:"Hafta 17–28",sch:"5 gün · Pzt:Push+HS · Sal:Pull+FL · Çar:Bacak · Per:Dinlenme · Cum:Skill+Core · Cmt:Güç",
-    desc:"Beceri odaklı. CNS koruması: bacak ile beceri arası 48s. Front lever, handstand, HSPU, dragon flag. Straight-arm kondisyon. Dinamik yatay çekiş ve baldır egzersizleri eklendi.",
-    lu:["1 dk freestanding HS","3 HSPU","20s adv tuck FL","Full dragon flag 3×10","30s L-sit","Pull-up +35kg","RDL 80+kg"],
+    desc:"Beceri odaklı. CNS koruması: bacak ile beceri arası 48s. Biceps curl izolasyonu eklendi. Front lever, handstand, HSPU, dragon flag. Dinamik yatay çekiş.",
+    lu:["1 dk freestanding HS","3 HSPU","20s adv tuck FL","Full dragon flag 3×10","30s L-sit","Pull-up +35kg","Leg Press 210kg","Machine Hip Thrust 155kg"],
     weeks:[
-      {n:17,f:"Skill split geçişi",note:"PPL'den beceri split'ine. Front lever tuck başlangıç. Handstand her gün.\n📺 Calihoss: Playlist 12 – Pull-ups (Scapular pull-ups, Hangs)\n📺 Calihoss: Playlist 17 – Handstand (Introduction, Strength workout)",days:[
+      {n:17,f:"Skill split geçişi",note:"PPL'den beceri split'ine. Front lever tuck başlangıç. Handstand her gün.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand BW","2","40-50s"],["Freestanding kick-up BW","5",""],["HSPU Negatif BW","2","3-5"],["Weighted Dip +20kg","2","5-7"],["One-arm Push-up BW","2","5-7/t"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Tuck Front Lever BW","2","10-15s"],["Pull-up +20kg","2","5-7"],["One-arm asılı BW","2","12-18s/t"],["Rev. Peck Deck @52.5kg","2","8-10"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @65kg","2","5-7"],["RDL @60kg","2","5-7"],["Back Extension @32.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","4-6"],["Jefferson Curl @30kg","2","10"],["Pistol Squat BW","2","6-8/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Tuck Front Lever BW","2","10-15s"],["Pull-up +20kg","2","5-7"],["One-arm asılı BW","2","12-18s/t"],["Rev. Peck Deck @52.5kg","2","8-10"],["Dumbbell Bicep Curl @16kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @160kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @105kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +5kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @57.5kg","2","6-8"],["Suitcase Carry @34kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat BW","2","6-8/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","8-10"],["L-sit BW","2","22-26s"],["Freestanding HS BW","10",""],["Copenhagen BW","2","35-45s/t"],["Hollow Body BW","2","25-30s"],["Straight-arm kond. BW","2","20-30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +22.5kg","2","4-6"],["Weighted Dip +22.5kg","2","4-6"],["Pike Push-up BW","2","6-8"],["Side Raise @14kg","2","10-12"]]}
       ]},
-      {n:18,f:"Tuck FL 15s + HS 55s",note:"Front lever süresini artır.\n📺 Calihoss: Playlist 12 – Pull-ups",days:[
+      {n:18,f:"Tuck FL 15s + HS 55s",note:"Front lever süresini artır.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand BW","2","50-55s"],["Freestanding HS BW","7",""],["HSPU Negatif BW","2","4-6"],["Weighted Dip +22.5kg","2","5-7"],["Side Raise @14kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Tuck Front Lever BW","2","12-18s"],["Pull-up +22.5kg","2","4-6"],["One-arm asılı BW","2","15-20s/t"],["Rev. Peck Deck @55kg","2","8-10"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @67.5kg","2","5-7"],["RDL @62.5kg","2","5-7"],["Back Extension @35kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","5-7"],["Jefferson Curl @32.5kg","2","10"],["Pistol Squat BW","2","7-9/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Tuck Front Lever BW","2","12-18s"],["Pull-up +22.5kg","2","4-6"],["One-arm asılı BW","2","15-20s/t"],["Rev. Peck Deck @55kg","2","8-10"],["Dumbbell Bicep Curl @16kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @165kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @110kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +5kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @60kg","2","6-8"],["Suitcase Carry @36kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat BW","2","7-9/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","8-10"],["L-sit BW","2","24-28s"],["Freestanding HS BW","8",""],["Copenhagen BW","2","40-50s/t"],["Hollow Body BW","2","30-35s"],["Straight-arm kond. BW","2","25-30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +25kg","2","4-6"],["Weighted Dip +25kg","2","4-6"],["Pike Push-up BW","2","6-8"],["Side Raise @14kg","2","10-12"]]}
       ]},
-      {n:19,f:"HSPU ilk tam rep",note:"Wall HS 60s varsa tam HSPU dene. 1-2 yeter.\n📺 Calihoss: Playlist 17 – Handstand (Beginner HSPU workout)",days:[
+      {n:19,f:"HSPU ilk tam rep",note:"Wall HS 60s varsa tam HSPU dene.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall HS BW","2","60s"],["Freestanding HS BW","8",""],["HSPU BW","2","1-3","✓"],["HSPU Negatif BW","2","3-5"],["Weighted Dip +25kg","2","5-7"],["Side Raise @14kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Advanced Tuck FL BW","2","10-15s"],["Pull-up +25kg","2","4-6"],["One-arm asılı BW","2","18-25s/t"],["Rev. Peck Deck @55kg","2","8-10"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @70kg","2","5-7"],["RDL @65kg","2","5-7"],["Back Extension @37.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","6-8"],["Jefferson Curl @35kg","2","10"],["Pistol Squat BW","2","8-10/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Advanced Tuck FL BW","2","10-15s"],["Pull-up +25kg","2","4-6"],["One-arm asılı BW","2","18-25s/t"],["Rev. Peck Deck @55kg","2","8-10"],["Dumbbell Bicep Curl @16kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @170kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @115kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +5kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @62.5kg","2","6-8"],["Suitcase Carry @38kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat BW","2","8-10/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","8-10"],["L-sit BW","2","25-30s"],["Freestanding HS BW","10",""],["Hollow Body BW","2","35-40s"],["Straight-arm kond. BW","2","25-30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +27.5kg","2","4-6"],["Weighted Dip +27.5kg","2","4-6"],["Pike Push-up BW","2","6-8"],["Side Raise @14kg","2","10-12"]]}
       ]},
-      {n:20,f:"Squat 75kg — arka zincir",note:"Arka zincir (RDL, back ext) sayesinde squat açıldı.",days:[
+      {n:20,f:"Arka zincir kapasitesi",note:"Hip Thrust yükü maksimal seviyelere ulaşıyor.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","10",""],["HSPU BW","2","2-4"],["Weighted Dip +27.5kg","2","5-7"],["Side Raise @14kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Advanced Tuck FL BW","2","12-18s"],["Pull-up +27.5kg","2","4-6"],["One-arm asılı BW","2","20-25s/t"],["Rev. Peck Deck @57.5kg","2","8-10"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @72.5kg","2","5-7"],["RDL @67.5kg","2","5-7"],["Back Extension @40kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","6-8"],["Jefferson Curl @37.5kg","2","10"],["Pistol Squat BW","2","9-11/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Advanced Tuck FL BW","2","12-18s"],["Pull-up +27.5kg","2","4-6"],["One-arm asılı BW","2","20-25s/t"],["Rev. Peck Deck @57.5kg","2","8-10"],["Dumbbell Bicep Curl @16kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @175kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @120kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +10kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @65kg","2","6-8"],["Suitcase Carry @40kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat BW","2","9-11/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","9-11"],["L-sit BW","2","25-30s"],["Freestanding HS BW","10",""],["Copenhagen BW","2","45-55s/t"],["Hollow Body BW","2","35-40s"],["Straight-arm kond. BW","2","25-30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +30kg","2","4-6"],["Weighted Dip +30kg","2","4-6"],["Pike Push-up BW","2","6-8"],["Side Raise @16kg","2","10-12"]]}
       ]},
-      {n:21,f:"Straddle FL",note:"Bacakları yana aç, tork azalır.\n📺 Calihoss: Playlist 12 – Pull-ups",days:[
+      {n:21,f:"Straddle FL",note:"Biceps Curl +18kg'a çıktı.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","12",""],["HSPU BW","2","2-4"],["Weighted Dip +30kg","2","4-6"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Straddle Front Lever BW","2","6-10s"],["Pull-up +30kg","2","4-6"],["One-arm asılı BW","2","25-30s/t"],["Rev. Peck Deck @60kg","2","8-10"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @75kg","2","5-7"],["RDL @70kg","2","5-7"],["Back Extension @42.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","7-9"],["Jefferson Curl @40kg","2","10"],["Pistol Squat +5kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Straddle Front Lever BW","2","6-10s"],["Pull-up +30kg","2","4-6"],["One-arm asılı BW","2","25-30s/t"],["Rev. Peck Deck @60kg","2","8-10"],["Dumbbell Bicep Curl @18kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @180kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @125kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +10kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @67.5kg","2","6-8"],["Suitcase Carry @40kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +5kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","10-12"],["L-sit BW","2","28-32s"],["Freestanding HS BW","12",""],["Hollow Body BW","2","40-45s"],["Straight-arm kond. BW","2","25-30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +32.5kg","2","3-5"],["Weighted Dip +32.5kg","2","3-5"],["Pike Push-up BW","2","6-8"],["Side Raise @16kg","2","10-12"]]}
       ]},
-      {n:22,f:"HSPU 3 rep · L-sit 30s",note:"İki büyük milestone. L-sit'te V-sit için bacakları hafif yükselt.\n📺 Calihoss: Playlist 17 & 16",days:[
+      {n:22,f:"HSPU 3 rep · L-sit 30s",note:"İki büyük milestone.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","15",""],["HSPU BW","2","2-4","✓ 3 rep"],["Weighted Dip +32.5kg","2","4-6"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Straddle FL BW","2","8-12s"],["Pull-up +32.5kg","2","4-6"],["One-arm asılı BW","2","28-35s/t"],["Rev. Peck Deck @62.5kg","2","8-10"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @77.5kg","2","5-7"],["RDL @72.5kg","2","5-7"],["Back Extension @45kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","7-9"],["Jefferson Curl @42.5kg","2","10"],["Pistol Squat +7.5kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Straddle FL BW","2","8-12s"],["Pull-up +32.5kg","2","4-6"],["One-arm asılı BW","2","28-35s/t"],["Rev. Peck Deck @62.5kg","2","8-10"],["Dumbbell Bicep Curl @18kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @185kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @130kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +10kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @70kg","2","6-8"],["Suitcase Carry @42kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +7.5kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","10-12"],["L-sit BW","2","30s","✓"],["Freestanding HS BW","12",""],["Copenhagen BW","2","50-60s/t"],["Straight-arm kond. BW","2","30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +35kg","2","3-5","✓ +35kg"],["Weighted Dip +35kg","2","3-5"],["Pike Push-up BW","2","6-8"],["Side Raise @16kg","2","10-12"]]}
       ]},
-      {n:23,f:"Freestanding HS 5s",note:"Denge anlık. Her gün kick-up dene.\n📺 Calihoss: Playlist 17 – Handstand (Balance workout, Alignment)",days:[
+      {n:23,f:"Freestanding HS 5s",note:"Denge anlık. Her gün kick-up dene.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","15",""],["HSPU BW","2","3-5"],["Weighted Dip +35kg","2","4-6"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Straddle FL BW","2","10-15s"],["Pull-up +35kg","2","4-6"],["One-arm asılı BW","2","28-35s/t"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @80kg","2","5-7"],["RDL @75kg","2","5-7"],["Back Extension @47.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","8-10"],["Jefferson Curl @45kg","2","10"],["Pistol Squat +10kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Straddle FL BW","2","10-15s"],["Pull-up +35kg","2","4-6"],["One-arm asılı BW","2","28-35s/t"],["Dumbbell Bicep Curl @18kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @190kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @135kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +10kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @72.5kg","2","6-8"],["Suitcase Carry @44kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +10kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag Full BW","2","10-12"],["L-sit BW","2","30s"],["Freestanding HS BW","15",""],["Straight-arm kond. BW","2","30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +37.5kg","2","3-5"],["Weighted Dip +37.5kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
       ]},
-      {n:24,f:"Full FL denemesi",note:"Full front lever 5-10s çok iyi.\n📺 Calihoss: Playlist 12 – Pull-ups",days:[
+      {n:24,f:"Full FL denemesi",note:"Full front lever 5-10s çok iyi.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","15",""],["HSPU BW","2","3-5"],["Weighted Dip +37.5kg","2","4-6"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Full Front Lever deneme BW","2","5-10s","✓"],["Straddle FL BW","2","12-15s"],["Pull-up +37.5kg","2","3-5"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @82.5kg","2","5-7"],["RDL @77.5kg","2","5-7"],["Back Extension @50kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","8-10"],["Jefferson Curl @47.5kg","2","10"],["Pistol Squat +10kg","2","6-8/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Full Front Lever deneme BW","2","5-10s","✓"],["Straddle FL BW","2","12-15s"],["Pull-up +37.5kg","2","3-5"],["Dumbbell Bicep Curl @18kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @195kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @140kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +15kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @75kg","2","6-8"],["Suitcase Carry @46kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +10kg","2","6-8/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","10-12"],["L-sit BW","2","30s"],["Freestanding HS BW","15",""],["Hollow Body BW","2","45-50s"],["Straight-arm kond. BW","2","30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +40kg","2","3-5"],["Weighted Dip +40kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
       ]},
-      {n:25,f:"Konsolidasyon",note:"Ağırlık artırma, form ve süreye odaklan.",days:[
+      {n:25,f:"Konsolidasyon",note:"Biceps Curl +20kg'a ulaştı.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","20",""],["HSPU BW","2","3-5"],["Weighted Dip +40kg","2","3-5"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Full Front Lever BW","2","8-15s"],["Pull-up +40kg","2","3-5"],["One-arm asılı BW","2","30-40s/t"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @85kg","2","5-7"],["RDL @80kg","2","5-7"],["Back Extension @50kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","9-11"],["Jefferson Curl @50kg","2","10"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Full Front Lever BW","2","8-15s"],["Pull-up +40kg","2","3-5"],["One-arm asılı BW","2","30-40s/t"],["Dumbbell Bicep Curl @20kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @200kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @145kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +15kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @77.5kg","2","6-8"],["Suitcase Carry @48kg","2","40m/t","Anti-lateral fleksiyon"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","10-12"],["L-sit BW","2","30s"],["Freestanding HS BW","18",""],["Copenhagen BW","2","50-60s/t"],["Straight-arm kond. BW","2","30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +42.5kg","2","3-5"],["Weighted Dip +42.5kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
       ]},
-      {n:26,f:"Deload",note:"Ağırlıklar -30%, rep -20%. Tendon ve CNS dinlenir.\n📺 Calihoss: Playlist 6 – Mobility",days:[
+      {n:26,f:"Deload",note:"Ağırlıklar -30%, rep -20%. Tendon ve CNS dinlenir.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand BW","2","60s"],["HSPU BW","2","2-3"],["Weighted Dip +25kg","2","5-7"],["Side Raise @10kg","2","12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row (hafif) BW","2","8-10"],["Tuck Front Lever BW","2","15s"],["Pull-up +20kg","2","5-7"],["Dead Hang BW","2","60s"]]},
-        {l:"Bacak+Mobilite",i:"Çarşamba",w:"legs",ex:[["Squat @60kg","2","5-7"],["RDL @55kg","2","6-8"],["Jefferson Curl @30kg","2","10"],["Calf Raise BW","2","12-15"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row (hafif) BW","2","8-10"],["Tuck Front Lever BW","2","15s"],["Pull-up +20kg","2","5-7"],["Dead Hang BW","2","60s"],["Dumbbell Bicep Curl @12kg","2","8-12","Deload"]]},
+        {l:"Bacak+Mobilite",i:"Çarşamba",w:"legs",ex:[["Leg Press @140kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @100kg","2","6-8","Lomber kilitli izometrik"],["Lying Leg Curl @55kg","2","8-10"],["Suitcase Carry @32kg","2","40m/t","Anti-lateral fleksiyon"],["Calf Raise BW","2","12-15"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","6-8"],["L-sit BW","2","25s"],["Freestanding HS BW","10",""],["Straight-arm kond. BW","2","20-30s"]]},
         {l:"Hafif Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +15kg","2","6-8"],["Weighted Dip +15kg","2","6-8"],["Pike Push-up BW","2","6-8"]]}
       ]},
       {n:27,f:"Yeniden yükleme",note:"Deload sonrası süperkompanzasyon. Güç taze.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","20",""],["HSPU BW","2","3-5"],["Weighted Dip +42.5kg","2","3-5"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Full Front Lever BW","2","10-18s"],["Pull-up +42.5kg","2","3-5"],["One-arm asılı BW","2","30-40s/t"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @87.5kg","2","5-7"],["RDL @82.5kg","2","5-7"],["Back Extension @52.5kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","9-11"],["Jefferson Curl @52.5kg","2","10"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Full Front Lever BW","2","10-18s"],["Pull-up +42.5kg","2","3-5"],["One-arm asılı BW","2","30-40s/t"],["Dumbbell Bicep Curl @20kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @205kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @150kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +20kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @80kg","2","6-8"],["Suitcase Carry @50kg","2","40m/t","Anti-lateral fleksiyon"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","11-13"],["L-sit BW","2","30s"],["Freestanding HS BW","18",""],["Straight-arm kond. BW","2","30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +45kg","2","3-5"],["Weighted Dip +45kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
       ]},
-      {n:28,f:"Program sonu",note:"60kg squat → 90kg, 50kg RDL → 85kg, sıfırdan full FL ve HSPU. Asıl yolculuk şimdi başlıyor. 🎉",days:[
+      {n:28,f:"Program sonu",note:"100kg Leg Press → 210kg, 50kg Hip Thrust → 155kg, sıfırdan full FL ve HSPU.",days:[
         {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS max BW","5",""],["HSPU BW","2","4-6","✓"],["Weighted Dip +45kg","2","3-5"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Full Front Lever BW","2","15-20s","✓"],["Pull-up +45kg","2","3-5"],["One-arm asılı BW","2","35-40s/t"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Squat @90kg","2","5-7"],["RDL @85kg","2","5-7","✓ 80+kg"],["Back Extension @55kg","2","8-10","4s iniş/1s tepe"],["Nordic Full","2","10-12"],["Jefferson Curl @55kg","2","10"],["Single Leg Calf Raise BW","2","10-12/t"]]},
+        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Weighted Inverted Row","2","6-8",""],["Full Front Lever BW","2","15-20s","✓"],["Pull-up +45kg","2","3-5"],["One-arm asılı BW","2","35-40s/t"],["Dumbbell Bicep Curl @20kg","2","8-12","Dirsekler gövdeye sabit"]]},
+        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @210kg","2","5-7","✓ 200+kg"],["Machine Hip Thrust @155kg","2","5-7","✓ Lomber kilitli"],["GHD İzometrik Tutuş +20kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @82.5kg","2","6-8"],["Suitcase Carry @52kg","2","40m/t","Anti-lateral fleksiyon"],["Single Leg Calf Raise BW","2","10-12/t"]]},
         {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag Full BW","2","10-12","✓"],["L-sit BW","2","30s","✓"],["Freestanding HS BW","20",""],["Straight-arm kond. BW","2","30s"]]},
         {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +47.5kg","2","3-5"],["Weighted Dip +47.5kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
       ]}
   ]}
 ];
 
-// ── State ──
 let si = parseInt(localStorage.getItem('si') || '0');
 let wi = parseInt(localStorage.getItem('wi') || '0');
 let di = parseInt(localStorage.getItem('di') || '0');
