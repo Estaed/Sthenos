@@ -39,7 +39,7 @@
             color: var(--text);
             line-height: 1.5;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: calc(140px + var(--safe-bottom));
+            padding-bottom: calc(130px + var(--safe-bottom));
         }
         .scroll-row {
             display: flex;
@@ -153,6 +153,7 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            user-select: none;
         }
         .pill.on {
             background: #2a2a2a;
@@ -175,27 +176,14 @@
             border-color: #2e7d32;
             color: var(--green);
         }
-        .pill .del-week-btn {
-            background: none;
-            border: none;
-            color: #6a6a6a;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0 0 0 4px;
-            line-height: 1;
-            transition: color .15s;
-            border-radius: 4px;
-            font-weight: 400;
+        .pill.delete-mode {
+            border-color: var(--orange);
+            background: var(--orange-bg);
+            color: var(--orange);
         }
-        .pill .del-week-btn:hover {
-            color: #ea4335;
-            background: rgba(234, 67, 53, 0.15);
-        }
-        .pill .del-week-btn.show {
-            display: inline-block;
-        }
-        .pill .del-week-btn.hide {
-            display: none;
+        .pill.delete-mode:hover {
+            background: #3d2a10;
+            border-color: #f9ab00;
         }
 
         .dpill {
@@ -521,35 +509,35 @@
             z-index: 50;
             background: var(--card);
             border-top: 1px solid var(--border);
-            padding: 8px 12px calc(8px + var(--safe-bottom));
+            padding: 6px 12px calc(6px + var(--safe-bottom));
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
             backdrop-filter: blur(10px);
             background: rgba(20,20,20,0.95);
         }
         #timerContainer .timer-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
         }
         #timerContainer .timer-row input {
-            width: 60px;
+            width: 50px;
             background: var(--card2);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 4px;
             color: var(--text);
-            padding: 4px 6px;
-            font-size: 14px;
+            padding: 3px 4px;
+            font-size: 13px;
             text-align: center;
+            outline: none;
         }
         #timerContainer .timer-row input:focus {
-            outline: none;
             border-color: #555;
         }
         #timerContainer .timer-row .timer-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text2);
             margin-right: 2px;
         }
@@ -558,9 +546,9 @@
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 34px;
-            height: 34px;
-            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
             cursor: pointer;
             transition: .15s;
             display: flex;
@@ -585,17 +573,17 @@
             color: var(--text2);
         }
         .timer-time {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text);
-            min-width: 56px;
+            min-width: 52px;
             text-align: center;
             font-variant-numeric: tabular-nums;
             letter-spacing: 1px;
         }
         .timer-progress {
             width: 100%;
-            height: 4px;
+            height: 3px;
             background: var(--card2);
             border-radius: 2px;
             overflow: hidden;
@@ -830,21 +818,21 @@
                 padding: 4px 8px;
             }
             #timerContainer .timer-row {
-                gap: 4px;
+                gap: 3px;
             }
             #timerContainer .timer-row input {
-                width: 50px;
-                font-size: 13px;
-                padding: 3px 4px;
+                width: 44px;
+                font-size: 12px;
+                padding: 2px 3px;
             }
             .timer-time {
-                font-size: 18px;
-                min-width: 48px;
+                font-size: 16px;
+                min-width: 44px;
             }
             #timerContainer .timer-row button {
-                width: 30px;
-                height: 30px;
-                font-size: 14px;
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
             }
             .week-nav-wrap .week-actions button {
                 width: 28px;
@@ -977,11 +965,10 @@
     <!-- Timer Container -->
     <div id="timerContainer" style="display:none;">
         <div class="timer-row">
-            <input type="number" id="timerInput" value="120" step="5" min="5">
+            <input type="text" inputmode="numeric" id="timerInput" value="120" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
             <span class="timer-label">sn</span>
             <span class="timer-time" id="timerDisplay">02:00</span>
-            <button id="timerStartBtn" class="start" onclick="startTimer()" title="Başlat">▶</button>
-            <button onclick="stopTimer()" class="stop" title="Durdur">⏹</button>
+            <button id="timerToggleBtn" class="start" onclick="toggleTimerStart()" title="Başlat/Durdur">▶</button>
             <button onclick="resetTimer()" class="reset" title="Sıfırla">⟳</button>
         </div>
         <div class="timer-progress">
@@ -1278,7 +1265,7 @@
             const d = getCurrentDay();
             const exercises = d ? d.exercises : [];
 
-            // Week navigation with delete buttons if deleteMode
+            // Week navigation - no delete buttons inside pills
             document.getElementById('weekNav').innerHTML = programData.weeks.map((wkItem, i) => {
                 let cls = 'pill';
                 if (i === currentWeekIdx) cls += ' on';
@@ -1286,20 +1273,14 @@
                 const wStatus = getWeekStatus(wkItem);
                 if (wStatus === 'done') cls += ' done';
                 else if (wStatus === 'partial') cls += ' partial';
+                if (deleteMode && i > 0) cls += ' delete-mode';
 
                 let label = 'H' + wkItem.weekNumber;
                 if (wkItem.completed) label += ' ✓';
 
-                let delBtn = '';
-                if (i > 0) {
-                    const showClass = deleteMode ? 'show' : 'hide';
-                    delBtn =
-                        `<button class="del-week-btn ${showClass}" onclick="deleteWeek(${i})" title="Bu haftayı sil">🗑</button>`;
-                }
-                return `<button class="${cls}" onclick="switchWeek(${i})">${label}${delBtn}</button>`;
+                return `<button class="${cls}" data-week-idx="${i}" onclick="handleWeekClick(${i})">${label}</button>`;
             }).join('');
 
-            // Toggle delete mode button highlight
             document.getElementById('weekDeleteToggle').classList.toggle('on', deleteMode);
 
             // Day tabs
@@ -1430,6 +1411,30 @@
         }
 
         // ───────────────────────────────────────────────────────────────
+        // WEEK CLICK HANDLER (supports delete mode)
+        // ───────────────────────────────────────────────────────────────
+
+        function handleWeekClick(idx) {
+            if (deleteMode) {
+                if (idx === 0) {
+                    alert('İlk hafta silinemez.');
+                    return;
+                }
+                if (confirm(`Hafta ${programData.weeks[idx].weekNumber} silinecek. Devam et?`)) {
+                    programData.weeks.splice(idx, 1);
+                    if (currentWeekIdx >= programData.weeks.length) {
+                        currentWeekIdx = programData.weeks.length - 1;
+                    }
+                    currentDayIdx = 0;
+                    saveData();
+                    render();
+                }
+            } else {
+                switchWeek(idx);
+            }
+        }
+
+        // ───────────────────────────────────────────────────────────────
         // ACTIONS
         // ───────────────────────────────────────────────────────────────
 
@@ -1499,21 +1504,8 @@
             render();
         }
 
-        function deleteWeek(idx) {
-            if (idx <= 0) return;
-            if (!confirm(`Hafta ${programData.weeks[idx].weekNumber} silinecek. Devam et?`)) return;
-            programData.weeks.splice(idx, 1);
-            if (currentWeekIdx >= programData.weeks.length) {
-                currentWeekIdx = programData.weeks.length - 1;
-            }
-            currentDayIdx = 0;
-            saveData();
-            render();
-        }
-
         function toggleDeleteMode() {
             deleteMode = !deleteMode;
-            // If delete mode is on, turn off drag mode to avoid confusion
             if (deleteMode && dragMode) {
                 dragMode = false;
             }
@@ -1876,7 +1868,7 @@
         }
 
         // ───────────────────────────────────────────────────────────────
-        // TIMER
+        // TIMER (tek buton toggle)
         // ───────────────────────────────────────────────────────────────
 
         function toggleTimer() {
@@ -1894,6 +1886,14 @@
             }
         }
 
+        function toggleTimerStart() {
+            if (timerRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        }
+
         function startTimer() {
             if (timerRunning) return;
             const input = document.getElementById('timerInput');
@@ -1902,9 +1902,10 @@
                 timerSeconds = timerTotal;
             }
             timerRunning = true;
-            document.getElementById('timerStartBtn').classList.remove('start');
-            document.getElementById('timerStartBtn').classList.add('stop');
-            document.getElementById('timerStartBtn').textContent = '⏹';
+            const btn = document.getElementById('timerToggleBtn');
+            btn.classList.remove('start');
+            btn.classList.add('stop');
+            btn.textContent = '⏹';
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timerSeconds--;
@@ -1913,9 +1914,9 @@
                 if (timerSeconds <= 0) {
                     clearInterval(timerInterval);
                     timerRunning = false;
-                    document.getElementById('timerStartBtn').textContent = '▶';
-                    document.getElementById('timerStartBtn').classList.remove('stop');
-                    document.getElementById('timerStartBtn').classList.add('start');
+                    btn.textContent = '▶';
+                    btn.classList.remove('stop');
+                    btn.classList.add('start');
                     if (navigator.vibrate) {
                         navigator.vibrate(3000);
                     }
@@ -1926,9 +1927,10 @@
         function stopTimer() {
             clearInterval(timerInterval);
             timerRunning = false;
-            document.getElementById('timerStartBtn').textContent = '▶';
-            document.getElementById('timerStartBtn').classList.remove('stop');
-            document.getElementById('timerStartBtn').classList.add('start');
+            const btn = document.getElementById('timerToggleBtn');
+            btn.textContent = '▶';
+            btn.classList.remove('stop');
+            btn.classList.add('start');
         }
 
         function resetTimer() {
