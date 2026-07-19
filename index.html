@@ -1,650 +1,2085 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f0f0f">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Calisthenic Program</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Calisthenics">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f0f0f">
+    <title>Calisthenic Program</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Calisthenics">
 
-<style>
-:root {
-  --bg: #0f0f0f;
-  --card: #1a1a1a;
-  --card2: #222;
-  --text: #e8eaed;
-  --text2: #9aa0a6;
-  --border: #2a2a2a;
-  --green: #34a853;
-  --green-bg: #152b1c;
-  --orange: #f9ab00;
-  --orange-bg: #2d2010;
-  --blue: #4a9eff;
-  --blue-bg: #0d1f33;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --card: #1a1a1a;
+            --card2: #222;
+            --text: #e8eaed;
+            --text2: #9aa0a6;
+            --border: #2a2a2a;
+            --green: #34a853;
+            --green-bg: #152b1c;
+            --orange: #f9ab00;
+            --orange-bg: #2d2010;
+            --radius: 12px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: calc(160px + var(--safe-bottom)); /* Timer alanı için */
+        }
+        .scroll-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 12px 12px 8px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            background: var(--bg);
+        }
+        .scroll-row::-webkit-scrollbar {
+            display: none;
+        }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+        .stage-bar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .stage-bar .scroll-row {
+            padding: 0;
+            background: transparent;
+            flex: 1;
+        }
+        .stage-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .stage-actions button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+        .stage-actions button:hover {
+            border-color: #555;
+            color: var(--text);
+        }
+        .reset-btn:hover {
+            border-color: #ea4335;
+            color: #ea4335;
+        }
 
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  -webkit-tap-highlight-color: transparent;
-  padding-bottom: calc(72px + var(--safe-bottom));
-}
+        .sbtn {
+            flex-shrink: 0;
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text2);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .15s;
+        }
+        .sbtn.on {
+            background: #2a2a2a;
+            border-color: #555;
+            color: var(--text);
+            font-weight: 700;
+        }
 
-.scroll-row {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 12px 12px 8px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  background: var(--bg);
-}
-.scroll-row::-webkit-scrollbar { display: none; }
+        .week-nav-wrap {
+            position: sticky;
+            top: 49px;
+            z-index: 30;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
 
-.stage-bar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  padding: 8px 12px;
-}
-.stage-bar .scroll-row { padding: 0; background: transparent; }
+        .pill {
+            flex-shrink: 0;
+            padding: 7px 10px 7px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text2);
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .pill.on {
+            background: #2a2a2a;
+            border-color: #555;
+            color: var(--text);
+            font-weight: 700;
+        }
+        .pill.done {
+            background: var(--green-bg);
+            border-color: #2e7d32;
+            color: var(--green);
+        }
+        .pill.partial {
+            background: var(--orange-bg);
+            border-color: #b45309;
+            color: var(--orange);
+        }
+        .pill.completed-true {
+            background: var(--green-bg);
+            border-color: #2e7d32;
+            color: var(--green);
+        }
+        .pill .del-week {
+            background: none;
+            border: none;
+            color: #6a6a6a;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 0 0 6px;
+            line-height: 1;
+            transition: color .15s;
+            border-radius: 4px;
+            margin-left: 2px;
+            font-weight: 400;
+        }
+        .pill .del-week:hover {
+            color: #ea4335;
+            background: rgba(234, 67, 53, 0.15);
+        }
 
-.sbtn {
-  flex-shrink: 0;
-  padding: 8px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text2);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .15s;
-}
-.sbtn.s0.on { background: var(--green-bg); color: var(--green); border-color: #2e7d32; }
-.sbtn.s1.on { background: var(--orange-bg); color: var(--orange); border-color: #b45309; }
-.sbtn.s2.on { background: #2a1515; color: #ea4335; border-color: #c5221f; }
+        .dpill {
+            flex-shrink: 0;
+            padding: 7px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text2);
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .15s;
+        }
+        .dpill.on {
+            background: #2a2a2a;
+            border-color: #555;
+            color: var(--text);
+            font-weight: 700;
+        }
+        .dpill.done {
+            background: var(--green-bg);
+            border-color: #2e7d32;
+            color: var(--green);
+        }
+        .dpill.partial {
+            background: var(--orange-bg);
+            border-color: #b45309;
+            color: var(--orange);
+        }
 
-.week-nav-wrap {
-  position: sticky;
-  top: 49px;
-  z-index: 30;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-}
+        .content {
+            padding: 0 12px;
+        }
 
-.pill, .dpill {
-  flex-shrink: 0;
-  padding: 7px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text2);
-  font-size: 13px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .15s;
-}
-.pill.on, .dpill.on {
-  background: #2a2a2a;
-  border-color: #555;
-  color: var(--text);
-  font-weight: 700;
-}
-.pill.done, .dpill.done { background: var(--green-bg); border-color: #2e7d32; color: var(--green); }
-.pill.partial, .dpill.partial { background: var(--orange-bg); border-color: #b45309; color: var(--orange); }
+        .card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card);
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
 
-.content { padding: 0 12px; }
+        .tipbox {
+            background: var(--blue-bg);
+            border: 1px solid #1e3d6e;
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #b8d0f0;
+            line-height: 1.6;
+        }
+        .tipbox strong {
+            color: #90c0ff;
+        }
 
-.card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--card);
-  padding: 14px 16px;
-  margin-bottom: 12px;
-}
+        .week-hdr {
+            margin-bottom: 12px;
+        }
+        .wfocus {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .wnote {
+            font-size: 13px;
+            color: var(--text2);
+            line-height: 1.7;
+        }
 
-.tipbox {
-  background: var(--blue-bg);
-  border: 1px solid #1e3d6e;
-  border-radius: var(--radius);
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  font-size: 13px;
-  color: #b8d0f0;
-  line-height: 1.6;
-}
-.tipbox strong { color: #90c0ff; }
-.cali-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #1a3a5c;
-  border: 1px solid #2e5c94;
-  border-radius: 20px;
-  padding: 4px 10px;
-  color: #7eb8ff;
-  font-weight: 600;
-  font-size: 12px;
-  text-decoration: none;
-  margin: 6px 0 8px;
-}
-.cali-link:hover { background: #254d7a; }
+        .day-info {
+            font-size: 13px;
+            color: var(--text2);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .day-done-badge {
+            display: inline-block;
+            background: var(--green-bg);
+            color: var(--green);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
 
-.week-hdr { margin-bottom: 12px; }
-.wfocus { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
-.wnote { font-size: 13px; color: var(--text2); line-height: 1.7; }
-.caliref {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  color: var(--orange);
-  font-weight: 500;
-  text-decoration: none;
-  font-size: 12px;
-}
-.caliref:hover { text-decoration: underline; }
+        .ex-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+        .ex-table th {
+            font-size: 11px;
+            color: var(--text2);
+            text-align: left;
+            padding: 8px 6px 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+        .ex-table th:first-child {
+            width: 70px;
+        }
+        .ex-table th:nth-child(2) {
+            width: 99%;
+        }
+        .ex-table th:nth-child(3) {
+            width: 46px;
+        }
+        .ex-table th:nth-child(4) {
+            width: 50px;
+        }
+        .ex-table th:nth-child(5) {
+            width: 70px;
+        }
+        .ex-table th:last-child {
+            width: 64px;
+        }
 
-.warmup-btn {
-  width: 100%;
-  text-align: left;
-  padding: 13px 0;
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  color: var(--text2);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.warmup-btn span:first-child { font-weight: 500; }
-.warmup-arrow { font-size: 16px; transition: transform .2s; }
-.warmup-arrow.open { transform: rotate(180deg); }
-.wlist { display: none; padding: 8px 0 4px; margin-bottom: 8px; }
-.wlist.open { display: block; }
-.wi {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 14px;
-  border-bottom: 1px solid var(--border);
-}
-.win { color: var(--text2); flex: 1; }
-.wid { color: var(--text); font-size: 13px; text-align: right; max-width: 45%; }
+        .ex-table td {
+            padding: 9px 6px 9px 0;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .ex-table td:first-child {
+            padding-left: 0;
+        }
 
-.day-info { font-size: 13px; color: var(--text2); margin-bottom: 10px; font-style: italic; }
-.day-done-badge {
-  display: inline-block;
-  background: var(--green-bg);
-  color: var(--green);
-  padding: 2px 10px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 700;
-  margin-left: 8px;
-  vertical-align: middle;
-}
+        /* Drag & Drop sırasında titreme */
+        .ex-table tr.dragging {
+            opacity: 0.5;
+            background: #2a2a2a;
+        }
+        .ex-table tr.drag-over {
+            border-bottom: 2px solid var(--green);
+        }
+        .ex-table tr.shake {
+            animation: shake 0.3s ease-in-out infinite alternate;
+        }
+        @keyframes shake {
+            0% { transform: translateX(-2px); }
+            100% { transform: translateX(2px); }
+        }
+        .drag-handle {
+            cursor: grab;
+            color: var(--text2);
+            font-size: 16px;
+            padding: 0 4px;
+            user-select: none;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .drag-mode-on .drag-handle {
+            color: var(--text);
+        }
+        .drag-mode-on tr {
+            cursor: grab;
+        }
+        .drag-mode-on tr:active {
+            cursor: grabbing;
+        }
 
-.et { width: 100%; border-collapse: collapse; margin-top: 6px; }
-.et th {
-  font-size: 11px;
-  color: var(--text2);
-  text-align: left;
-  padding: 8px 6px 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-.et th:first-child { width: 36px; }
-.et th:nth-child(2) { width: 99%; }
-.et th:nth-child(3) { width: 34px; white-space: nowrap; }
-.et th:nth-child(4) { width: 60px; white-space: nowrap; }
+        .status-group {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .status-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            color: var(--text2);
+            flex-shrink: 0;
+        }
+        .status-btn.green-on {
+            border-color: #2e7d32;
+            background: var(--green-bg);
+            color: var(--green);
+            box-shadow: 0 0 8px rgba(52, 168, 83, 0.3);
+        }
+        .status-btn.orange-on {
+            border-color: #b45309;
+            background: var(--orange-bg);
+            color: var(--orange);
+            box-shadow: 0 0 8px rgba(249, 171, 0, 0.3);
+        }
+        .status-btn:hover {
+            opacity: .8;
+        }
 
-.et td { padding: 11px 6px 11px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
-.et td:first-child { padding-left: 0; }
+        .ex-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
 
-.et input[type=checkbox] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--green);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.ex-name { font-weight: 600; font-size: 14px; }
-.ex-note { font-size: 12px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
-.ex-check-note { font-size: 12px; color: var(--green); margin-top: 2px; font-weight: 500; }
-.et td:nth-child(3) { color: var(--text2); font-size: 13px; }
-.et td:nth-child(4) { font-size: 13px; font-weight: 500; }
+        .ex-input {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 4px 6px;
+            width: 100%;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            min-width: 36px;
+            transition: border .15s;
+        }
+        .ex-input:focus {
+            outline: none;
+            border-color: #555;
+        }
+        .ex-input-sm {
+            max-width: 44px;
+        }
+        .ex-input-med {
+            max-width: 62px;
+        }
 
-.lu-title {
-  font-size: 11px;
-  color: var(--text2);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  margin-bottom: 10px;
-}
-.luc {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-}
-.luc:last-child { border-bottom: none; }
-.lck { color: var(--green); flex-shrink: 0; font-weight: 700; margin-top: 1px; }
+        .action-btn {
+            background: none;
+            border: none;
+            color: #5a5a5a;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 3px;
+            transition: color .15s;
+            line-height: 1;
+            border-radius: 4px;
+        }
+        .action-btn:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .del-btn {
+            color: #6a6a6a;
+            font-size: 17px;
+        }
+        .del-btn:hover {
+            color: #ea4335;
+            background: rgba(234, 67, 53, 0.12);
+        }
+        .mode-btn.on {
+            color: var(--green);
+            border-color: var(--green);
+        }
 
-.sp { height: 8px; }
-</style>
+        .add-ex-btn {
+            background: var(--card2);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text2);
+            padding: 10px 0;
+            width: 100%;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all .15s;
+            margin-top: 12px;
+        }
+        .add-ex-btn:hover {
+            border-color: #555;
+            color: var(--text);
+        }
+
+        .week-complete-area {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .complete-btn {
+            background: var(--green-bg);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 10px 28px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+        }
+        .complete-btn:hover {
+            background: #1e3a28;
+        }
+        .complete-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .week-done-badge {
+            display: inline-block;
+            background: var(--green-bg);
+            color: var(--green);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .sp {
+            height: 8px;
+        }
+
+        /* ─── TIMER ─── */
+        #timerContainer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 10px 12px calc(10px + var(--safe-bottom));
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            background: rgba(20,20,20,0.95);
+        }
+        #timerContainer .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        #timerContainer .timer-row input {
+            flex: 1;
+            min-width: 60px;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 6px 8px;
+            font-size: 14px;
+            width: 80px;
+        }
+        #timerContainer .timer-row input:focus {
+            outline: none;
+            border-color: #555;
+        }
+        #timerContainer .timer-row button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: .15s;
+        }
+        #timerContainer .timer-row button:hover {
+            border-color: #555;
+        }
+        #timerContainer .timer-row button.start {
+            background: var(--green-bg);
+            border-color: var(--green);
+            color: var(--green);
+        }
+        #timerContainer .timer-row button.stop {
+            background: #2a1515;
+            border-color: #c5221f;
+            color: #ea4335;
+        }
+        .timer-progress {
+            width: 100%;
+            height: 6px;
+            background: var(--card2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .timer-progress .bar {
+            height: 100%;
+            width: 0%;
+            background: var(--green);
+            transition: width 0.2s linear;
+            border-radius: 3px;
+        }
+        .timer-time {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            min-width: 60px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ─── HISTORY ─── */
+        #historyContainer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        #historyContainer.open {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .history-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .history-box h2 {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-box h2 button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 20px;
+            padding: 4px 14px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .history-box h2 button:hover {
+            border-color: #555;
+        }
+        .history-table-wrap {
+            overflow-x: auto;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history-table th {
+            text-align: left;
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text2);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .history-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        .history-table .status-badge {
+            display: inline-block;
+            padding: 0 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .history-table .status-badge.done {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .history-table .status-badge.partial {
+            background: var(--orange-bg);
+            color: var(--orange);
+        }
+        .history-table .status-badge.none {
+            background: var(--card2);
+            color: var(--text2);
+        }
+        .history-export-btn {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+        .history-export-btn:hover {
+            border-color: #555;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 420px;
+            width: 100%;
+        }
+        .modal-box h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .modal-box label {
+            font-size: 13px;
+            color: var(--text2);
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+        .modal-box input,
+        .modal-box select {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--card2);
+            color: var(--text);
+            font-size: 14px;
+        }
+        .modal-box input:focus,
+        .modal-box select:focus {
+            outline: none;
+            border-color: #555;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            justify-content: flex-end;
+        }
+        .modal-actions button {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-actions .btn-cancel {
+            background: var(--card2);
+            color: var(--text2);
+        }
+        .modal-actions .btn-add {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
+        .modal-actions .btn-danger {
+            background: #2a1515;
+            color: #ea4335;
+            border: 1px solid #c5221f;
+        }
+
+        .empty-msg {
+            color: var(--text2);
+            font-size: 14px;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        @media (max-width: 480px) {
+            .ex-table th:nth-child(3),
+            .ex-table td:nth-child(3) {
+                width: 40px;
+            }
+            .ex-table th:nth-child(4),
+            .ex-table td:nth-child(4) {
+                width: 44px;
+            }
+            .ex-table th:nth-child(5),
+            .ex-table td:nth-child(5) {
+                width: 58px;
+            }
+            .status-btn {
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+            }
+            .ex-input-sm {
+                max-width: 36px;
+                font-size: 12px;
+                padding: 3px 4px;
+            }
+            .ex-input-med {
+                max-width: 52px;
+                font-size: 12px;
+                padding: 3px 4px;
+            }
+            .ex-name {
+                font-size: 13px;
+            }
+            .pill .del-week {
+                font-size: 12px;
+                padding: 0 0 0 4px;
+            }
+            .pill {
+                padding: 6px 8px 6px 12px;
+                font-size: 12px;
+            }
+            .stage-actions button {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+            #timerContainer .timer-row {
+                gap: 6px;
+            }
+            #timerContainer .timer-row input {
+                width: 60px;
+                font-size: 12px;
+            }
+            .timer-time {
+                font-size: 16px;
+                min-width: 50px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="content">
+    <div class="content">
 
-  <div class="tipbox" style="margin-top:12px">
-    💡 <strong>Antrenman İpuçları</strong><br>
-    • Setler arası 2-3 dk dinlenin.<br>
-    • Kontrollü iniş (2-3s) – patlayıcı çıkış (1s). Form her zaman ağırlıktan önce.<br>
-    <a class="cali-link" href="https://calihoss.me/learn/calisthenics" target="_blank" rel="noopener">
-      📚 Calihoss Kalistenik Kursu
-    </a>
-  </div>
+        <div class="tipbox" style="margin-top:12px">
+            💡 <strong>Antrenman İpuçları</strong><br>
+            • Setler arası 2-3 dk dinlenin.<br>
+            • Kontrollü iniş (2-3s) – patlayıcı çıkış (1s). Form her zaman ağırlıktan önce.<br>
+            • <strong>Yeşil</strong> = tamamlandı → ilerleme uygulanır.<br>
+            • <strong>Turuncu</strong> = yapıldı ama eksik rep → hafta tamamlanmış sayılır ve ilerleme uygulanır.
+        </div>
 
-  <div class="stage-bar">
-    <div class="scroll-row" id="stages"></div>
-  </div>
+        <div class="stage-bar">
+            <div class="scroll-row" id="stages"></div>
+            <div class="stage-actions">
+                <button onclick="toggleTimer()">⏱️ Timer</button>
+                <button onclick="toggleHistory()">📊 Geçmiş</button>
+                <button class="reset-btn" onclick="resetAll()">🔄 Sıfırla</button>
+            </div>
+        </div>
 
-  <div class="week-nav-wrap">
-    <div class="scroll-row" id="weekNav"></div>
-  </div>
+        <div class="week-nav-wrap">
+            <div class="scroll-row" id="weekNav"></div>
+        </div>
 
-  <div class="week-hdr" id="weekHdr"></div>
+        <div class="week-hdr" id="weekHdr"></div>
 
-  <div class="scroll-row" style="padding:0 0 10px" id="dayTabs"></div>
-  <div class="day-info" id="dinfo"></div>
+        <div class="scroll-row" style="padding:0 0 10px" id="dayTabs"></div>
+        <div class="day-info" id="dinfo"></div>
 
-  <button class="warmup-btn" onclick="toggleW()">
-    <span id="wtit">Isınma</span>
-    <span class="warmup-arrow" id="warr">▼</span>
-  </button>
-  <div class="wlist" id="wlist"></div>
+        <div class="card" style="margin-top:6px">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:13px;color:var(--text2);">Egzersizler</span>
+                <button class="action-btn mode-btn" id="dragToggle" onclick="toggleDragMode()" title="Sürükle-Bırak modu">⇅ Sırala</button>
+            </div>
+            <table class="ex-table" id="exTable">
+                <thead>
+                    <tr>
+                        <th>Durum</th>
+                        <th>Egzersiz</th>
+                        <th>Set</th>
+                        <th>Rep</th>
+                        <th>Ağırlık</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="exb"></tbody>
+            </table>
+            <button class="add-ex-btn" onclick="openAddModal()">+ Egzersiz Ekle</button>
 
-  <div class="card" style="margin-top:10px">
-    <table class="et">
-      <thead>
-        <tr>
-          <th>✓</th>
-          <th>Egzersiz</th>
-          <th>Set</th>
-          <th>Rep/Süre</th>
-        </tr>
-      </thead>
-      <tbody id="exb"></tbody>
-    </table>
-  </div>
+            <div class="week-complete-area" id="weekCompleteArea"></div>
+        </div>
 
-  <div class="card" id="lubox"></div>
+        <div class="sp"></div>
+    </div>
 
-  <div class="sp"></div>
-</div>
+    <!-- Add Exercise Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-box">
+            <h3>Yeni Egzersiz</h3>
+            <label>Egzersiz Adı</label>
+            <input id="modalName" placeholder="Örn: Weighted Dip" value="">
+            <label>Set</label>
+            <input id="modalSets" type="number" value="2" min="1">
+            <label>Rep</label>
+            <input id="modalReps" placeholder="8 / 15s / 60s" value="8">
+            <label>Ağırlık</label>
+            <input id="modalWeight" placeholder="+10 kg / BW / 45 kg" value="">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeAddModal()">İptal</button>
+                <button class="btn-add" onclick="confirmAddExercise()">Ekle</button>
+            </div>
+        </div>
+    </div>
 
-<script>
-const WU = {
-  fb: [["Bilek Mobilizasyonu", "1 dk"], ["Scapular Push-up", "10"], ["Active Hang", "20s"], ["Glute Bridge", "10 (2s tepe)"], ["McGill Curl-up", "3×10s"]],
-  push: [["Bilek Mobilizasyonu", "1 dk"], ["Scapular Push-up", "10"], ["Band Pull-apart", "15"]],
-  pull: [["Active Hang", "20s"], ["Dead Hang", "30s"], ["Prone Y-Raise", "12"]],
-  legs: [["90/90 Kalça Rotasyonu", "8/yön"], ["Glute Bridge", "10 (2s tepe)"], ["McGill Curl-up", "3×10s"]],
-  skill: [["Bilek Mobilizasyonu", "1 dk"], ["Scapular Push-up", "10"], ["Dead Hang", "30s"], ["Band Pull-apart", "15"]]
-};
-const WN={fb:"Tam Vücut İzole — 5 dk",push:"İtiş Spesifik — 4 dk",pull:"Çekiş Spesifik — 4 dk",legs:"Alt Vücut+Core — 5 dk",skill:"Beceri Hazırlık — 4 dk"};
+    <!-- Edit Exercise Config Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h3>Egzersiz İlerleme Ayarları</h3>
+            <label>Egzersiz Adı</label>
+            <input id="editName" placeholder="Egzersiz adı" value="">
+            <label>Haftalık Artış Miktarı</label>
+            <input id="editIncrement" type="number" step="0.1" min="0" value="2.5">
+            <label>Artış Birimi</label>
+            <select id="editUnit">
+                <option value="kg">kg (ağırlık)</option>
+                <option value="reps">rep (tekrar)</option>
+                <option value="s">saniye (süre)</option>
+                <option value="yok">— Artış Yok —</option>
+            </select>
+            <label>Kaç Hafta Üst Üste Yeşil Olmalı</label>
+            <input id="editRequiredWeeks" type="number" min="1" value="1">
+            <div style="font-size:12px;color:var(--text2);margin-top:8px;">
+                Mevcut yeşil hafta sayısı: <span id="editCurrentGreen">0</span>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeEditModal()">İptal</button>
+                <button class="btn-add" onclick="confirmEditExercise()">Kaydet</button>
+            </div>
+        </div>
+    </div>
 
-const ST = [
-  { name:"NEWBIE",lbl:"Temel Atma",dur:"Hafta 1–4",sch:"3 gün/hafta · Pzt/Çar/Cum · Her gün aynı tam vücut",
-    desc:"Tekniğe odaklan. Ağırlık değil form. Scapular mekanik, vücut gerilimi. Pull-up/dip hafif ağırlıklı.",
-    lu:["5 pull-up +5kg","6 dip +5kg","8 push-up (scap)","30s plank","Machine Hip Thrust 45kg"],
-    weeks:[
-      {n:1,f:"Scapular mekanik öğrenme",note:"Aktif asılışta kürek kemiklerini deprese et, push-up'ta protrakte et.\n📺 Calihoss: Playlist 1 – Foundation (Scapular control basics)\n📺 Calihoss: Playlist 12 – Pull-ups (Scapular pull-ups technique)\n📺 Calihoss: Playlist 15 – Pike (Scapular elevations technique)",days:[
-        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8","Kollar düz, sadece skapula"],["Pull-up BW (teknik)","2","3","Active hang ile başla"],["Inverted Row BW","2","6-8","Göğüs yüksekliğinde bar"],["Push-up BW (3s iniş)","2","5","Çıkışta omuzu öne it"],["Scapular Elevation (pike) BW","2","6","Kulaklara doğru skapula"],["Dip Support Hold BW","2","10s","Skapula depresyonda"],["Plank BW","2","20s","Gövde gergin, bel çökmesin"],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12","Kalça tam ekstansiyon"],["Squat BW","2","8","Tam derinlik, topuk yerde"],["Machine Hip Thrust @40kg","2","8-12","Lomber kilitli izometrik"],["Bird-Dog @4kg","2","6-8","10s statik"],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8",""],["Pull-up BW (teknik)","2","3",""],["Inverted Row BW","2","6-8",""],["Push-up BW (3s iniş)","2","5",""],["Scapular Elevation (pike) BW","2","6",""],["Dip Support Hold BW","2","10s",""],["Plank BW","2","20s",""],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12",""],["Squat BW","2","8",""],["Machine Hip Thrust @40kg","2","8-12","Lomber kilitli izometrik"],["Bird-Dog @4kg","2","6-8","10s statik"],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","8",""],["Pull-up BW (teknik)","2","3",""],["Inverted Row BW","2","6-8",""],["Push-up BW (3s iniş)","2","5",""],["Scapular Elevation (pike) BW","2","6",""],["Dip Support Hold BW","2","10s",""],["Plank BW","2","20s",""],["Yan Plank BW","2","15s/t",""],["Glute Bridge BW","2","12",""],["Squat BW","2","8",""],["Machine Hip Thrust @40kg","2","8-12","Lomber kilitli izometrik"],["Bird-Dog @4kg","2","6-8","10s statik"],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]}
-      ]},
-      {n:2,f:"Hacim artışı + L-sit",note:"Her set +1-2 rep. Form bozulursa rep artırma.\n📺 Calihoss: Playlist 1 – Foundation (Progressive overload basics)",days:[
-        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["Machine Hip Thrust @42.5kg","2","10-12","Lomber kilitli izometrik"],["Bird-Dog @5kg","2","6-8","10s statik"],["Tuck L-sit BW","2","8s","Paralette dizler göğüste"],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["Machine Hip Thrust @42.5kg","2","10-12","Lomber kilitli izometrik"],["Bird-Dog @5kg","2","6-8","10s statik"],["Tuck L-sit BW","2","8s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Scapular Pull-up BW","2","10",""],["Pull-up +2.5kg","2","4",""],["Inverted Row BW","2","8-10",""],["Push-up BW","2","7","3s iniş"],["Dip Negatif BW","2","5s hold+3 neg",""],["Pike Push-up BW","2","5",""],["Plank BW","2","25s",""],["Yan Plank BW","2","20s/t",""],["Glute Bridge BW","2","14",""],["Squat BW","2","10",""],["Machine Hip Thrust @42.5kg","2","10-12","Lomber kilitli izometrik"],["Bird-Dog @5kg","2","6-8","10s statik"],["Tuck L-sit BW","2","8s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]}
-      ]},
-      {n:3,f:"Ağırlıklı pull-up + dip",note:"Form sağlamsa ağırlık ekle.\n📺 Calihoss: Playlist 1 – Foundation (Progressive overload)",days:[
-        {l:"Pazartesi",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["Machine Hip Thrust @45kg","2","8-10","Lomber kilitli izometrik"],["Bird-Dog @6kg","2","6-8","10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Çarşamba",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["Machine Hip Thrust @45kg","2","8-10","Lomber kilitli izometrik"],["Bird-Dog @6kg","2","6-8","10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Cuma",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","4",""],["Scapular Pull-up BW","2","8",""],["Inverted Row BW","2","8-10",""],["Push-up (ayak yüksek) BW","2","8",""],["Dip +5kg","2","5",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Ters Plank BW","2","15s",""],["Glute Bridge BW","2","15",""],["Machine Hip Thrust @45kg","2","8-10","Lomber kilitli izometrik"],["Bird-Dog @6kg","2","6-8","10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]}
-      ]},
-      {n:4,f:"Level-up testi",note:"Kriterleri 2 sette test et. Başarırsan Beginner'a geç.",days:[
-        {l:"Pazartesi (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5","✓ 5 rep"],["Dip +5kg","2","6","✓ 6 rep"],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s","✓ 30s"],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["Machine Hip Thrust @45kg","2","10","Lomber kilitli izometrik"],["Bird-Dog @6kg","2","6-8","10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Çarşamba (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5",""],["Dip +5kg","2","6",""],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["Machine Hip Thrust @45kg","2","10","Lomber kilitli izometrik"],["Bird-Dog @6kg","2","6-8","10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Cuma (test)",i:"3 gün/hafta",w:"fb",ex:[["Pull-up +5kg","2","5",""],["Dip +5kg","2","6",""],["Inverted Row BW","2","10",""],["Push-up BW","2","8",""],["Pike Push-up BW","2","6",""],["Plank BW","2","30s",""],["Glute Bridge BW","2","15",""],["Squat BW","2","10",""],["Machine Hip Thrust @45kg","2","10","Lomber kilitli izometrik"],["Bird-Dog @6kg","2","6-8","10s statik"],["Tuck L-sit BW","2","10s",""],["Dumbbell Bicep Curl @8kg","2","8-12","Dirsekler gövdeye sabit"]]}
-      ]}
-  ]},
-  { name:"BEGINNER",lbl:"Temel Güçlenme",dur:"Hafta 5–16",sch:"4 gün · Pzt:Push · Sal:Pull · Per:Bacak+Core · Cmt:Teknik (48s CNS koruması)",
-    desc:"Hacim tamamlama ile ilerle. Alt sınırla başla, üst sınıra ulaşana kadar ağırlığı/varyasyonu sabit tut. L-sit ve pike push-up temel beceriler.",
-    lu:["5 pull-up +20kg","5 dip +20kg","20s L-sit","8 pike push-up duvara","3 HSPU negatif 5s","Machine Hip Thrust 100kg"],
-    weeks:[
-      {n:5,f:"PPL alışma — Hacim Tamamlama",note:"Yeni format.\n📺 Calihoss: Playlist 1 – Foundation (Programming basics & Volume completion)",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up BW","2","3-5/t"],["Push-up (ayak yüksek) BW","2","6-8"],["Pike Push-up BW","2","4-6"],["Weighted Dip +5kg","2","6-8"],["Side Raise @8kg","2","10-12"],["Dip Support Hold BW","2","15-20s"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +5kg","2","4-6"],["Inverted Row BW","2","6-8"],["Scapular Pull-up BW","2","8-10"],["Dead Hang BW","2","20-30s"],["Rev. Peck Deck @40kg","2","8-10"],["Dumbbell Bicep Curl @10kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @100kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @50kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @30kg","2","8-10"],["Suitcase Carry @16kg","2","40m/t","Anti-lateral fleksiyon"],["Calf Raise @85kg","2","10-12"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","15-20s"],["Hollow Body BW","2","15-20s"],["Dead Hang BW","2","30-40s"],["Pistol Squat (kutu) BW","2","4-5/t"],["Tuck L-sit BW","2","8-12s"],["Plank BW","2","25-30s"],["Copenhagen Plank BW","2","12-15s/t"]]}
-      ]},
-      {n:6,f:"Ağırlık başlangıcı",note:"Pull-up +7.5, Dip +7.5. Hacim tamamlama devrede.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up BW","2","4-6/t"],["Push-up BW","2","6-8"],["Pike Push-up BW","2","4-6"],["Weighted Dip +7.5kg","2","5-7"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +7.5kg","2","4-6"],["Inverted Row BW","2","6-8"],["Dead Hang BW","2","30-35s"],["Rev. Peck Deck @42.5kg","2","8-10"],["Dumbbell Bicep Curl @10kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @105kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @55kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @32.5kg","2","8-10"],["Suitcase Carry @18kg","2","40m/t","Anti-lateral fleksiyon"],["Plank BW","2","30-35s"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","20-25s"],["Pistol Squat BW","2","5-6/t"],["Straight-arm kond. BW","2","12-18s"],["L-sit (tuck) BW","2","10-15s"]]}
-      ]},
-      {n:7,f:"Pull-up +10kg giriş",note:"Ağırlıklı pull-up'ta ilk büyük sıçrama. 3-5 rep ile başla, 5 temiz olunca artır.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up BW","2","4-6/t"],["Pike Push-up BW","2","5-7"],["Weighted Dip +10kg","2","5-7"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +10kg","2","3-5"],["Inverted Row BW","2","6-8"],["Dead Hang BW","2","30-40s"],["Rev. Peck Deck @42.5kg","2","8-10"],["Dumbbell Bicep Curl @10kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @110kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @60kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @35kg","2","8-10"],["Suitcase Carry @20kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","25-30s"],["Pistol Squat BW","2","5-7/t"],["Straight-arm kond. BW","2","15-20s"],["L-sit BW","2","10-15s"],["Plank BW","2","30-40s"]]}
-      ]},
-      {n:8,f:"Arka zincir adaptasyonu",note:"Leg Press ve Hip Thrust paralel ilerliyor.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["Archer Push-up BW","2","5-7/t"],["Pike Push-up BW","2","6-8"],["Weighted Dip +10kg","2","6-8"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +10kg","2","5-7"],["Inverted Row (dik) BW","2","6-8"],["Dead Hang BW","2","35-45s"],["Rev. Peck Deck @45kg","2","8-10"],["Dumbbell Bicep Curl @10kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @115kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @65kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @37.5kg","2","8-10"],["Suitcase Carry @22kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","35-45s"],["Dragon Flag Tuck BW","2","4-6"],["Straight-arm kond. BW","2","15-25s"],["L-sit BW","2","12-18s"]]}
-      ]},
-      {n:9,f:"One-arm Push-up giriş",note:"Biceps Curl ağırlığı +12kg'a çıkarıldı.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up prog. BW","2","3-5/t"],["Archer Push-up BW","2","5-6/t"],["Pike Push-up (steep) BW","2","6-8"],["Weighted Dip +12.5kg","2","5-7"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +12.5kg","2","4-6"],["Inverted Row tek kol asiste BW","2","4-5/t"],["Dead Hang BW","2","40-50s"],["Rev. Peck Deck @45kg","2","8-10"],["Dumbbell Bicep Curl @12kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @120kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @70kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @40kg","2","8-10"],["Suitcase Carry @24kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","40-50s"],["Pistol Squat BW","2","7-8/t"],["Straight-arm kond. BW","2","18-25s"],["L-sit BW","2","15-20s"],["Dragon Flag Tuck BW","2","5-7"]]}
-      ]},
-      {n:10,f:"Lying Leg Curl Hacim Artışı",note:"Daha yavaş inişler ve izole kasılma.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","4-6/t"],["Pike Push-up BW","2","6-8"],["Weighted Dip +12.5kg","2","6-8"],["Side Raise @10kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +12.5kg","2","5-7"],["Inverted Row tek kol BW","2","5-6/t"],["Dead Hang BW","2","45-50s"],["Rev. Peck Deck @47.5kg","2","8-10"],["Dumbbell Bicep Curl @12kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @125kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @75kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @42.5kg","2","8-10"],["Suitcase Carry @24kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","45-55s"],["Pistol Squat BW","2","8-10/t"],["Straight-arm kond. BW","2","20-30s"],["L-sit BW","2","18-20s"],["Dragon Flag Tuck BW","2","6-8"]]}
-      ]},
-      {n:11,f:"L-sit 20s hedefi",note:"L-sit 20 saniye bu bloğun en önemli hedefi.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","5-7/t"],["Pike Push-up (duvara) BW","2","6-8"],["Weighted Dip +15kg","2","5-7"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +15kg","2","4-6"],["Inverted Row tek kol BW","2","5-7/t"],["Dead Hang BW","2","50-55s"],["Rev. Peck Deck @47.5kg","2","8-10"],["Dumbbell Bicep Curl @12kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @130kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @80kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @45kg","2","8-10"],["Suitcase Carry @26kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","50-60s"],["Dragon Flag Tuck BW","2","7-9"],["Straight-arm kond. BW","2","20-30s"],["L-sit BW","2","18-20s","✓ 20s hedefi"]]}
-      ]},
-      {n:12,f:"L-sit 20s teyit",note:"Milestone teyit haftası. L-sit 20s.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","5-7/t"],["Pike Push-up BW","2","6-8"],["Weighted Dip +15kg","2","6-8"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +15kg","2","5-7"],["Inverted Row tek kol BW","2","6-8/t"],["Dead Hang BW","2","55-60s"],["Rev. Peck Deck @50kg","2","8-10"],["Dumbbell Bicep Curl @12kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @135kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @85kg","2","6-8","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @47.5kg","2","8-10"],["Suitcase Carry @26kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","55-65s"],["Dragon Flag BW","2","5-7"],["Straight-arm kond. BW","2","25-30s"],["L-sit BW","2","20-25s","✓"]]}
-      ]},
-      {n:13,f:"HSPU negatif + Posterior Zincir",note:"Biceps Curl ağırlığı +14kg'a çıkarıldı.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","6-8/t"],["Pike Push-up (steep) BW","2","6-8"],["HSPU Negatif BW","2","3-5","5s iniş"],["Weighted Dip +17.5kg","2","5-7"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +17.5kg","2","4-6"],["One-arm asılı BW","2","10-15s/t"],["Dead Hang BW","2","60s"],["Rev. Peck Deck @50kg","2","8-10"],["Dumbbell Bicep Curl @14kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @140kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @90kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @50kg","2","8-10"],["Suitcase Carry @28kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Wall Handstand BW","2","60s"],["Freestanding HS kick-up BW","5","deneme"],["Dragon Flag BW","2","7-9"],["Straight-arm kond. BW","2","25-30s"],["L-sit BW","2","20-25s"]]}
-      ]},
-      {n:14,f:"Pull-up +17.5kg × 6",note:"Pull-up'ta hacim tamamlama ile ilerleme sürüyor.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["One-arm Push-up BW","2","6-8/t"],["Pike Push-up BW","2","6-8"],["HSPU Negatif BW","2","4-6"],["Weighted Dip +17.5kg","2","6-8"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +17.5kg","2","5-7"],["One-arm asılı BW","2","12-18s/t"],["Dead Hang BW","2","60s"],["Rev. Peck Deck @52.5kg","2","8-10"],["Dumbbell Bicep Curl @14kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @145kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @95kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @52.5kg","2","8-10"],["Suitcase Carry @30kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS kick-up BW","7",""],["Wall Handstand BW","2","60s"],["Dragon Flag BW","2","8-10"],["Straight-arm kond. BW","2","25-30s"],["L-sit BW","2","20-25s"]]}
-      ]},
-      {n:15,f:"Zirve başlangıcı",note:"+20kg pull-up ve dip hedefi yakın. Acele etme.",days:[
-        {l:"Push",i:"Pazartesi",w:"push",ex:[["Pike Push-up (duvara) BW","2","6-8"],["HSPU Negatif BW","2","4-6"],["Weighted Dip +20kg","2","5-7"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull",i:"Salı",w:"pull",ex:[["Pull-up +20kg","2","4-6","✓ kriter yakın"],["One-arm asılı BW","2","15-20s/t"],["Dead Hang BW","2","60s"],["Dumbbell Bicep Curl @14kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @150kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @100kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @55kg","2","8-10"],["Suitcase Carry @32kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS BW","8","deneme"],["Dragon Flag BW","2","8-10"],["Straight-arm kond. BW","2","30s"],["L-sit BW","2","20-25s"]]}
-      ]},
-      {n:16,f:"Stage 2 Final Testi",note:"Tüm kriterleri test et. 5 pull-up +20kg, 5 dip +20kg, 20s L-sit, 3 HSPU negatif, Hip Thrust 100kg → Intermediate.",days:[
-        {l:"Push (test)",i:"Pazartesi",w:"push",ex:[["HSPU Negatif BW","2","3-5","✓ 5s"],["Pike Push-up BW","2","6-8"],["Weighted Dip +20kg","2","5-7","✓"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull (test)",i:"Salı",w:"pull",ex:[["Pull-up +20kg","2","4-6","✓"],["One-arm asılı BW","2","15-20s/t"],["Dead Hang BW","2","60s"],["Dumbbell Bicep Curl @14kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak+Core",i:"Perşembe",w:"legs",ex:[["Leg Press @155kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @100kg","2","5-7","✓ Lomber kilitli izometrik"],["GHD İzometrik Tutuş BW","2","30-45s","Nötral omurga"],["Lying Leg Curl @55kg","2","8-10"],["Suitcase Carry @32kg","2","40m/t","Anti-lateral fleksiyon"]]},
-        {l:"Teknik",i:"Cumartesi",w:"skill",ex:[["Freestanding HS BW","10","deneme"],["Dragon Flag BW","2","8-10"],["Straight-arm kond. BW","2","30s"],["L-sit BW","2","20-25s","✓"]]}
-      ]}
-  ]},
-  { name:"INTERMEDIATE",lbl:"Beceri Geliştirme",dur:"Hafta 17–28",sch:"5 gün · Pzt:Push+HS · Sal:Pull+FL · Çar:Bacak · Per:Dinlenme · Cum:Skill+Core · Cmt:Güç",
-    desc:"Beceri odaklı. CNS koruması: bacak ile beceri arası 48s. Biceps curl izolasyonu eklendi. Front lever, handstand, HSPU, dragon flag. Dinamik yatay çekiş.",
-    lu:["1 dk freestanding HS","3 HSPU","20s adv tuck FL","Full dragon flag 3×10","30s L-sit","Pull-up +35kg","Leg Press 210kg","Machine Hip Thrust 155kg"],
-    weeks:[
-      {n:17,f:"Skill split geçişi",note:"PPL'den beceri split'ine. Front lever tuck başlangıç. Handstand her gün.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand BW","2","40-50s"],["Freestanding kick-up BW","5",""],["HSPU Negatif BW","2","3-5"],["Weighted Dip +20kg","2","5-7"],["One-arm Push-up BW","2","5-7/t"],["Side Raise @12kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +10kg","2","6-8",""],["Tuck Front Lever BW","2","10-15s"],["Pull-up +20kg","2","5-7"],["One-arm asılı BW","2","12-18s/t"],["Rev. Peck Deck @52.5kg","2","8-10"],["Dumbbell Bicep Curl @16kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @160kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @105kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +5kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @57.5kg","2","6-8"],["Suitcase Carry @34kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +5kg","2","6-8/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","8-10"],["L-sit BW","2","22-26s"],["Freestanding HS BW","10",""],["Copenhagen BW","2","35-45s/t"],["Hollow Body BW","2","25-30s"],["Straight-arm kond. BW","2","20-30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +22.5kg","2","4-6"],["Weighted Dip +22.5kg","2","4-6"],["Pike Push-up BW","2","6-8"],["Side Raise @14kg","2","10-12"]]}
-      ]},
-      {n:18,f:"Tuck FL 15s + HS 55s",note:"Front lever süresini artır.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand BW","2","50-55s"],["Freestanding HS BW","7",""],["HSPU Negatif BW","2","4-6"],["Weighted Dip +22.5kg","2","5-7"],["Side Raise @14kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +12.5kg","2","6-8",""],["Tuck Front Lever BW","2","12-18s"],["Pull-up +22.5kg","2","4-6"],["One-arm asılı BW","2","15-20s/t"],["Rev. Peck Deck @55kg","2","8-10"],["Dumbbell Bicep Curl @16kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @165kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @110kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +5kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @60kg","2","6-8"],["Suitcase Carry @36kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +5kg","2","7-9/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","8-10"],["L-sit BW","2","24-28s"],["Freestanding HS BW","8",""],["Copenhagen BW","2","40-50s/t"],["Hollow Body BW","2","30-35s"],["Straight-arm kond. BW","2","25-30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +25kg","2","4-6"],["Weighted Dip +25kg","2","4-6"],["Pike Push-up BW","2","6-8"],["Side Raise @14kg","2","10-12"]]}
-      ]},
-      {n:19,f:"HSPU ilk tam rep",note:"Wall HS 60s varsa tam HSPU dene.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall HS BW","2","60s"],["Freestanding HS BW","8",""],["HSPU BW","2","1-3","✓"],["HSPU Negatif BW","2","3-5"],["Weighted Dip +25kg","2","5-7"],["Side Raise @14kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +15kg","2","6-8",""],["Advanced Tuck FL BW","2","10-15s"],["Pull-up +25kg","2","4-6"],["One-arm asılı BW","2","18-25s/t"],["Rev. Peck Deck @55kg","2","8-10"],["Dumbbell Bicep Curl @16kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @170kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @115kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +5kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @62.5kg","2","6-8"],["Suitcase Carry @38kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +5kg","2","8-10/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","8-10"],["L-sit BW","2","25-30s"],["Freestanding HS BW","10",""],["Hollow Body BW","2","35-40s"],["Straight-arm kond. BW","2","25-30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +27.5kg","2","4-6"],["Weighted Dip +27.5kg","2","4-6"],["Pike Push-up BW","2","6-8"],["Side Raise @14kg","2","10-12"]]}
-      ]},
-      {n:20,f:"Arka zincir kapasitesi",note:"Hip Thrust yükü maksimal seviyelere ulaşıyor.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","10",""],["HSPU BW","2","2-4"],["Weighted Dip +27.5kg","2","5-7"],["Side Raise @14kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +17.5kg","2","6-8",""],["Advanced Tuck FL BW","2","12-18s"],["Pull-up +27.5kg","2","4-6"],["One-arm asılı BW","2","20-25s/t"],["Rev. Peck Deck @57.5kg","2","8-10"],["Dumbbell Bicep Curl @16kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @175kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @120kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +10kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @65kg","2","6-8"],["Suitcase Carry @40kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +5kg","2","9-11/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","9-11"],["L-sit BW","2","25-30s"],["Freestanding HS BW","10",""],["Copenhagen BW","2","45-55s/t"],["Hollow Body BW","2","35-40s"],["Straight-arm kond. BW","2","25-30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +30kg","2","4-6"],["Weighted Dip +30kg","2","4-6"],["Pike Push-up BW","2","6-8"],["Side Raise @16kg","2","10-12"]]}
-      ]},
-      {n:21,f:"Straddle FL",note:"Biceps Curl +18kg'a çıktı.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","12",""],["HSPU BW","2","2-4"],["Weighted Dip +30kg","2","4-6"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +20kg","2","6-8",""],["Straddle Front Lever BW","2","6-10s"],["Pull-up +30kg","2","4-6"],["One-arm asılı BW","2","25-30s/t"],["Rev. Peck Deck @60kg","2","8-10"],["Dumbbell Bicep Curl @18kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @180kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @125kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +10kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @67.5kg","2","6-8"],["Suitcase Carry @40kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +5kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","10-12"],["L-sit BW","2","28-32s"],["Freestanding HS BW","12",""],["Hollow Body BW","2","40-45s"],["Straight-arm kond. BW","2","25-30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +32.5kg","2","3-5"],["Weighted Dip +32.5kg","2","3-5"],["Pike Push-up BW","2","6-8"],["Side Raise @16kg","2","10-12"]]}
-      ]},
-      {n:22,f:"HSPU 3 rep · L-sit 30s",note:"İki büyük milestone.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","15",""],["HSPU BW","2","2-4","✓ 3 rep"],["Weighted Dip +32.5kg","2","4-6"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +22.5kg","2","6-8",""],["Straddle FL BW","2","8-12s"],["Pull-up +32.5kg","2","4-6"],["One-arm asılı BW","2","28-35s/t"],["Rev. Peck Deck @62.5kg","2","8-10"],["Dumbbell Bicep Curl @18kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @185kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @130kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +10kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @70kg","2","6-8"],["Suitcase Carry @42kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +7.5kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","10-12"],["L-sit BW","2","30s","✓"],["Freestanding HS BW","12",""],["Copenhagen BW","2","50-60s/t"],["Straight-arm kond. BW","2","30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +35kg","2","3-5","✓ +35kg"],["Weighted Dip +35kg","2","3-5"],["Pike Push-up BW","2","6-8"],["Side Raise @16kg","2","10-12"]]}
-      ]},
-      {n:23,f:"Freestanding HS 5s",note:"Denge anlık. Her gün kick-up dene.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","15",""],["HSPU BW","2","3-5"],["Weighted Dip +35kg","2","4-6"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +25kg","2","6-8",""],["Straddle FL BW","2","10-15s"],["Pull-up +35kg","2","4-6"],["One-arm asılı BW","2","28-35s/t"],["Dumbbell Bicep Curl @18kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @190kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @135kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +10kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @72.5kg","2","6-8"],["Suitcase Carry @44kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +10kg","2","5-7/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag Full BW","2","10-12"],["L-sit BW","2","30s"],["Freestanding HS BW","15",""],["Straight-arm kond. BW","2","30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +37.5kg","2","3-5"],["Weighted Dip +37.5kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
-      ]},
-      {n:24,f:"Full FL denemesi",note:"Full front lever 5-10s çok iyi.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","15",""],["HSPU BW","2","3-5"],["Weighted Dip +37.5kg","2","4-6"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +27.5kg","2","6-8",""],["Full Front Lever deneme BW","2","5-10s","✓"],["Straddle FL BW","2","12-15s"],["Pull-up +37.5kg","2","3-5"],["Dumbbell Bicep Curl @18kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @195kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @140kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +15kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @75kg","2","6-8"],["Suitcase Carry @46kg","2","40m/t","Anti-lateral fleksiyon"],["Pistol Squat +10kg","2","6-8/t"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","10-12"],["L-sit BW","2","30s"],["Freestanding HS BW","15",""],["Hollow Body BW","2","45-50s"],["Straight-arm kond. BW","2","30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +40kg","2","3-5"],["Weighted Dip +40kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
-      ]},
-      {n:25,f:"Konsolidasyon",note:"Biceps Curl +20kg'a ulaştı.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","20",""],["HSPU BW","2","3-5"],["Weighted Dip +40kg","2","3-5"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +30kg","2","6-8",""],["Full Front Lever BW","2","8-15s"],["Pull-up +40kg","2","3-5"],["One-arm asılı BW","2","30-40s/t"],["Dumbbell Bicep Curl @20kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @200kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @145kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +15kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @77.5kg","2","6-8"],["Suitcase Carry @48kg","2","40m/t","Anti-lateral fleksiyon"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","10-12"],["L-sit BW","2","30s"],["Freestanding HS BW","18",""],["Copenhagen BW","2","50-60s/t"],["Straight-arm kond. BW","2","30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +42.5kg","2","3-5"],["Weighted Dip +42.5kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
-      ]},
-      {n:26,f:"Deload",note:"Ağırlıklar -30%, rep -20%. Tendon ve CNS dinlenir.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Wall Handstand BW","2","60s"],["HSPU BW","2","2-3"],["Weighted Dip +25kg","2","5-7"],["Side Raise @10kg","2","12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row (hafif) BW","2","8-10"],["Tuck Front Lever BW","2","15s"],["Pull-up +20kg","2","5-7"],["Dead Hang BW","2","60s"],["Dumbbell Bicep Curl @12kg","2","8-12","Deload"]]},
-        {l:"Bacak+Mobilite",i:"Çarşamba",w:"legs",ex:[["Leg Press @140kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @100kg","2","6-8","Lomber kilitli izometrik"],["Lying Leg Curl @55kg","2","8-10"],["Suitcase Carry @32kg","2","40m/t","Anti-lateral fleksiyon"],["Calf Raise BW","2","12-15"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","6-8"],["L-sit BW","2","25s"],["Freestanding HS BW","10",""],["Straight-arm kond. BW","2","20-30s"]]},
-        {l:"Hafif Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +15kg","2","6-8"],["Weighted Dip +15kg","2","6-8"],["Pike Push-up BW","2","6-8"]]}
-      ]},
-      {n:27,f:"Yeniden yükleme",note:"Deload sonrası süperkompanzasyon. Güç taze.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS BW","20",""],["HSPU BW","2","3-5"],["Weighted Dip +42.5kg","2","3-5"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +30kg","2","6-8",""],["Full Front Lever BW","2","10-18s"],["Pull-up +42.5kg","2","3-5"],["One-arm asılı BW","2","30-40s/t"],["Dumbbell Bicep Curl @20kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @205kg","2","5-7","Pelvis pedden ayrılmamalıdır"],["Machine Hip Thrust @150kg","2","5-7","Lomber kilitli izometrik"],["GHD İzometrik Tutuş +20kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @80kg","2","6-8"],["Suitcase Carry @50kg","2","40m/t","Anti-lateral fleksiyon"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag BW","2","11-13"],["L-sit BW","2","30s"],["Freestanding HS BW","18",""],["Straight-arm kond. BW","2","30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +45kg","2","3-5"],["Weighted Dip +45kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
-      ]},
-      {n:28,f:"Program sonu",note:"100kg Leg Press → 210kg, 50kg Hip Thrust → 155kg, sıfırdan full FL ve HSPU.",days:[
-        {l:"Push+HS",i:"Pazartesi",w:"push",ex:[["Freestanding HS max BW","5",""],["HSPU BW","2","4-6","✓"],["Weighted Dip +45kg","2","3-5"],["Side Raise @16kg","2","10-12"]]},
-        {l:"Pull+FL",i:"Salı",w:"pull",ex:[["Inverted Row +32.5kg","2","6-8",""],["Full Front Lever BW","2","15-20s","✓"],["Pull-up +45kg","2","3-5"],["One-arm asılı BW","2","35-40s/t"],["Dumbbell Bicep Curl @20kg","2","8-12","Dirsekler gövdeye sabit"]]},
-        {l:"Bacak-Ağır",i:"Çarşamba",w:"legs",ex:[["Leg Press @210kg","2","5-7","✓ 200+kg"],["Machine Hip Thrust @155kg","2","5-7","✓ Lomber kilitli"],["GHD İzometrik Tutuş +20kg","2","30-45s","Nötral omurga"],["Lying Leg Curl @82.5kg","2","6-8"],["Suitcase Carry @52kg","2","40m/t","Anti-lateral fleksiyon"],["Single Leg Calf Raise BW","2","10-12/t"]]},
-        {l:"Skill+Core",i:"Cuma",w:"skill",ex:[["Dragon Flag Full BW","2","10-12","✓"],["L-sit BW","2","30s","✓"],["Freestanding HS BW","20",""],["Straight-arm kond. BW","2","30s"]]},
-        {l:"Güç",i:"Cumartesi",w:"push",ex:[["Pull-up +47.5kg","2","3-5"],["Weighted Dip +47.5kg","2","3-5"],["Pike Push-up BW","2","6-8"]]}
-      ]}
-  ]}
-];
+    <!-- Reset Confirm Modal -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal-box">
+            <h3>⚠️ Tüm Verileri Sıfırla</h3>
+            <p style="color:var(--text2);font-size:14px;margin:10px 0;">
+                Bu işlem tüm antrenman verilerini, ilerlemeleri ve ayarları kalıcı olarak silecektir.
+                Geri alınamaz. Devam etmek istediğinize emin misiniz?
+            </p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeResetModal()">İptal</button>
+                <button class="btn-danger" onclick="confirmReset()">Evet, Sıfırla</button>
+            </div>
+        </div>
+    </div>
 
-let si = parseInt(localStorage.getItem('si') || '0');
-let wi = parseInt(localStorage.getItem('wi') || '0');
-let di = parseInt(localStorage.getItem('di') || '0');
-let wuOpen = localStorage.getItem('wuOpen') === 'true';
+    <!-- Timer Container -->
+    <div id="timerContainer" style="display:none;">
+        <div class="timer-row">
+            <input type="number" id="timerInput" value="120" step="5" min="5"> sn
+            <span class="timer-time" id="timerDisplay">02:00</span>
+            <button id="timerStartBtn" class="start" onclick="startTimer()">▶ Başlat</button>
+            <button onclick="stopTimer()" class="stop">■ Durdur</button>
+            <button onclick="resetTimer()">⟲ Sıfırla</button>
+        </div>
+        <div class="timer-progress">
+            <div class="bar" id="timerProgressBar"></div>
+        </div>
+    </div>
 
-function saveState() {
-  localStorage.setItem('si', si);
-  localStorage.setItem('wi', wi);
-  localStorage.setItem('di', di);
-  localStorage.setItem('wuOpen', wuOpen);
-}
+    <!-- History Container -->
+    <div id="historyContainer">
+        <div class="history-box">
+            <h2>
+                📊 Antrenman Geçmişi
+                <button onclick="toggleHistory()">✕ Kapat</button>
+            </h2>
+            <div class="history-table-wrap">
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Hafta</th>
+                            <th>Gün</th>
+                            <th>Egzersiz</th>
+                            <th>Set</th>
+                            <th>Rep</th>
+                            <th>Ağırlık</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+            <button class="history-export-btn" onclick="exportCSV()">📥 CSV Olarak Dışa Aktar</button>
+        </div>
+    </div>
 
-function getKey(s,w,d,ex){ return `cali_${s}_${w}_${d}_${ex}`; }
-function isChecked(s,w,d,ex){ return localStorage.getItem(getKey(s,w,d,ex))==='1'; }
-function setChecked(s,w,d,ex,val){ localStorage.setItem(getKey(s,w,d,ex),val?'1':'0'); }
+    <script>
+        // ───────────────────────────────────────────────────────────────
+        // DATA
+        // ───────────────────────────────────────────────────────────────
 
-function calcWeekStats(s,w){
-  let total=0, done=0;
-  ST[s].weeks[w].days.forEach((d,di)=>{ d.ex.forEach((_,ex)=>{ total++; if(isChecked(s,w,di,ex)) done++; }); });
-  return {total,done};
-}
-function calcDayStats(s,w,d){
-  let total=0, done=0;
-  ST[s].weeks[w].days[d].ex.forEach((_,ex)=>{ total++; if(isChecked(s,w,d,ex)) done++; });
-  return {total,done};
-}
+        const PROGRAM_NAME = "Calisthenic Program";
 
-function render(){
-  const s=ST[si], w=s.weeks[wi], d=w.days[Math.min(di, w.days.length-1)];
+        function buildInitialWeek() {
+            return {
+                weekNumber: 1,
+                completed: false,
+                days: [{
+                    name: "Push",
+                    exercises: [
+                        { id: genId(), name: "Weighted Dip", sets: 2, reps: "8", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Incline Barbell Bench Press", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Pike Push-up (ayak yükseltili)", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 0,
+                            incrementUnit: "yok", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Side Lateral Raise", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 1, incrementUnit: "kg",
+                            requiredWeeks: 3, consecutiveGreen: 0 },
+                        { id: genId(), name: "Wall Handstand Hold", sets: 3, reps: "30s", weight: "",
+                            status: "none", incrementAmount: 2, incrementUnit: "s",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "L-sit Progresyonu (tek bacak/tuck)", sets: 3, reps: "15s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }, {
+                    name: "Lower Quad",
+                    exercises: [
+                        { id: genId(), name: "Leg Press Orta Ayak", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Leg Extension", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Lying Leg Curl", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Standing Calf Raise", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Hip Abduction", sets: 2, reps: "15",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Hanging Knee Raise", sets: 2, reps: "12",
+                            weight: "", status: "none", incrementAmount: 1,
+                            incrementUnit: "reps", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Plank", sets: 2, reps: "60s", weight: "",
+                            status: "none", incrementAmount: 2, incrementUnit: "s",
+                            requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }, {
+                    name: "Pull",
+                    exercises: [
+                        { id: genId(), name: "Weighted Pull-up", sets: 2, reps: "8", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Lat Pulldown (geniş pronated)", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Inverted Row (ayak yerde)", sets: 2, reps: "12",
+                            weight: "", status: "none", incrementAmount: 0,
+                            incrementUnit: "yok", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Face Pull", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Scapular Pull-up", sets: 2, reps: "10", weight: "",
+                            status: "none", incrementAmount: 0, incrementUnit: "yok",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Tuck Front Lever Tutuş", sets: 3, reps: "15s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }, {
+                    name: "Lower Posterior",
+                    exercises: [
+                        { id: genId(), name: "Leg Press Yüksek Ayak", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Leg Extension", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Lying Leg Curl", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Seated Calf Raise", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Hip Abduction", sets: 2, reps: "15",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "L-sit Pratiği (parallette)", sets: 3, reps: "15s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Side Plank (her taraf)", sets: 2, reps: "30s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }]
+            };
+        }
 
-  document.getElementById('weekNav').innerHTML = s.weeks.map((wk,i)=>{
-    const stat=calcWeekStats(si,i);
-    let cls='pill'; if(i===wi) cls+=' on';
-    if(stat.total>0 && stat.done===stat.total) cls+=' done';
-    else if(stat.done>0) cls+=' partial';
-    return `<button class="${cls}" onclick="selW(${i})">H${wk.n}</button>`;
-  }).join('');
+        let programData = null;
+        let currentWeekIdx = 0;
+        let currentDayIdx = 0;
+        let editingExerciseId = null;
 
-  document.getElementById('dayTabs').innerHTML = w.days.map((day,j)=>{
-    const stat=calcDayStats(si,wi,j);
-    let cls='dpill'; if(j===di) cls+=' on';
-    if(stat.total>0 && stat.done===stat.total) cls+=' done';
-    else if(stat.done>0) cls+=' partial';
-    return `<button class="${cls}" onclick="selD(${j})">${day.l}</button>`;
-  }).join('');
+        // ── Timer state ──
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let timerTotal = 0;
+        let timerRunning = false;
 
-  const allChecked = d.ex.every((_,idx) => isChecked(si,wi,di,idx));
-  const doneBadge = allChecked ? '<span class="day-done-badge">✅ Gün Tamamlandı</span>' : '';
-  document.getElementById('dinfo').innerHTML = d.i + doneBadge;
+        // ── Drag state ──
+        let dragMode = false;
+        let dragSrcIndex = null;
 
-  let noteHtml = (w.note||'').replace(/\n/g,'<br>');
-  noteHtml = noteHtml.replace(/📺 (Calihoss:[^\n<]*)/g,
-    '<a class="caliref" href="https://calihoss.me/learn/calisthenics" target="_blank" rel="noopener">📺 $1</a>');
-  document.getElementById('weekHdr').innerHTML =
-    `<div class="wfocus">${w.f}</div><div class="wnote">${noteHtml||''}</div>`;
+        // ───────────────────────────────────────────────────────────────
+        // HELPERS
+        // ───────────────────────────────────────────────────────────────
 
-  document.getElementById('wtit').textContent = 'Isınma — '+WN[d.w];
-  document.getElementById('wlist').innerHTML = WU[d.w].map(([n,det])=>
-    `<div class="wi"><span class="win">${n}</span><span class="wid">${det}</span></div>`
-  ).join('');
+        function genId() {
+            return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+        }
 
-  document.getElementById('exb').innerHTML = d.ex.map(([nm,sets,reps,note],idx)=>{
-    const checked = isChecked(si,wi,di,idx);
-    const noteHtml2 = note
-      ? (note.startsWith('✓')
-          ? `<div class="ex-check-note">${note}</div>`
-          : `<div class="ex-note">${note}</div>`)
-      : '';
-    return `<tr>
-      <td><input type="checkbox" ${checked?'checked':''} onchange="setChecked(${si},${wi},${di},${idx},this.checked);render()" id="cb_${idx}"></td>
-      <td><label for="cb_${idx}" class="ex-name">${nm}</label>${noteHtml2}</td>
-      <td>${sets}</td>
-      <td>${reps}</td>
-    </tr>`;
-  }).join('');
+        function getStorageKey() {
+            return 'cali4_program_data';
+        }
 
-  document.getElementById('lubox').innerHTML = `
-    <div class="lu-title">Level-up Kriterleri</div>
-    ${s.lu.map(c=>`<div class="luc"><span class="lck">✓</span><span>${c}</span></div>`).join('')}`;
-}
+        function loadData() {
+            const raw = localStorage.getItem(getStorageKey());
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && parsed.weeks && parsed.weeks.length > 0) {
+                        parsed.weeks.forEach(w => {
+                            w.days.forEach(d => {
+                                d.exercises.forEach(ex => {
+                                    if (!ex.id) ex.id = genId();
+                                    if (!ex.status) ex.status = "none";
+                                    if (ex.incrementAmount === undefined) ex.incrementAmount = 2.5;
+                                    if (!ex.incrementUnit) ex.incrementUnit = "kg";
+                                    if (ex.requiredWeeks === undefined) ex.requiredWeeks = 1;
+                                    if (ex.consecutiveGreen === undefined) ex.consecutiveGreen = 0;
+                                });
+                            });
+                        });
+                        programData = parsed;
+                        return true;
+                    }
+                } catch (e) {}
+            }
+            return false;
+        }
 
-function selW(i){wi=i;di=0;saveState();render();}
-function selD(i){di=i;saveState();render();}
+        function saveData() {
+            if (programData) {
+                localStorage.setItem(getStorageKey(), JSON.stringify(programData));
+            }
+        }
 
-function toggleW(){
-  wuOpen=!wuOpen;
-  document.getElementById('wlist').className='wlist'+(wuOpen?' open':'');
-  document.getElementById('warr').className='warmup-arrow'+(wuOpen?' open':'');
-  saveState();
-}
+        function initProgram() {
+            if (loadData()) {
+                if (currentWeekIdx >= programData.weeks.length) currentWeekIdx = programData.weeks.length - 1;
+                if (currentWeekIdx < 0) currentWeekIdx = 0;
+                const w = programData.weeks[currentWeekIdx];
+                if (w && currentDayIdx >= w.days.length) currentDayIdx = w.days.length - 1;
+                if (currentDayIdx < 0) currentDayIdx = 0;
+                return;
+            }
+            const initial = {
+                programName: PROGRAM_NAME,
+                weeks: [buildInitialWeek()]
+            };
+            programData = initial;
+            saveData();
+        }
 
-function selS(i){
-  si=i; wi=0; di=0;
-  document.querySelectorAll('.sbtn').forEach((b,j)=>{
-    b.className=`sbtn s${j}${j===i?' on':''}`;
-  });
-  saveState();
-  render();
-}
+        function getCurrentWeek() {
+            if (!programData || programData.weeks.length === 0) return null;
+            if (currentWeekIdx >= programData.weeks.length) currentWeekIdx = programData.weeks.length - 1;
+            return programData.weeks[currentWeekIdx];
+        }
 
-document.getElementById('stages').innerHTML = ST.map((s,i)=>
-  `<button class="sbtn s${i}${i===si?' on':''}" onclick="selS(${i})"><strong>${s.name}</strong> — ${s.lbl}</button>`
-).join('');
+        function getCurrentDay() {
+            const w = getCurrentWeek();
+            if (!w) return null;
+            if (currentDayIdx >= w.days.length) currentDayIdx = w.days.length - 1;
+            return w.days[currentDayIdx];
+        }
 
-if(wuOpen){ document.getElementById('wlist').className='wlist open'; document.getElementById('warr').className='warmup-arrow open'; }
-
-render();
-</script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(registrations => {
-      registrations.forEach(reg => reg.unregister());
-    }).then(() => {
-      caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key))));
-    }).finally(() => {
-      navigator.serviceWorker.register('sw.js?v=3')
-        .then(reg => {
-          reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                if (confirm('Yeni güncelleme var! Şimdi yenilensin mi?')) {
-                  window.location.reload();
+        function isWeekFullyDone(w) {
+            for (const day of w.days) {
+                for (const ex of day.exercises) {
+                    if (ex.status === 'none') return false;
                 }
-              }
+            }
+            return true;
+        }
+
+        function hasAnyDone(w) {
+            for (const day of w.days) {
+                for (const ex of day.exercises) {
+                    if (ex.status === 'done' || ex.status === 'partial') return true;
+                }
+            }
+            return false;
+        }
+
+        function getWeekStatus(w) {
+            let allDone = true;
+            let anyDone = false;
+            for (const day of w.days) {
+                for (const ex of day.exercises) {
+                    if (ex.status === 'done' || ex.status === 'partial') anyDone = true;
+                    else if (ex.status === 'none') allDone = false;
+                }
+            }
+            if (allDone && anyDone) return 'done';
+            if (anyDone) return 'partial';
+            return 'none';
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // RENDER
+        // ───────────────────────────────────────────────────────────────
+
+        function render() {
+            const w = getCurrentWeek();
+            if (w) {
+                if (w.completed && !isWeekFullyDone(w)) {
+                    w.completed = false;
+                    if (programData.weeks.length > currentWeekIdx + 1) {
+                        programData.weeks.splice(currentWeekIdx + 1, 1);
+                    }
+                    saveData();
+                }
+                if (programData.weeks.length > currentWeekIdx + 1) {
+                    const nextW = programData.weeks[currentWeekIdx + 1];
+                    if (nextW && !isWeekFullyDone(w)) {
+                        programData.weeks.splice(currentWeekIdx + 1, 1);
+                        saveData();
+                    }
+                }
+            }
+
+            const wk = getCurrentWeek();
+            if (!wk) {
+                document.getElementById('weekHdr').innerHTML = '<div class="wfocus">Program boş</div>';
+                document.getElementById('exb').innerHTML = '';
+                document.getElementById('weekNav').innerHTML = '';
+                document.getElementById('dayTabs').innerHTML = '';
+                document.getElementById('dinfo').textContent = '';
+                document.getElementById('weekCompleteArea').innerHTML = '';
+                document.getElementById('stages').innerHTML = '';
+                return;
+            }
+
+            const d = getCurrentDay();
+            const exercises = d ? d.exercises : [];
+
+            // Week navigation
+            document.getElementById('weekNav').innerHTML = programData.weeks.map((wkItem, i) => {
+                let cls = 'pill';
+                if (i === currentWeekIdx) cls += ' on';
+                if (wkItem.completed) cls += ' completed-true';
+                const wStatus = getWeekStatus(wkItem);
+                if (wStatus === 'done') cls += ' done';
+                else if (wStatus === 'partial') cls += ' partial';
+
+                let label = 'H' + wkItem.weekNumber;
+                if (wkItem.completed) label += ' ✓';
+
+                let delBtn = '';
+                if (i > 0) {
+                    delBtn =
+                    `<button class="del-week" onclick="deleteWeek(${i})" title="Bu haftayı ve sonrasını sil">✕</button>`;
+                }
+                return `<button class="${cls}" onclick="switchWeek(${i})">${label}${delBtn}</button>`;
+            }).join('');
+
+            // Day tabs
+            document.getElementById('dayTabs').innerHTML = wk.days.map((day, j) => {
+                let cls = 'dpill';
+                if (j === currentDayIdx) cls += ' on';
+                let allDone = true;
+                let anyDone = false;
+                for (const ex of day.exercises) {
+                    if (ex.status === 'done' || ex.status === 'partial') anyDone = true;
+                    else if (ex.status === 'none') { allDone = false; break; }
+                }
+                if (allDone && anyDone) cls += ' done';
+                else if (anyDone) cls += ' partial';
+                return `<button class="${cls}" onclick="switchDay(${j})">${day.name}</button>`;
+            }).join('');
+
+            // Day info
+            const dayName = d ? d.name : '';
+            let allDone = true;
+            let anyDone = false;
+            if (d) {
+                for (const ex of d.exercises) {
+                    if (ex.status === 'done' || ex.status === 'partial') anyDone = true;
+                    else if (ex.status === 'none') { allDone = false; break; }
+                }
+            }
+            const doneBadge = (allDone && anyDone) ? '<span class="day-done-badge">✅ Gün Tamamlandı</span>' : '';
+            document.getElementById('dinfo').innerHTML = dayName + ' ' + doneBadge;
+
+            // Week header
+            const totalEx = d ? d.exercises.length : 0;
+            const doneEx = d ? d.exercises.filter(e => e.status === 'done' || e.status === 'partial').length : 0;
+            const greenEx = d ? d.exercises.filter(e => e.status === 'done').length : 0;
+            const progText = d ? `${doneEx}/${totalEx} yapıldı (${greenEx} yeşil)` : '';
+            document.getElementById('weekHdr').innerHTML = `
+                <div class="wfocus">Hafta ${wk.weekNumber} · ${dayName}</div>
+                <div class="wnote">${progText} ${wk.completed ? '✅ Hafta tamamlandı!' : ''}</div>
+            `;
+
+            // Exercise table
+            if (d) {
+                const rows = d.exercises.map((ex, idx) => {
+                    const isDone = ex.status === 'done';
+                    const isPartial = ex.status === 'partial';
+                    const weightVal = ex.weight || '';
+                    return `<tr data-ex-idx="${idx}" draggable="${dragMode}">
+                        <td>
+                            <div class="status-group">
+                                <button class="status-btn ${isDone ? 'green-on' : ''}" 
+                                    onclick="setStatus(${idx}, 'done')" title="Tamamlandı">✓</button>
+                                <button class="status-btn ${isPartial ? 'orange-on' : ''}" 
+                                    onclick="setStatus(${idx}, 'partial')" title="Yarım kaldı (ilerleme uygulanır)">◐</button>
+                            </div>
+                        </td>
+                        <td>
+                            ${dragMode ? `<span class="drag-handle" title="Sürükle">⠿</span>` : ''}
+                            <span class="ex-name">${escHtml(ex.name)}</span>
+                        </td>
+                        <td><input class="ex-input ex-input-sm" type="number" min="1" value="${ex.sets}" 
+                                onchange="updateField(${idx}, 'sets', this.value)" /></td>
+                        <td><input class="ex-input ex-input-sm" type="text" value="${escHtml(ex.reps)}" 
+                                onchange="updateField(${idx}, 'reps', this.value)" /></td>
+                        <td><input class="ex-input ex-input-med" type="text" value="${escHtml(weightVal)}" 
+                                placeholder="Boş" onchange="updateField(${idx}, 'weight', this.value)" /></td>
+                        <td>
+                            <button class="action-btn" onclick="openEditModal('${ex.id}')" title="İlerleme ayarları">⚙</button>
+                            <button class="action-btn del-btn" onclick="deleteExercise(${idx})" title="Sil">✕</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+                document.getElementById('exb').innerHTML = rows;
+
+                // Drag & Drop olaylarını bağla
+                if (dragMode) {
+                    const trs = document.querySelectorAll('#exb tr');
+                    trs.forEach(tr => {
+                        tr.addEventListener('dragstart', handleDragStart);
+                        tr.addEventListener('dragover', handleDragOver);
+                        tr.addEventListener('dragenter', handleDragEnter);
+                        tr.addEventListener('dragleave', handleDragLeave);
+                        tr.addEventListener('drop', handleDrop);
+                        tr.addEventListener('dragend', handleDragEnd);
+                        // Touch events for mobile
+                        tr.addEventListener('touchstart', handleTouchStart, { passive: true });
+                        tr.addEventListener('touchmove', handleTouchMove, { passive: false });
+                        tr.addEventListener('touchend', handleTouchEnd, { passive: true });
+                    });
+                }
+            } else {
+                document.getElementById('exb').innerHTML = '<tr><td colspan="6" class="empty-msg">Bu gün için egzersiz yok</td></tr>';
+            }
+
+            // Week complete area
+            const area = document.getElementById('weekCompleteArea');
+            if (wk.completed) {
+                area.innerHTML = `<div class="week-done-badge">✅ Hafta ${wk.weekNumber} Tamamlandı</div>`;
+            } else {
+                const fullyDone = isWeekFullyDone(wk);
+                if (fullyDone && d && d.exercises.length > 0) {
+                    area.innerHTML = `
+                        <button class="complete-btn" onclick="completeWeek()">✅ Bu Haftayı Tamamla → Hafta ${wk.weekNumber + 1}</button>
+                        <div style="font-size:12px;color:var(--text2);margin-top:6px;">Tüm egzersizler yapıldı! Yeni hafta oluştur.</div>
+                    `;
+                } else {
+                    const total = d ? d.exercises.length : 0;
+                    const done = d ? d.exercises.filter(e => e.status === 'done' || e.status === 'partial').length : 0;
+                    area.innerHTML = `
+                        <div style="font-size:13px;color:var(--text2);">
+                            ${done}/${total} egzersiz yapıldı. 
+                            ${total > 0 && done < total ? 'Tümünü yeşil veya turuncu yaparak haftayı tamamlayın.' : ''}
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById('stages').innerHTML = `
+                <span style="color:var(--text);font-size:14px;font-weight:600;padding:8px 0;">Hafta ${wk.weekNumber}</span>
+            `;
+
+            // Drag mode button state
+            document.getElementById('dragToggle').classList.toggle('on', dragMode);
+            document.getElementById('exTable').classList.toggle('drag-mode-on', dragMode);
+
+            saveData();
+        }
+
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // ACTIONS
+        // ───────────────────────────────────────────────────────────────
+
+        function switchWeek(idx) {
+            if (idx >= 0 && idx < programData.weeks.length) {
+                currentWeekIdx = idx;
+                currentDayIdx = 0;
+                render();
+            }
+        }
+
+        function switchDay(idx) {
+            const w = getCurrentWeek();
+            if (w && idx >= 0 && idx < w.days.length) {
+                currentDayIdx = idx;
+                render();
+            }
+        }
+
+        function setStatus(exIdx, status) {
+            const d = getCurrentDay();
+            if (!d) return;
+            const ex = d.exercises[exIdx];
+            if (!ex) return;
+            if (ex.status === status) {
+                ex.status = "none";
+            } else {
+                ex.status = status;
+            }
+            const w = getCurrentWeek();
+            if (w && w.completed && !isWeekFullyDone(w)) {
+                w.completed = false;
+                if (programData.weeks.length > currentWeekIdx + 1) {
+                    programData.weeks.splice(currentWeekIdx + 1, 1);
+                }
+            }
+            render();
+        }
+
+        function updateField(exIdx, field, value) {
+            const d = getCurrentDay();
+            if (!d) return;
+            const ex = d.exercises[exIdx];
+            if (!ex) return;
+            if (field === 'sets') {
+                const num = parseInt(value);
+                if (!isNaN(num) && num > 0) ex.sets = num;
+            } else if (field === 'reps') {
+                ex.reps = value.trim() || '0';
+            } else if (field === 'weight') {
+                ex.weight = value.trim() || '';
+            }
+            saveData();
+            render();
+        }
+
+        function deleteExercise(exIdx) {
+            const d = getCurrentDay();
+            if (!d) return;
+            if (d.exercises.length <= 1) {
+                alert('En az bir egzersiz olmalı.');
+                return;
+            }
+            if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
+            d.exercises.splice(exIdx, 1);
+            saveData();
+            render();
+        }
+
+        function deleteWeek(idx) {
+            if (idx <= 0) return;
+            if (!confirm(`Hafta ${programData.weeks[idx].weekNumber} ve sonraki tüm haftalar silinecek. Devam et?`)) return;
+            programData.weeks.splice(idx);
+            if (currentWeekIdx >= programData.weeks.length) {
+                currentWeekIdx = programData.weeks.length - 1;
+            }
+            currentDayIdx = 0;
+            saveData();
+            render();
+        }
+
+        function completeWeek() {
+            const w = getCurrentWeek();
+            if (!w) return;
+            if (w.completed) {
+                alert('Bu hafta zaten tamamlanmış.');
+                return;
+            }
+            if (!isWeekFullyDone(w)) {
+                alert('Tüm egzersizleri yapmadan (yeşil veya turuncu) haftayı bitiremezsiniz!');
+                return;
+            }
+
+            const newDays = w.days.map(day => {
+                const newExercises = day.exercises.map(ex => {
+                    let newConsecutive = ex.consecutiveGreen;
+                    let newWeight = ex.weight || '';
+                    let newReps = ex.reps || '0';
+                    let applied = false;
+
+                    // Both GREEN and PARTIAL count for progression
+                    if (ex.status === 'done' || ex.status === 'partial') {
+                        newConsecutive = ex.consecutiveGreen + 1;
+                    } else {
+                        newConsecutive = 0;
+                    }
+
+                    // Apply progression only if unit is not 'yok' and consecutiveGreen meets threshold
+                    if (ex.incrementUnit !== 'yok' && newConsecutive >= ex.requiredWeeks) {
+                        const unit = ex.incrementUnit;
+                        const amount = ex.incrementAmount || 0;
+
+                        if (unit === 'kg') {
+                            const weightStr = ex.weight || '';
+                            if (/kg/.test(weightStr) && !/^bw$/i.test(weightStr.trim())) {
+                                const match = weightStr.match(/([\+\-]?\d+\.?\d*)\s*kg/);
+                                if (match) {
+                                    const val = parseFloat(match[1]);
+                                    const newVal = val + amount;
+                                    const prefix = weightStr.startsWith('+') ? '+' : '';
+                                    newWeight = prefix + newVal.toFixed(1) + ' kg';
+                                    applied = true;
+                                }
+                            } else if (weightStr.trim().toUpperCase() === 'BW') {
+                                newWeight = 'BW';
+                            } else if (weightStr === '') {
+                                newWeight = '';
+                            }
+                        } else if (unit === 'reps') {
+                            const repsStr = ex.reps || '0';
+                            const match = repsStr.match(/(\d+)/);
+                            if (match) {
+                                const val = parseInt(match[1]);
+                                const newVal = val + amount;
+                                newReps = newVal + '';
+                                applied = true;
+                            }
+                        } else if (unit === 's') {
+                            const repsStr = ex.reps || '0s';
+                            const match = repsStr.match(/(\d+)s/);
+                            if (match) {
+                                const val = parseInt(match[1]);
+                                const newVal = val + amount;
+                                newReps = newVal + 's';
+                                applied = true;
+                            }
+                        }
+                        if (applied) {
+                            newConsecutive = 0;
+                        }
+                    }
+
+                    return {
+                        id: genId(),
+                        name: ex.name,
+                        sets: ex.sets,
+                        reps: newReps,
+                        weight: newWeight,
+                        status: "none",
+                        incrementAmount: ex.incrementAmount,
+                        incrementUnit: ex.incrementUnit,
+                        requiredWeeks: ex.requiredWeeks,
+                        consecutiveGreen: newConsecutive
+                    };
+                });
+                return {
+                    name: day.name,
+                    exercises: newExercises
+                };
             });
-          });
-        })
-        .catch(err => console.log('SW kaydı başarısız:', err));
-    });
-  }
-</script>
+
+            const newWeek = {
+                weekNumber: w.weekNumber + 1,
+                completed: false,
+                days: newDays
+            };
+
+            w.completed = true;
+            programData.weeks.push(newWeek);
+            saveData();
+
+            currentWeekIdx = programData.weeks.length - 1;
+            currentDayIdx = 0;
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // DRAG & DROP (Sürükle-Bırak)
+        // ───────────────────────────────────────────────────────────────
+
+        function toggleDragMode() {
+            dragMode = !dragMode;
+            if (dragMode) {
+                // Titreme efekti için shake sınıfını ekle
+                document.querySelectorAll('#exb tr').forEach(tr => tr.classList.add('shake'));
+            } else {
+                document.querySelectorAll('#exb tr').forEach(tr => {
+                    tr.classList.remove('shake', 'dragging', 'drag-over');
+                    tr.draggable = false;
+                });
+                // Olayları temizle
+                const trs = document.querySelectorAll('#exb tr');
+                trs.forEach(tr => {
+                    tr.removeEventListener('dragstart', handleDragStart);
+                    tr.removeEventListener('dragover', handleDragOver);
+                    tr.removeEventListener('dragenter', handleDragEnter);
+                    tr.removeEventListener('dragleave', handleDragLeave);
+                    tr.removeEventListener('drop', handleDrop);
+                    tr.removeEventListener('dragend', handleDragEnd);
+                    tr.removeEventListener('touchstart', handleTouchStart);
+                    tr.removeEventListener('touchmove', handleTouchMove);
+                    tr.removeEventListener('touchend', handleTouchEnd);
+                });
+                dragSrcIndex = null;
+            }
+            render();
+        }
+
+        let touchDragData = null;
+
+        function handleDragStart(e) {
+            if (!dragMode) return;
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const idx = parseInt(tr.dataset.exIdx);
+            dragSrcIndex = idx;
+            tr.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', idx);
+            // Touch drag için
+            touchDragData = { idx, startY: 0 };
+        }
+
+        function handleDragOver(e) {
+            if (!dragMode) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            if (!dragMode) return;
+            e.preventDefault();
+            const tr = e.target.closest('tr');
+            if (tr && dragSrcIndex !== null && parseInt(tr.dataset.exIdx) !== dragSrcIndex) {
+                tr.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            if (!dragMode) return;
+            const tr = e.target.closest('tr');
+            if (tr) tr.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (!dragMode) return;
+            e.preventDefault();
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const targetIdx = parseInt(tr.dataset.exIdx);
+            if (dragSrcIndex === null || targetIdx === dragSrcIndex) {
+                tr.classList.remove('drag-over');
+                return;
+            }
+            const d = getCurrentDay();
+            if (!d) return;
+            // Swap exercises
+            const exs = d.exercises;
+            const [removed] = exs.splice(dragSrcIndex, 1);
+            exs.splice(targetIdx, 0, removed);
+            saveData();
+            dragSrcIndex = null;
+            tr.classList.remove('drag-over');
+            render();
+        }
+
+        function handleDragEnd(e) {
+            if (!dragMode) return;
+            document.querySelectorAll('#exb tr').forEach(tr => tr.classList.remove('dragging', 'drag-over'));
+            dragSrcIndex = null;
+        }
+
+        // Touch support for mobile
+        function handleTouchStart(e) {
+            if (!dragMode) return;
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const idx = parseInt(tr.dataset.exIdx);
+            touchDragData = { idx, startY: e.touches[0].clientY, tr };
+        }
+
+        function handleTouchMove(e) {
+            if (!dragMode || !touchDragData) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const trs = document.querySelectorAll('#exb tr');
+            let targetTr = null;
+            trs.forEach(tr => {
+                const rect = tr.getBoundingClientRect();
+                if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                    targetTr = tr;
+                }
+            });
+            if (targetTr && targetTr.dataset.exIdx != touchDragData.idx) {
+                // Highlight
+                trs.forEach(tr => tr.classList.remove('drag-over'));
+                targetTr.classList.add('drag-over');
+            } else {
+                trs.forEach(tr => tr.classList.remove('drag-over'));
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!dragMode || !touchDragData) return;
+            const trs = document.querySelectorAll('#exb tr');
+            let targetTr = null;
+            trs.forEach(tr => {
+                if (tr.classList.contains('drag-over')) targetTr = tr;
+                tr.classList.remove('drag-over');
+            });
+            if (targetTr) {
+                const targetIdx = parseInt(targetTr.dataset.exIdx);
+                if (targetIdx !== touchDragData.idx) {
+                    const d = getCurrentDay();
+                    if (d) {
+                        const exs = d.exercises;
+                        const [removed] = exs.splice(touchDragData.idx, 1);
+                        exs.splice(targetIdx, 0, removed);
+                        saveData();
+                        render();
+                    }
+                }
+            }
+            touchDragData = null;
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // EDIT EXERCISE CONFIG
+        // ───────────────────────────────────────────────────────────────
+
+        function openEditModal(exId) {
+            const d = getCurrentDay();
+            if (!d) return;
+            const ex = d.exercises.find(e => e.id === exId);
+            if (!ex) return;
+            editingExerciseId = exId;
+            document.getElementById('editName').value = ex.name || '';
+            document.getElementById('editIncrement').value = ex.incrementAmount || 0;
+            document.getElementById('editUnit').value = ex.incrementUnit || 'kg';
+            document.getElementById('editRequiredWeeks').value = ex.requiredWeeks || 1;
+            document.getElementById('editCurrentGreen').textContent = ex.consecutiveGreen || 0;
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('open');
+            editingExerciseId = null;
+        }
+
+        function confirmEditExercise() {
+            const d = getCurrentDay();
+            if (!d) return;
+            const ex = d.exercises.find(e => e.id === editingExerciseId);
+            if (!ex) return;
+
+            const newName = document.getElementById('editName').value.trim();
+            if (newName) {
+                ex.name = newName;
+            }
+
+            const inc = parseFloat(document.getElementById('editIncrement').value);
+            if (isNaN(inc) || inc < 0) {
+                alert('Geçerli bir artış miktarı girin.');
+                return;
+            }
+            ex.incrementAmount = inc;
+            ex.incrementUnit = document.getElementById('editUnit').value;
+            const req = parseInt(document.getElementById('editRequiredWeeks').value);
+            if (isNaN(req) || req < 1) {
+                alert('En az 1 hafta olmalı.');
+                return;
+            }
+            ex.requiredWeeks = req;
+            saveData();
+            closeEditModal();
+            render();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // ADD EXERCISE MODAL
+        // ───────────────────────────────────────────────────────────────
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('open');
+            document.getElementById('modalName').value = '';
+            document.getElementById('modalSets').value = '2';
+            document.getElementById('modalReps').value = '8';
+            document.getElementById('modalWeight').value = '';
+            document.getElementById('modalName').focus();
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('open');
+        }
+
+        function confirmAddExercise() {
+            const name = document.getElementById('modalName').value.trim();
+            const sets = parseInt(document.getElementById('modalSets').value) || 2;
+            const reps = document.getElementById('modalReps').value.trim() || '8';
+            const weight = document.getElementById('modalWeight').value.trim() || '';
+
+            if (!name) {
+                alert('Egzersiz adı giriniz.');
+                return;
+            }
+
+            const d = getCurrentDay();
+            if (!d) {
+                alert('Gün bulunamadı.');
+                return;
+            }
+
+            d.exercises.push({
+                id: genId(),
+                name: name,
+                sets: sets,
+                reps: reps,
+                weight: weight,
+                status: "none",
+                incrementAmount: 2.5,
+                incrementUnit: "kg",
+                requiredWeeks: 1,
+                consecutiveGreen: 0
+            });
+
+            closeAddModal();
+            saveData();
+            render();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // TIMER
+        // ───────────────────────────────────────────────────────────────
+
+        function toggleTimer() {
+            const container = document.getElementById('timerContainer');
+            if (container.style.display === 'none') {
+                container.style.display = 'flex';
+                // Varsayılan süre input'tan al
+                const input = document.getElementById('timerInput');
+                timerTotal = parseInt(input.value) || 120;
+                timerSeconds = timerTotal;
+                updateTimerDisplay();
+                updateProgress();
+            } else {
+                container.style.display = 'none';
+                stopTimer();
+            }
+        }
+
+        function startTimer() {
+            if (timerRunning) return;
+            const input = document.getElementById('timerInput');
+            timerTotal = parseInt(input.value) || 120;
+            if (timerSeconds <= 0) {
+                timerSeconds = timerTotal;
+            }
+            timerRunning = true;
+            document.getElementById('timerStartBtn').textContent = '▶ Çalışıyor';
+            document.getElementById('timerStartBtn').classList.remove('start');
+            document.getElementById('timerStartBtn').classList.add('stop');
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+                updateProgress();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerRunning = false;
+                    document.getElementById('timerStartBtn').textContent = '▶ Başlat';
+                    document.getElementById('timerStartBtn').classList.remove('stop');
+                    document.getElementById('timerStartBtn').classList.add('start');
+                    // Titreşim
+                    if (navigator.vibrate) {
+                        navigator.vibrate(3000);
+                    }
+                    // Sesli bildirim (opsiyonel)
+                    // alert('Süre doldu!');
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            document.getElementById('timerStartBtn').textContent = '▶ Başlat';
+            document.getElementById('timerStartBtn').classList.remove('stop');
+            document.getElementById('timerStartBtn').classList.add('start');
+        }
+
+        function resetTimer() {
+            stopTimer();
+            const input = document.getElementById('timerInput');
+            timerTotal = parseInt(input.value) || 120;
+            timerSeconds = timerTotal;
+            updateTimerDisplay();
+            updateProgress();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        }
+
+        function updateProgress() {
+            const pct = timerTotal > 0 ? ((timerTotal - timerSeconds) / timerTotal * 100) : 0;
+            document.getElementById('timerProgressBar').style.width = Math.min(100, pct) + '%';
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // HISTORY
+        // ───────────────────────────────────────────────────────────────
+
+        function toggleHistory() {
+            const container = document.getElementById('historyContainer');
+            container.classList.toggle('open');
+            if (container.classList.contains('open')) {
+                renderHistory();
+            }
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('historyBody');
+            if (!programData || !programData.weeks) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Veri yok</td></tr>';
+                return;
+            }
+            let html = '';
+            programData.weeks.forEach(w => {
+                w.days.forEach(day => {
+                    day.exercises.forEach(ex => {
+                        const statusCls = ex.status === 'done' ? 'done' : (ex.status === 'partial' ?
+                            'partial' : 'none');
+                        const statusText = ex.status === 'done' ? '✅ Tam' : (ex.status === 'partial' ?
+                            '◐ Eksik' : '⬜ Boş');
+                        html += `<tr>
+                            <td>${w.weekNumber}</td>
+                            <td>${escHtml(day.name)}</td>
+                            <td>${escHtml(ex.name)}</td>
+                            <td>${ex.sets}</td>
+                            <td>${escHtml(ex.reps)}</td>
+                            <td>${escHtml(ex.weight)}</td>
+                            <td><span class="status-badge ${statusCls}">${statusText}</span></td>
+                        </tr>`;
+                    });
+                });
+            });
+            if (!html) {
+                html = '<tr><td colspan="7" class="empty-msg">Henüz kayıt yok</td></tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function exportCSV() {
+            if (!programData || !programData.weeks) {
+                alert('Veri yok.');
+                return;
+            }
+            let csv = 'Hafta,Gün,Egzersiz,Set,Rep,Ağırlık,Durum\n';
+            programData.weeks.forEach(w => {
+                w.days.forEach(day => {
+                    day.exercises.forEach(ex => {
+                        const statusText = ex.status === 'done' ? 'Tam' : (ex.status === 'partial' ?
+                            'Eksik' : 'Boş');
+                        const row = [
+                            w.weekNumber,
+                            `"${day.name}"`,
+                            `"${ex.name}"`,
+                            ex.sets,
+                            `"${ex.reps}"`,
+                            `"${ex.weight}"`,
+                            statusText
+                        ];
+                        csv += row.join(',') + '\n';
+                    });
+                });
+            });
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute('download', 'calisthenics_history.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // RESET
+        // ───────────────────────────────────────────────────────────────
+
+        function resetAll() {
+            document.getElementById('resetModal').classList.add('open');
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.remove('open');
+        }
+
+        function confirmReset() {
+            localStorage.removeItem(getStorageKey());
+            programData = null;
+            currentWeekIdx = 0;
+            currentDayIdx = 0;
+            closeResetModal();
+            initProgram();
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Close modals on overlay click
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddModal();
+        });
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+        document.getElementById('resetModal').addEventListener('click', function(e) {
+            if (e.target === this) closeResetModal();
+        });
+        document.getElementById('historyContainer').addEventListener('click', function(e) {
+            if (e.target === this) toggleHistory();
+        });
+
+        // ───────────────────────────────────────────────────────────────
+        // INIT
+        // ───────────────────────────────────────────────────────────────
+
+        initProgram();
+
+        let foundIncomplete = false;
+        for (let i = programData.weeks.length - 1; i >= 0; i--) {
+            if (!programData.weeks[i].completed) {
+                currentWeekIdx = i;
+                foundIncomplete = true;
+                break;
+            }
+        }
+        if (!foundIncomplete && programData.weeks.length > 0) {
+            currentWeekIdx = programData.weeks.length - 1;
+        }
+        currentDayIdx = 0;
+
+        render();
+
+        // ───────────────────────────────────────────────────────────────
+        // SERVICE WORKER (optional)
+        // ───────────────────────────────────────────────────────────────
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                registrations.forEach(reg => reg.unregister());
+            }).then(() => {
+                caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key))));
+            }).finally(() => {
+                navigator.serviceWorker.register('sw.js?v=3')
+                    .then(reg => {
+                        reg.addEventListener('updatefound', () => {
+                            const newWorker = reg.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker
+                                    .controller) {
+                                    if (confirm('Yeni güncelleme var! Şimdi yenilensin mi?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(err => console.log('SW kaydı başarısız:', err));
+            });
+        }
+    </script>
 </body>
 </html>
