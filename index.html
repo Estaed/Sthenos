@@ -39,7 +39,7 @@
             color: var(--text);
             line-height: 1.5;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: calc(160px + var(--safe-bottom)); /* Timer alanı için */
+            padding-bottom: calc(140px + var(--safe-bottom));
         }
         .scroll-row {
             display: flex;
@@ -97,37 +97,51 @@
             color: #ea4335;
         }
 
-        .sbtn {
-            flex-shrink: 0;
-            padding: 8px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text2);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all .15s;
-        }
-        .sbtn.on {
-            background: #2a2a2a;
-            border-color: #555;
-            color: var(--text);
-            font-weight: 700;
-        }
-
         .week-nav-wrap {
             position: sticky;
             top: 49px;
             z-index: 30;
             background: var(--bg);
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px 0 4px;
+        }
+        .week-nav-wrap .scroll-row {
+            padding: 8px 4px;
+            flex: 1;
+        }
+        .week-nav-wrap .week-actions {
+            flex-shrink: 0;
+            margin-left: 4px;
+        }
+        .week-nav-wrap .week-actions button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: .15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .week-nav-wrap .week-actions button:hover {
+            border-color: #555;
+            color: var(--text);
+        }
+        .week-nav-wrap .week-actions button.on {
+            border-color: var(--orange);
+            color: var(--orange);
         }
 
         .pill {
             flex-shrink: 0;
-            padding: 7px 10px 7px 14px;
+            padding: 6px 12px;
             border-radius: 20px;
             border: 1px solid var(--border);
             background: var(--card);
@@ -161,22 +175,27 @@
             border-color: #2e7d32;
             color: var(--green);
         }
-        .pill .del-week {
+        .pill .del-week-btn {
             background: none;
             border: none;
             color: #6a6a6a;
             cursor: pointer;
             font-size: 14px;
-            padding: 0 0 0 6px;
+            padding: 0 0 0 4px;
             line-height: 1;
             transition: color .15s;
             border-radius: 4px;
-            margin-left: 2px;
             font-weight: 400;
         }
-        .pill .del-week:hover {
+        .pill .del-week-btn:hover {
             color: #ea4335;
             background: rgba(234, 67, 53, 0.15);
+        }
+        .pill .del-week-btn.show {
+            display: inline-block;
+        }
+        .pill .del-week-btn.hide {
+            display: none;
         }
 
         .dpill {
@@ -307,41 +326,6 @@
         }
         .ex-table td:first-child {
             padding-left: 0;
-        }
-
-        /* Drag & Drop sırasında titreme */
-        .ex-table tr.dragging {
-            opacity: 0.5;
-            background: #2a2a2a;
-        }
-        .ex-table tr.drag-over {
-            border-bottom: 2px solid var(--green);
-        }
-        .ex-table tr.shake {
-            animation: shake 0.3s ease-in-out infinite alternate;
-        }
-        @keyframes shake {
-            0% { transform: translateX(-2px); }
-            100% { transform: translateX(2px); }
-        }
-        .drag-handle {
-            cursor: grab;
-            color: var(--text2);
-            font-size: 16px;
-            padding: 0 4px;
-            user-select: none;
-        }
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-        .drag-mode-on .drag-handle {
-            color: var(--text);
-        }
-        .drag-mode-on tr {
-            cursor: grab;
-        }
-        .drag-mode-on tr:active {
-            cursor: grabbing;
         }
 
         .status-group {
@@ -493,6 +477,41 @@
             height: 8px;
         }
 
+        /* Drag & Drop */
+        .ex-table tr.dragging {
+            opacity: 0.5;
+            background: #2a2a2a;
+        }
+        .ex-table tr.drag-over {
+            border-bottom: 2px solid var(--green);
+        }
+        .ex-table tr.shake {
+            animation: shake 0.3s ease-in-out infinite alternate;
+        }
+        @keyframes shake {
+            0% { transform: translateX(-2px); }
+            100% { transform: translateX(2px); }
+        }
+        .drag-handle {
+            cursor: grab;
+            color: var(--text2);
+            font-size: 16px;
+            padding: 0 4px;
+            user-select: none;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .drag-mode-on .drag-handle {
+            color: var(--text);
+        }
+        .drag-mode-on tr {
+            cursor: grab;
+        }
+        .drag-mode-on tr:active {
+            cursor: grabbing;
+        }
+
         /* ─── TIMER ─── */
         #timerContainer {
             position: fixed;
@@ -502,44 +521,52 @@
             z-index: 50;
             background: var(--card);
             border-top: 1px solid var(--border);
-            padding: 10px 12px calc(10px + var(--safe-bottom));
+            padding: 8px 12px calc(8px + var(--safe-bottom));
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             backdrop-filter: blur(10px);
             background: rgba(20,20,20,0.95);
         }
         #timerContainer .timer-row {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         #timerContainer .timer-row input {
-            flex: 1;
-            min-width: 60px;
+            width: 60px;
             background: var(--card2);
             border: 1px solid var(--border);
             border-radius: 6px;
             color: var(--text);
-            padding: 6px 8px;
+            padding: 4px 6px;
             font-size: 14px;
-            width: 80px;
+            text-align: center;
         }
         #timerContainer .timer-row input:focus {
             outline: none;
             border-color: #555;
         }
+        #timerContainer .timer-row .timer-label {
+            font-size: 12px;
+            color: var(--text2);
+            margin-right: 2px;
+        }
         #timerContainer .timer-row button {
             background: var(--card2);
             border: 1px solid var(--border);
             color: var(--text);
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 14px;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            font-size: 16px;
             cursor: pointer;
-            white-space: nowrap;
             transition: .15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         #timerContainer .timer-row button:hover {
             border-color: #555;
@@ -554,27 +581,31 @@
             border-color: #c5221f;
             color: #ea4335;
         }
+        #timerContainer .timer-row button.reset {
+            color: var(--text2);
+        }
+        .timer-time {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            min-width: 56px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+        }
         .timer-progress {
             width: 100%;
-            height: 6px;
+            height: 4px;
             background: var(--card2);
-            border-radius: 3px;
+            border-radius: 2px;
             overflow: hidden;
         }
         .timer-progress .bar {
             height: 100%;
             width: 0%;
             background: var(--green);
+            border-radius: 2px;
             transition: width 0.2s linear;
-            border-radius: 3px;
-        }
-        .timer-time {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
-            min-width: 60px;
-            text-align: center;
-            font-variant-numeric: tabular-nums;
         }
 
         /* ─── HISTORY ─── */
@@ -790,12 +821,8 @@
             .ex-name {
                 font-size: 13px;
             }
-            .pill .del-week {
-                font-size: 12px;
-                padding: 0 0 0 4px;
-            }
             .pill {
-                padding: 6px 8px 6px 12px;
+                padding: 5px 10px;
                 font-size: 12px;
             }
             .stage-actions button {
@@ -803,15 +830,26 @@
                 padding: 4px 8px;
             }
             #timerContainer .timer-row {
-                gap: 6px;
+                gap: 4px;
             }
             #timerContainer .timer-row input {
-                width: 60px;
-                font-size: 12px;
+                width: 50px;
+                font-size: 13px;
+                padding: 3px 4px;
             }
             .timer-time {
-                font-size: 16px;
-                min-width: 50px;
+                font-size: 18px;
+                min-width: 48px;
+            }
+            #timerContainer .timer-row button {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+            .week-nav-wrap .week-actions button {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
             }
         }
     </style>
@@ -839,6 +877,9 @@
 
         <div class="week-nav-wrap">
             <div class="scroll-row" id="weekNav"></div>
+            <div class="week-actions">
+                <button id="weekDeleteToggle" onclick="toggleDeleteMode()" title="Hafta silme modu">⚙</button>
+            </div>
         </div>
 
         <div class="week-hdr" id="weekHdr"></div>
@@ -936,11 +977,12 @@
     <!-- Timer Container -->
     <div id="timerContainer" style="display:none;">
         <div class="timer-row">
-            <input type="number" id="timerInput" value="120" step="5" min="5"> sn
+            <input type="number" id="timerInput" value="120" step="5" min="5">
+            <span class="timer-label">sn</span>
             <span class="timer-time" id="timerDisplay">02:00</span>
-            <button id="timerStartBtn" class="start" onclick="startTimer()">▶ Başlat</button>
-            <button onclick="stopTimer()" class="stop">■ Durdur</button>
-            <button onclick="resetTimer()">⟲ Sıfırla</button>
+            <button id="timerStartBtn" class="start" onclick="startTimer()" title="Başlat">▶</button>
+            <button onclick="stopTimer()" class="stop" title="Durdur">⏹</button>
+            <button onclick="resetTimer()" class="reset" title="Sıfırla">⟳</button>
         </div>
         <div class="timer-progress">
             <div class="bar" id="timerProgressBar"></div>
@@ -1098,6 +1140,9 @@
         let dragMode = false;
         let dragSrcIndex = null;
 
+        // ── Delete mode for weeks ──
+        let deleteMode = false;
+
         // ───────────────────────────────────────────────────────────────
         // HELPERS
         // ───────────────────────────────────────────────────────────────
@@ -1181,15 +1226,6 @@
             return true;
         }
 
-        function hasAnyDone(w) {
-            for (const day of w.days) {
-                for (const ex of day.exercises) {
-                    if (ex.status === 'done' || ex.status === 'partial') return true;
-                }
-            }
-            return false;
-        }
-
         function getWeekStatus(w) {
             let allDone = true;
             let anyDone = false;
@@ -1242,7 +1278,7 @@
             const d = getCurrentDay();
             const exercises = d ? d.exercises : [];
 
-            // Week navigation
+            // Week navigation with delete buttons if deleteMode
             document.getElementById('weekNav').innerHTML = programData.weeks.map((wkItem, i) => {
                 let cls = 'pill';
                 if (i === currentWeekIdx) cls += ' on';
@@ -1256,11 +1292,15 @@
 
                 let delBtn = '';
                 if (i > 0) {
+                    const showClass = deleteMode ? 'show' : 'hide';
                     delBtn =
-                    `<button class="del-week" onclick="deleteWeek(${i})" title="Bu haftayı ve sonrasını sil">✕</button>`;
+                        `<button class="del-week-btn ${showClass}" onclick="deleteWeek(${i})" title="Bu haftayı sil">🗑</button>`;
                 }
                 return `<button class="${cls}" onclick="switchWeek(${i})">${label}${delBtn}</button>`;
             }).join('');
+
+            // Toggle delete mode button highlight
+            document.getElementById('weekDeleteToggle').classList.toggle('on', deleteMode);
 
             // Day tabs
             document.getElementById('dayTabs').innerHTML = wk.days.map((day, j) => {
@@ -1333,7 +1373,6 @@
                 }).join('');
                 document.getElementById('exb').innerHTML = rows;
 
-                // Drag & Drop olaylarını bağla
                 if (dragMode) {
                     const trs = document.querySelectorAll('#exb tr');
                     trs.forEach(tr => {
@@ -1343,7 +1382,6 @@
                         tr.addEventListener('dragleave', handleDragLeave);
                         tr.addEventListener('drop', handleDrop);
                         tr.addEventListener('dragend', handleDragEnd);
-                        // Touch events for mobile
                         tr.addEventListener('touchstart', handleTouchStart, { passive: true });
                         tr.addEventListener('touchmove', handleTouchMove, { passive: false });
                         tr.addEventListener('touchend', handleTouchEnd, { passive: true });
@@ -1380,7 +1418,6 @@
                 <span style="color:var(--text);font-size:14px;font-weight:600;padding:8px 0;">Hafta ${wk.weekNumber}</span>
             `;
 
-            // Drag mode button state
             document.getElementById('dragToggle').classList.toggle('on', dragMode);
             document.getElementById('exTable').classList.toggle('drag-mode-on', dragMode);
 
@@ -1464,13 +1501,22 @@
 
         function deleteWeek(idx) {
             if (idx <= 0) return;
-            if (!confirm(`Hafta ${programData.weeks[idx].weekNumber} ve sonraki tüm haftalar silinecek. Devam et?`)) return;
-            programData.weeks.splice(idx);
+            if (!confirm(`Hafta ${programData.weeks[idx].weekNumber} silinecek. Devam et?`)) return;
+            programData.weeks.splice(idx, 1);
             if (currentWeekIdx >= programData.weeks.length) {
                 currentWeekIdx = programData.weeks.length - 1;
             }
             currentDayIdx = 0;
             saveData();
+            render();
+        }
+
+        function toggleDeleteMode() {
+            deleteMode = !deleteMode;
+            // If delete mode is on, turn off drag mode to avoid confusion
+            if (deleteMode && dragMode) {
+                dragMode = false;
+            }
             render();
         }
 
@@ -1493,14 +1539,12 @@
                     let newReps = ex.reps || '0';
                     let applied = false;
 
-                    // Both GREEN and PARTIAL count for progression
                     if (ex.status === 'done' || ex.status === 'partial') {
                         newConsecutive = ex.consecutiveGreen + 1;
                     } else {
                         newConsecutive = 0;
                     }
 
-                    // Apply progression only if unit is not 'yok' and consecutiveGreen meets threshold
                     if (ex.incrementUnit !== 'yok' && newConsecutive >= ex.requiredWeeks) {
                         const unit = ex.incrementUnit;
                         const amount = ex.incrementAmount || 0;
@@ -1581,20 +1625,21 @@
         }
 
         // ───────────────────────────────────────────────────────────────
-        // DRAG & DROP (Sürükle-Bırak)
+        // DRAG & DROP
         // ───────────────────────────────────────────────────────────────
 
         function toggleDragMode() {
             dragMode = !dragMode;
+            if (dragMode && deleteMode) {
+                deleteMode = false;
+            }
             if (dragMode) {
-                // Titreme efekti için shake sınıfını ekle
                 document.querySelectorAll('#exb tr').forEach(tr => tr.classList.add('shake'));
             } else {
                 document.querySelectorAll('#exb tr').forEach(tr => {
                     tr.classList.remove('shake', 'dragging', 'drag-over');
                     tr.draggable = false;
                 });
-                // Olayları temizle
                 const trs = document.querySelectorAll('#exb tr');
                 trs.forEach(tr => {
                     tr.removeEventListener('dragstart', handleDragStart);
@@ -1623,7 +1668,6 @@
             tr.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', idx);
-            // Touch drag için
             touchDragData = { idx, startY: 0 };
         }
 
@@ -1660,7 +1704,6 @@
             }
             const d = getCurrentDay();
             if (!d) return;
-            // Swap exercises
             const exs = d.exercises;
             const [removed] = exs.splice(dragSrcIndex, 1);
             exs.splice(targetIdx, 0, removed);
@@ -1676,7 +1719,6 @@
             dragSrcIndex = null;
         }
 
-        // Touch support for mobile
         function handleTouchStart(e) {
             if (!dragMode) return;
             const tr = e.target.closest('tr');
@@ -1698,7 +1740,6 @@
                 }
             });
             if (targetTr && targetTr.dataset.exIdx != touchDragData.idx) {
-                // Highlight
                 trs.forEach(tr => tr.classList.remove('drag-over'));
                 targetTr.classList.add('drag-over');
             } else {
@@ -1842,7 +1883,6 @@
             const container = document.getElementById('timerContainer');
             if (container.style.display === 'none') {
                 container.style.display = 'flex';
-                // Varsayılan süre input'tan al
                 const input = document.getElementById('timerInput');
                 timerTotal = parseInt(input.value) || 120;
                 timerSeconds = timerTotal;
@@ -1862,9 +1902,9 @@
                 timerSeconds = timerTotal;
             }
             timerRunning = true;
-            document.getElementById('timerStartBtn').textContent = '▶ Çalışıyor';
             document.getElementById('timerStartBtn').classList.remove('start');
             document.getElementById('timerStartBtn').classList.add('stop');
+            document.getElementById('timerStartBtn').textContent = '⏹';
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timerSeconds--;
@@ -1873,15 +1913,12 @@
                 if (timerSeconds <= 0) {
                     clearInterval(timerInterval);
                     timerRunning = false;
-                    document.getElementById('timerStartBtn').textContent = '▶ Başlat';
+                    document.getElementById('timerStartBtn').textContent = '▶';
                     document.getElementById('timerStartBtn').classList.remove('stop');
                     document.getElementById('timerStartBtn').classList.add('start');
-                    // Titreşim
                     if (navigator.vibrate) {
                         navigator.vibrate(3000);
                     }
-                    // Sesli bildirim (opsiyonel)
-                    // alert('Süre doldu!');
                 }
             }, 1000);
         }
@@ -1889,7 +1926,7 @@
         function stopTimer() {
             clearInterval(timerInterval);
             timerRunning = false;
-            document.getElementById('timerStartBtn').textContent = '▶ Başlat';
+            document.getElementById('timerStartBtn').textContent = '▶';
             document.getElementById('timerStartBtn').classList.remove('stop');
             document.getElementById('timerStartBtn').classList.add('start');
         }
@@ -1983,7 +2020,6 @@
                     });
                 });
             });
-            // Download
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
