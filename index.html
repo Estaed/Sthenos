@@ -1015,6 +1015,7 @@
                 weekNumber: 1,
                 completed: false,
                 days: [{
+                    // PUSH
                     name: "Push",
                     exercises: [
                         { id: genId(), name: "Weighted Dip", sets: 2, reps: "8", weight: "",
@@ -1037,7 +1038,31 @@
                             incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
                 }, {
-                    name: "Lower Quad",
+                    // PULL (Face Pull yerine Reverse Pec Deck Fly)
+                    name: "Pull",
+                    exercises: [
+                        { id: genId(), name: "Weighted Pull-up", sets: 2, reps: "8", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Lat Pulldown (geniş pronated)", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Inverted Row (ayak yerde)", sets: 2, reps: "12",
+                            weight: "", status: "none", incrementAmount: 0,
+                            incrementUnit: "yok", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Reverse Pec Deck Fly (Ters Kelebek)", sets: 2, reps: "12",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Scapular Pull-up", sets: 2, reps: "10", weight: "",
+                            status: "none", incrementAmount: 0, incrementUnit: "yok",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Tuck Front Lever Tutuş", sets: 3, reps: "15s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }, {
+                    // LEG (eski Lower Quad)
+                    name: "Leg",
                     exercises: [
                         { id: genId(), name: "Leg Press Orta Ayak", sets: 2, reps: "8",
                             weight: "", status: "none", incrementAmount: 5,
@@ -1062,29 +1087,31 @@
                             requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
                 }, {
-                    name: "Pull",
+                    // UPPER (tamamen yeni)
+                    name: "Upper",
                     exercises: [
                         { id: genId(), name: "Weighted Pull-up", sets: 2, reps: "8", weight: "",
                             status: "none", incrementAmount: 2.5, incrementUnit: "kg",
                             requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Lat Pulldown (geniş pronated)", sets: 2, reps: "8",
-                            weight: "", status: "none", incrementAmount: 2.5,
-                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Inverted Row (ayak yerde)", sets: 2, reps: "12",
-                            weight: "", status: "none", incrementAmount: 0,
-                            incrementUnit: "yok", requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Face Pull", sets: 2, reps: "12", weight: "",
+                        { id: genId(), name: "Weighted Dips", sets: 2, reps: "10", weight: "",
                             status: "none", incrementAmount: 2.5, incrementUnit: "kg",
                             requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Scapular Pull-up", sets: 2, reps: "10", weight: "",
-                            status: "none", incrementAmount: 0, incrementUnit: "yok",
+                        { id: genId(), name: "Machine Row", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
                             requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Tuck Front Lever Tutuş", sets: 3, reps: "15s",
-                            weight: "", status: "none", incrementAmount: 2,
-                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
+                        { id: genId(), name: "Shoulder Press (BB/DB)", sets: 2, reps: "10", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Dumbbell Lateral Raise", sets: 2, reps: "15", weight: "",
+                            status: "none", incrementAmount: 1, incrementUnit: "kg",
+                            requiredWeeks: 2, consecutiveGreen: 0 },
+                        { id: genId(), name: "Dumbbell Biceps Curl", sets: 2, reps: "15", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
                 }, {
-                    name: "Lower Posterior",
+                    // LOWER (eski Lower Posterior)
+                    name: "Lower",
                     exercises: [
                         { id: genId(), name: "Leg Press Yüksek Ayak", sets: 2, reps: "8",
                             weight: "", status: "none", incrementAmount: 5,
@@ -1265,7 +1292,7 @@
             const d = getCurrentDay();
             const exercises = d ? d.exercises : [];
 
-            // Week navigation - no delete buttons inside pills
+            // Week navigation
             document.getElementById('weekNav').innerHTML = programData.weeks.map((wkItem, i) => {
                 let cls = 'pill';
                 if (i === currentWeekIdx) cls += ' on';
