@@ -965,9 +965,9 @@
     <!-- Timer Container -->
     <div id="timerContainer" style="display:none;">
         <div class="timer-row">
-            <input type="text" inputmode="numeric" id="timerInput" value="120" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <input type="text" inputmode="numeric" id="timerInput" value="30" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
             <span class="timer-label">sn</span>
-            <span class="timer-time" id="timerDisplay">02:00</span>
+            <span class="timer-time" id="timerDisplay">00:30</span>
             <button id="timerToggleBtn" class="start" onclick="toggleTimerStart()" title="Başlat/Durdur">▶</button>
             <button onclick="resetTimer()" class="reset" title="Sıfırla">⟳</button>
         </div>
@@ -1024,7 +1024,7 @@
                         { id: genId(), name: "Incline Barbell Bench Press", sets: 2, reps: "8",
                             weight: "", status: "none", incrementAmount: 2.5,
                             incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Pike Push-up (ayak yükseltili)", sets: 2, reps: "8",
+                        { id: genId(), name: "Pike Push-up", sets: 2, reps: "8",
                             weight: "", status: "none", incrementAmount: 0,
                             incrementUnit: "yok", requiredWeeks: 1, consecutiveGreen: 0 },
                         { id: genId(), name: "Side Lateral Raise", sets: 2, reps: "12", weight: "",
@@ -1033,7 +1033,7 @@
                         { id: genId(), name: "Wall Handstand Hold", sets: 3, reps: "30s", weight: "",
                             status: "none", incrementAmount: 2, incrementUnit: "s",
                             requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "L-sit Progresyonu (tek bacak/tuck)", sets: 3, reps: "15s",
+                        { id: genId(), name: "L-sit Progresyonu", sets: 3, reps: "15s",
                             weight: "", status: "none", incrementAmount: 2,
                             incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
@@ -1044,13 +1044,13 @@
                         { id: genId(), name: "Weighted Pull-up", sets: 2, reps: "8", weight: "",
                             status: "none", incrementAmount: 2.5, incrementUnit: "kg",
                             requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Lat Pulldown (geniş pronated)", sets: 2, reps: "8",
+                        { id: genId(), name: "Lat Pulldown", sets: 2, reps: "8",
                             weight: "", status: "none", incrementAmount: 2.5,
                             incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Inverted Row (ayak yerde)", sets: 2, reps: "12",
+                        { id: genId(), name: "Inverted Row", sets: 2, reps: "12",
                             weight: "", status: "none", incrementAmount: 0,
                             incrementUnit: "yok", requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Reverse Pec Deck Fly (Ters Kelebek)", sets: 2, reps: "12",
+                        { id: genId(), name: "Reverse Pec Deck Fly", sets: 2, reps: "12",
                             weight: "", status: "none", incrementAmount: 2.5,
                             incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
                         { id: genId(), name: "Scapular Pull-up", sets: 2, reps: "10", weight: "",
@@ -1099,7 +1099,7 @@
                         { id: genId(), name: "Machine Row", sets: 2, reps: "12", weight: "",
                             status: "none", incrementAmount: 2.5, incrementUnit: "kg",
                             requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Shoulder Press (BB/DB)", sets: 2, reps: "10", weight: "",
+                        { id: genId(), name: "Shoulder Press", sets: 2, reps: "10", weight: "",
                             status: "none", incrementAmount: 2.5, incrementUnit: "kg",
                             requiredWeeks: 1, consecutiveGreen: 0 },
                         { id: genId(), name: "Dumbbell Lateral Raise", sets: 2, reps: "15", weight: "",
@@ -1128,10 +1128,10 @@
                         { id: genId(), name: "Hip Abduction", sets: 2, reps: "15",
                             weight: "", status: "none", incrementAmount: 2.5,
                             incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "L-sit Pratiği (parallette)", sets: 3, reps: "15s",
+                        { id: genId(), name: "L-sit Pratiği", sets: 3, reps: "15s",
                             weight: "", status: "none", incrementAmount: 2,
                             incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 },
-                        { id: genId(), name: "Side Plank (her taraf)", sets: 2, reps: "30s",
+                        { id: genId(), name: "Side Plank", sets: 2, reps: "30s",
                             weight: "", status: "none", incrementAmount: 2,
                             incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
@@ -1903,7 +1903,7 @@
             if (container.style.display === 'none') {
                 container.style.display = 'flex';
                 const input = document.getElementById('timerInput');
-                timerTotal = parseInt(input.value) || 120;
+                timerTotal = parseInt(input.value) || 30;
                 timerSeconds = timerTotal;
                 updateTimerDisplay();
                 updateProgress();
@@ -1924,7 +1924,7 @@
         function startTimer() {
             if (timerRunning) return;
             const input = document.getElementById('timerInput');
-            timerTotal = parseInt(input.value) || 120;
+            timerTotal = parseInt(input.value) || 30;
             if (timerSeconds <= 0) {
                 timerSeconds = timerTotal;
             }
@@ -1963,7 +1963,7 @@
         function resetTimer() {
             stopTimer();
             const input = document.getElementById('timerInput');
-            timerTotal = parseInt(input.value) || 120;
+            timerTotal = parseInt(input.value) || 30;
             timerSeconds = timerTotal;
             updateTimerDisplay();
             updateProgress();
