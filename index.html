@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0f0f0f">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f0f0f" />
     <title>Calisthenic Program</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Calisthenics">
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Calisthenics" />
 
     <style>
+        /* ── same as before, with a few additions ── */
         :root {
             --bg: #0f0f0f;
             --card: #1a1a1a;
@@ -25,6 +26,8 @@
             --green-bg: #152b1c;
             --orange: #f9ab00;
             --orange-bg: #2d2010;
+            --red: #ea4335;
+            --red-bg: #2a1515;
             --radius: 12px;
             --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
@@ -93,8 +96,8 @@
             color: var(--text);
         }
         .reset-btn:hover {
-            border-color: #ea4335;
-            color: #ea4335;
+            border-color: var(--red);
+            color: var(--red);
         }
 
         .week-nav-wrap {
@@ -107,6 +110,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 8px 0 4px;
+            gap: 4px;
         }
         .week-nav-wrap .scroll-row {
             padding: 8px 4px;
@@ -114,6 +118,8 @@
         }
         .week-nav-wrap .week-actions {
             flex-shrink: 0;
+            display: flex;
+            gap: 4px;
             margin-left: 4px;
         }
         .week-nav-wrap .week-actions button {
@@ -137,6 +143,10 @@
         .week-nav-wrap .week-actions button.on {
             border-color: var(--orange);
             color: var(--orange);
+        }
+        .week-nav-wrap .week-actions button.manage-on {
+            border-color: var(--green);
+            color: var(--green);
         }
 
         .pill {
@@ -185,6 +195,18 @@
             background: #3d2a10;
             border-color: #f9ab00;
         }
+        .pill .del-week-btn {
+            background: none;
+            border: none;
+            color: var(--red);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 0 2px;
+            margin-left: 2px;
+        }
+        .pill .del-week-btn:hover {
+            color: #ff6b5e;
+        }
 
         .dpill {
             flex-shrink: 0;
@@ -197,6 +219,9 @@
             cursor: pointer;
             white-space: nowrap;
             transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         .dpill.on {
             background: #2a2a2a;
@@ -214,6 +239,30 @@
             border-color: #b45309;
             color: var(--orange);
         }
+        .dpill.manage-mode .del-day-btn {
+            display: inline-block;
+        }
+        .dpill .del-day-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--red);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 0 2px;
+            margin-left: 2px;
+        }
+        .dpill .del-day-btn:hover {
+            color: #ff6b5e;
+        }
+        .dpill.add-day-btn {
+            border: 1px dashed var(--green);
+            color: var(--green);
+            background: var(--green-bg);
+        }
+        .dpill.add-day-btn:hover {
+            background: #1e3a28;
+        }
 
         .content {
             padding: 0 12px;
@@ -228,7 +277,7 @@
         }
 
         .tipbox {
-            background: var(--blue-bg);
+            background: #0d1a2b;
             border: 1px solid #1e3d6e;
             border-radius: var(--radius);
             padding: 12px 14px;
@@ -401,7 +450,7 @@
             font-size: 17px;
         }
         .del-btn:hover {
-            color: #ea4335;
+            color: var(--red);
             background: rgba(234, 67, 53, 0.12);
         }
         .mode-btn.on {
@@ -412,7 +461,7 @@
         .add-ex-btn {
             background: var(--card2);
             border: 1px dashed var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             color: var(--text2);
             padding: 10px 0;
             width: 100%;
@@ -477,8 +526,12 @@
             animation: shake 0.3s ease-in-out infinite alternate;
         }
         @keyframes shake {
-            0% { transform: translateX(-2px); }
-            100% { transform: translateX(2px); }
+            0% {
+                transform: translateX(-2px);
+            }
+            100% {
+                transform: translateX(2px);
+            }
         }
         .drag-handle {
             cursor: grab;
@@ -514,7 +567,7 @@
             flex-direction: column;
             gap: 3px;
             backdrop-filter: blur(10px);
-            background: rgba(20,20,20,0.95);
+            background: rgba(20, 20, 20, 0.95);
         }
         #timerContainer .timer-row {
             display: flex;
@@ -565,9 +618,9 @@
             color: var(--green);
         }
         #timerContainer .timer-row button.stop {
-            background: #2a1515;
+            background: var(--red-bg);
             border-color: #c5221f;
-            color: #ea4335;
+            color: var(--red);
         }
         #timerContainer .timer-row button.reset {
             color: var(--text2);
@@ -602,7 +655,7 @@
             position: fixed;
             inset: 0;
             z-index: 60;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(4px);
             padding: 20px;
             overflow-y: auto;
@@ -766,8 +819,8 @@
             border: 1px solid var(--green);
         }
         .modal-actions .btn-danger {
-            background: #2a1515;
-            color: #ea4335;
+            background: var(--red-bg);
+            color: var(--red);
             border: 1px solid #c5221f;
         }
 
@@ -776,6 +829,21 @@
             font-size: 14px;
             text-align: center;
             padding: 20px 0;
+        }
+
+        /* Day name input inline */
+        .day-name-input {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 4px 8px;
+            font-size: 13px;
+            width: 100px;
+        }
+        .day-name-input:focus {
+            outline: none;
+            border-color: #555;
         }
 
         @media (max-width: 480px) {
@@ -839,6 +907,14 @@
                 height: 28px;
                 font-size: 14px;
             }
+            .dpill {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            .day-name-input {
+                width: 70px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -847,11 +923,11 @@
     <div class="content">
 
         <div class="tipbox" style="margin-top:12px">
-            💡 <strong>Antrenman İpuçları</strong><br>
-            • Setler arası 2-3 dk dinlenin.<br>
-            • Kontrollü iniş (2-3s) – patlayıcı çıkış (1s). Form her zaman ağırlıktan önce.<br>
-            • <strong>Yeşil</strong> = tamamlandı → ilerleme uygulanır.<br>
-            • <strong>Turuncu</strong> = yapıldı ama eksik rep → hafta tamamlanmış sayılır ve ilerleme uygulanır.
+            💡 <strong>Antrenman İpuçları</strong><br />
+            • Setler arası 2-3 dk dinlenin.<br />
+            • Kontrollü iniş (2-3s) – patlayıcı çıkış (1s). Form her zaman ağırlıktan önce.<br />
+            • <strong>Yeşil</strong> = tamamlandı → ilerleme uygulanır.<br />
+            • <strong>Turuncu</strong> = yapıldı ama eksik rep → <strong>ilerleme uygulanmaz</strong>, hafta tamamlanmış sayılır.
         </div>
 
         <div class="stage-bar">
@@ -866,7 +942,8 @@
         <div class="week-nav-wrap">
             <div class="scroll-row" id="weekNav"></div>
             <div class="week-actions">
-                <button id="weekDeleteToggle" onclick="toggleDeleteMode()" title="Hafta silme modu">⚙</button>
+                <button id="weekManageToggle" onclick="toggleManagementMode()" title="Gün yönetimi modu">⚙</button>
+                <button id="weekDeleteToggle" onclick="toggleWeekDeleteMode()" title="Hafta silme modu">✕</button>
             </div>
         </div>
 
@@ -906,13 +983,13 @@
         <div class="modal-box">
             <h3>Yeni Egzersiz</h3>
             <label>Egzersiz Adı</label>
-            <input id="modalName" placeholder="Örn: Weighted Dip" value="">
+            <input id="modalName" placeholder="Örn: Weighted Dip" value="" />
             <label>Set</label>
-            <input id="modalSets" type="number" value="2" min="1">
+            <input id="modalSets" type="number" value="2" min="1" />
             <label>Rep</label>
-            <input id="modalReps" placeholder="8 / 15s / 60s" value="8">
+            <input id="modalReps" placeholder="8 / 15s / 60s" value="8" />
             <label>Ağırlık</label>
-            <input id="modalWeight" placeholder="+10 kg / BW / 45 kg" value="">
+            <input id="modalWeight" placeholder="+10 kg / BW / 45 kg" value="" />
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeAddModal()">İptal</button>
                 <button class="btn-add" onclick="confirmAddExercise()">Ekle</button>
@@ -925,9 +1002,9 @@
         <div class="modal-box">
             <h3>Egzersiz İlerleme Ayarları</h3>
             <label>Egzersiz Adı</label>
-            <input id="editName" placeholder="Egzersiz adı" value="">
+            <input id="editName" placeholder="Egzersiz adı" value="" />
             <label>Haftalık Artış Miktarı</label>
-            <input id="editIncrement" type="number" step="0.1" min="0" value="2.5">
+            <input id="editIncrement" type="number" step="0.1" min="0" value="2.5" />
             <label>Artış Birimi</label>
             <select id="editUnit">
                 <option value="kg">kg (ağırlık)</option>
@@ -936,7 +1013,7 @@
                 <option value="yok">— Artış Yok —</option>
             </select>
             <label>Kaç Hafta Üst Üste Yeşil Olmalı</label>
-            <input id="editRequiredWeeks" type="number" min="1" value="1">
+            <input id="editRequiredWeeks" type="number" min="1" value="1" />
             <div style="font-size:12px;color:var(--text2);margin-top:8px;">
                 Mevcut yeşil hafta sayısı: <span id="editCurrentGreen">0</span>
             </div>
@@ -965,7 +1042,7 @@
     <!-- Timer Container -->
     <div id="timerContainer" style="display:none;">
         <div class="timer-row">
-            <input type="text" inputmode="numeric" id="timerInput" value="30" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <input type="text" inputmode="numeric" id="timerInput" value="30" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
             <span class="timer-label">sn</span>
             <span class="timer-time" id="timerDisplay">00:30</span>
             <button id="timerToggleBtn" class="start" onclick="toggleTimerStart()" title="Başlat/Durdur">▶</button>
@@ -1005,17 +1082,27 @@
 
     <script>
         // ───────────────────────────────────────────────────────────────
-        // DATA
+        // DATA VERSIONING (Issue 5)
         // ───────────────────────────────────────────────────────────────
 
-        const PROGRAM_NAME = "Calisthenic Program";
+        const DATA_VERSION = 2;
+        const STORAGE_KEY = 'cali4_program_data';
+
+        function getStorageKey() { return STORAGE_KEY; }
+
+        function genId() {
+            return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // BUILD INITIAL DATA
+        // ───────────────────────────────────────────────────────────────
 
         function buildInitialWeek() {
             return {
                 weekNumber: 1,
                 completed: false,
                 days: [{
-                    // PUSH
                     name: "Push",
                     exercises: [
                         { id: genId(), name: "Weighted Dip", sets: 2, reps: "8", weight: "",
@@ -1038,7 +1125,6 @@
                             incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
                 }, {
-                    // PULL (Face Pull yerine Reverse Pec Deck Fly)
                     name: "Pull",
                     exercises: [
                         { id: genId(), name: "Weighted Pull-up", sets: 2, reps: "8", weight: "",
@@ -1061,7 +1147,6 @@
                             incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
                 }, {
-                    // LEG (eski Lower Quad)
                     name: "Leg",
                     exercises: [
                         { id: genId(), name: "Leg Press Orta Ayak", sets: 2, reps: "8",
@@ -1087,7 +1172,6 @@
                             requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
                 }, {
-                    // UPPER (tamamen yeni)
                     name: "Upper",
                     exercises: [
                         { id: genId(), name: "Weighted Pull-up", sets: 2, reps: "8", weight: "",
@@ -1110,7 +1194,6 @@
                             requiredWeeks: 1, consecutiveGreen: 0 }
                     ]
                 }, {
-                    // LOWER (eski Lower Posterior)
                     name: "Lower",
                     exercises: [
                         { id: genId(), name: "Leg Press Yüksek Ayak", sets: 2, reps: "8",
@@ -1139,66 +1222,120 @@
             };
         }
 
+        // ───────────────────────────────────────────────────────────────
+        // MIGRATIONS (Issue 5)
+        // ───────────────────────────────────────────────────────────────
+
+        function migrateData(data) {
+            let version = data._version || 0;
+            let needsSave = false;
+
+            // v0 → v1: add missing fields to exercises
+            if (version < 1) {
+                if (data.weeks) {
+                    data.weeks.forEach(w => {
+                        if (w.days) {
+                            w.days.forEach(d => {
+                                if (d.exercises) {
+                                    d.exercises.forEach(ex => {
+                                        if (!ex.id) { ex.id = genId();
+                                            needsSave = true; }
+                                        if (!ex.status) { ex.status = "none";
+                                            needsSave = true; }
+                                        if (ex.incrementAmount === undefined) { ex
+                                                .incrementAmount = 2.5;
+                                            needsSave = true; }
+                                        if (!ex.incrementUnit) { ex.incrementUnit =
+                                                "kg";
+                                            needsSave = true; }
+                                        if (ex.requiredWeeks === undefined) { ex
+                                                .requiredWeeks = 1;
+                                            needsSave = true; }
+                                        if (ex.consecutiveGreen === undefined) { ex
+                                                .consecutiveGreen = 0;
+                                            needsSave = true; }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+                version = 1;
+            }
+
+            // v1 → v2: ensure all exercises have all fields (defensive)
+            if (version < 2) {
+                if (data.weeks) {
+                    data.weeks.forEach(w => {
+                        if (w.days) {
+                            w.days.forEach(d => {
+                                if (d.exercises) {
+                                    d.exercises.forEach(ex => {
+                                        const defaults = {
+                                            id: genId(),
+                                            status: "none",
+                                            incrementAmount: 2.5,
+                                            incrementUnit: "kg",
+                                            requiredWeeks: 1,
+                                            consecutiveGreen: 0
+                                        };
+                                        for (const [k, v] of Object.entries(
+                                            defaults)) {
+                                            if (ex[k] === undefined) { ex[k] = v;
+                                                needsSave = true; }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+                version = 2;
+            }
+
+            data._version = version;
+            if (needsSave) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            }
+            return data;
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // LOAD / INIT
+        // ───────────────────────────────────────────────────────────────
+
         let programData = null;
         let currentWeekIdx = 0;
         let currentDayIdx = 0;
         let editingExerciseId = null;
 
-        // ── Timer state ──
+        // Management modes
+        let managementMode = false; // for days
+        let weekDeleteMode = false; // for weeks
+        let dragMode = false;
+        let dragSrcIndex = null;
+        let touchDragData = null;
+
+        // Timer state
         let timerInterval = null;
         let timerSeconds = 0;
         let timerTotal = 0;
         let timerRunning = false;
-
-        // ── Drag state ──
-        let dragMode = false;
-        let dragSrcIndex = null;
-
-        // ── Delete mode for weeks ──
-        let deleteMode = false;
-
-        // ───────────────────────────────────────────────────────────────
-        // HELPERS
-        // ───────────────────────────────────────────────────────────────
-
-        function genId() {
-            return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
-        }
-
-        function getStorageKey() {
-            return 'cali4_program_data';
-        }
+        let timerNotifyPermission = false;
 
         function loadData() {
-            const raw = localStorage.getItem(getStorageKey());
+            const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 try {
                     const parsed = JSON.parse(raw);
                     if (parsed && parsed.weeks && parsed.weeks.length > 0) {
-                        parsed.weeks.forEach(w => {
-                            w.days.forEach(d => {
-                                d.exercises.forEach(ex => {
-                                    if (!ex.id) ex.id = genId();
-                                    if (!ex.status) ex.status = "none";
-                                    if (ex.incrementAmount === undefined) ex.incrementAmount = 2.5;
-                                    if (!ex.incrementUnit) ex.incrementUnit = "kg";
-                                    if (ex.requiredWeeks === undefined) ex.requiredWeeks = 1;
-                                    if (ex.consecutiveGreen === undefined) ex.consecutiveGreen = 0;
-                                });
-                            });
-                        });
-                        programData = parsed;
+                        const migrated = migrateData(parsed);
+                        programData = migrated;
                         return true;
                     }
-                } catch (e) {}
+                } catch (e) { /* fall through */ }
             }
             return false;
-        }
-
-        function saveData() {
-            if (programData) {
-                localStorage.setItem(getStorageKey(), JSON.stringify(programData));
-            }
         }
 
         function initProgram() {
@@ -1211,11 +1348,19 @@
                 return;
             }
             const initial = {
-                programName: PROGRAM_NAME,
+                _version: DATA_VERSION,
+                programName: "Calisthenic Program",
                 weeks: [buildInitialWeek()]
             };
             programData = initial;
             saveData();
+        }
+
+        function saveData() {
+            if (programData) {
+                programData._version = DATA_VERSION;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(programData));
+            }
         }
 
         function getCurrentWeek() {
@@ -1252,6 +1397,11 @@
             if (allDone && anyDone) return 'done';
             if (anyDone) return 'partial';
             return 'none';
+        }
+
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
         // ───────────────────────────────────────────────────────────────
@@ -1292,26 +1442,35 @@
             const d = getCurrentDay();
             const exercises = d ? d.exercises : [];
 
-            // Week navigation
-            document.getElementById('weekNav').innerHTML = programData.weeks.map((wkItem, i) => {
+            // ── Week navigation ──
+            const weekNav = document.getElementById('weekNav');
+            weekNav.innerHTML = programData.weeks.map((wkItem, i) => {
                 let cls = 'pill';
                 if (i === currentWeekIdx) cls += ' on';
                 if (wkItem.completed) cls += ' completed-true';
                 const wStatus = getWeekStatus(wkItem);
                 if (wStatus === 'done') cls += ' done';
                 else if (wStatus === 'partial') cls += ' partial';
-                if (deleteMode && i > 0) cls += ' delete-mode';
+                if (weekDeleteMode && i > 0) cls += ' delete-mode';
 
                 let label = 'H' + wkItem.weekNumber;
                 if (wkItem.completed) label += ' ✓';
 
-                return `<button class="${cls}" data-week-idx="${i}" onclick="handleWeekClick(${i})">${label}</button>`;
+                let delBtn = '';
+                if (weekDeleteMode && i > 0) {
+                    delBtn = `<button class="del-week-btn" onclick="event.stopPropagation();deleteWeek(${i})">✕</button>`;
+                }
+
+                return `<button class="${cls}" data-week-idx="${i}" onclick="handleWeekClick(${i})">${label}${delBtn}</button>`;
             }).join('');
 
-            document.getElementById('weekDeleteToggle').classList.toggle('on', deleteMode);
+            document.getElementById('weekDeleteToggle').classList.toggle('on', weekDeleteMode);
+            document.getElementById('weekManageToggle').classList.toggle('manage-on', managementMode);
 
-            // Day tabs
-            document.getElementById('dayTabs').innerHTML = wk.days.map((day, j) => {
+            // ── Day tabs ──
+            const dayTabs = document.getElementById('dayTabs');
+            let dayHTML = '';
+            wk.days.forEach((day, j) => {
                 let cls = 'dpill';
                 if (j === currentDayIdx) cls += ' on';
                 let allDone = true;
@@ -1322,23 +1481,40 @@
                 }
                 if (allDone && anyDone) cls += ' done';
                 else if (anyDone) cls += ' partial';
-                return `<button class="${cls}" onclick="switchDay(${j})">${day.name}</button>`;
-            }).join('');
+                if (managementMode) cls += ' manage-mode';
 
-            // Day info
+                let delBtn = '';
+                if (managementMode && wk.days.length > 1) {
+                    delBtn =
+                        `<button class="del-day-btn" onclick="event.stopPropagation();deleteDay(${j})">✕</button>`;
+                }
+
+                dayHTML +=
+                    `<button class="${cls}" onclick="switchDay(${j})">${escHtml(day.name)}${delBtn}</button>`;
+            });
+
+            // Add day button (management mode)
+            if (managementMode) {
+                dayHTML +=
+                    `<button class="dpill add-day-btn" onclick="addDay()">+ Gün Ekle</button>`;
+            }
+
+            dayTabs.innerHTML = dayHTML;
+
+            // ── Day info ──
             const dayName = d ? d.name : '';
-            let allDone = true;
-            let anyDone = false;
+            let allDoneDay = true;
+            let anyDoneDay = false;
             if (d) {
                 for (const ex of d.exercises) {
-                    if (ex.status === 'done' || ex.status === 'partial') anyDone = true;
-                    else if (ex.status === 'none') { allDone = false; break; }
+                    if (ex.status === 'done' || ex.status === 'partial') anyDoneDay = true;
+                    else if (ex.status === 'none') { allDoneDay = false; break; }
                 }
             }
-            const doneBadge = (allDone && anyDone) ? '<span class="day-done-badge">✅ Gün Tamamlandı</span>' : '';
+            const doneBadge = (allDoneDay && anyDoneDay) ? '<span class="day-done-badge">✅ Gün Tamamlandı</span>' : '';
             document.getElementById('dinfo').innerHTML = dayName + ' ' + doneBadge;
 
-            // Week header
+            // ── Week header ──
             const totalEx = d ? d.exercises.length : 0;
             const doneEx = d ? d.exercises.filter(e => e.status === 'done' || e.status === 'partial').length : 0;
             const greenEx = d ? d.exercises.filter(e => e.status === 'done').length : 0;
@@ -1348,7 +1524,7 @@
                 <div class="wnote">${progText} ${wk.completed ? '✅ Hafta tamamlandı!' : ''}</div>
             `;
 
-            // Exercise table
+            // ── Exercise table ──
             if (d) {
                 const rows = d.exercises.map((ex, idx) => {
                     const isDone = ex.status === 'done';
@@ -1360,7 +1536,7 @@
                                 <button class="status-btn ${isDone ? 'green-on' : ''}" 
                                     onclick="setStatus(${idx}, 'done')" title="Tamamlandı">✓</button>
                                 <button class="status-btn ${isPartial ? 'orange-on' : ''}" 
-                                    onclick="setStatus(${idx}, 'partial')" title="Yarım kaldı (ilerleme uygulanır)">◐</button>
+                                    onclick="setStatus(${idx}, 'partial')" title="Yarım kaldı (ilerleme uygulanmaz)">◐</button>
                             </div>
                         </td>
                         <td>
@@ -1399,7 +1575,7 @@
                 document.getElementById('exb').innerHTML = '<tr><td colspan="6" class="empty-msg">Bu gün için egzersiz yok</td></tr>';
             }
 
-            // Week complete area
+            // ── Week complete area ──
             const area = document.getElementById('weekCompleteArea');
             if (wk.completed) {
                 area.innerHTML = `<div class="week-done-badge">✅ Hafta ${wk.weekNumber} Tamamlandı</div>`;
@@ -1432,38 +1608,17 @@
             saveData();
         }
 
-        function escHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
-
         // ───────────────────────────────────────────────────────────────
-        // WEEK CLICK HANDLER (supports delete mode)
+        // WEEK & DAY NAVIGATION
         // ───────────────────────────────────────────────────────────────
 
         function handleWeekClick(idx) {
-            if (deleteMode) {
-                if (idx === 0) {
-                    alert('İlk hafta silinemez.');
-                    return;
-                }
-                if (confirm(`Hafta ${programData.weeks[idx].weekNumber} silinecek. Devam et?`)) {
-                    programData.weeks.splice(idx, 1);
-                    if (currentWeekIdx >= programData.weeks.length) {
-                        currentWeekIdx = programData.weeks.length - 1;
-                    }
-                    currentDayIdx = 0;
-                    saveData();
-                    render();
-                }
-            } else {
-                switchWeek(idx);
+            if (weekDeleteMode) {
+                // handled by deleteWeek via the button
+                return;
             }
+            switchWeek(idx);
         }
-
-        // ───────────────────────────────────────────────────────────────
-        // ACTIONS
-        // ───────────────────────────────────────────────────────────────
 
         function switchWeek(idx) {
             if (idx >= 0 && idx < programData.weeks.length) {
@@ -1480,6 +1635,82 @@
                 render();
             }
         }
+
+        // ───────────────────────────────────────────────────────────────
+        // WEEK DELETE MODE (Issue 2 – weeks)
+        // ───────────────────────────────────────────────────────────────
+
+        function toggleWeekDeleteMode() {
+            weekDeleteMode = !weekDeleteMode;
+            if (weekDeleteMode && managementMode) {
+                managementMode = false;
+            }
+            render();
+        }
+
+        function deleteWeek(idx) {
+            if (idx === 0) {
+                alert('İlk hafta silinemez.');
+                return;
+            }
+            if (confirm(`Hafta ${programData.weeks[idx].weekNumber} silinecek. Devam et?`)) {
+                programData.weeks.splice(idx, 1);
+                if (currentWeekIdx >= programData.weeks.length) {
+                    currentWeekIdx = programData.weeks.length - 1;
+                }
+                currentDayIdx = 0;
+                saveData();
+                render();
+            }
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // DAY MANAGEMENT (Issue 2 – days)
+        // ───────────────────────────────────────────────────────────────
+
+        function toggleManagementMode() {
+            managementMode = !managementMode;
+            if (managementMode && weekDeleteMode) {
+                weekDeleteMode = false;
+            }
+            render();
+        }
+
+        function deleteDay(idx) {
+            const w = getCurrentWeek();
+            if (!w) return;
+            if (w.days.length <= 1) {
+                alert('En az bir gün olmalı.');
+                return;
+            }
+            const dayName = w.days[idx].name;
+            if (!confirm(`"${dayName}" gününü silmek istediğinize emin misiniz?`)) return;
+            w.days.splice(idx, 1);
+            if (currentDayIdx >= w.days.length) {
+                currentDayIdx = w.days.length - 1;
+            }
+            saveData();
+            render();
+        }
+
+        function addDay() {
+            const w = getCurrentWeek();
+            if (!w) return;
+            const name = prompt('Yeni gün adı:', 'Gün ' + (w.days.length + 1));
+            if (name === null || name.trim() === '') return;
+            const newDay = {
+                name: name.trim(),
+                exercises: []
+            };
+            w.days.push(newDay);
+            currentDayIdx = w.days.length - 1;
+            saveData();
+            render();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // EXERCISE ACTIONS
+        // ───────────────────────────────────────────────────────────────
 
         function setStatus(exIdx, status) {
             const d = getCurrentDay();
@@ -1531,13 +1762,9 @@
             render();
         }
 
-        function toggleDeleteMode() {
-            deleteMode = !deleteMode;
-            if (deleteMode && dragMode) {
-                dragMode = false;
-            }
-            render();
-        }
+        // ───────────────────────────────────────────────────────────────
+        // COMPLETE WEEK (Issue 1 – orange fix)
+        // ───────────────────────────────────────────────────────────────
 
         function completeWeek() {
             const w = getCurrentWeek();
@@ -1558,53 +1785,65 @@
                     let newReps = ex.reps || '0';
                     let applied = false;
 
-                    if (ex.status === 'done' || ex.status === 'partial') {
+                    // ── Issue 1: ONLY green (done) increments consecutiveGreen ──
+                    if (ex.status === 'done') {
                         newConsecutive = ex.consecutiveGreen + 1;
                     } else {
+                        // partial or none → reset consecutive
                         newConsecutive = 0;
                     }
 
-                    if (ex.incrementUnit !== 'yok' && newConsecutive >= ex.requiredWeeks) {
+                    // ── Only apply progression if status is 'done' AND consecutiveGreen >= requiredWeeks ──
+                    if (ex.status === 'done' && newConsecutive >= ex.requiredWeeks) {
                         const unit = ex.incrementUnit;
                         const amount = ex.incrementAmount || 0;
 
                         if (unit === 'kg') {
                             const weightStr = ex.weight || '';
-                            if (/kg/.test(weightStr) && !/^bw$/i.test(weightStr.trim())) {
-                                const match = weightStr.match(/([\+\-]?\d+\.?\d*)\s*kg/);
-                                if (match) {
-                                    const val = parseFloat(match[1]);
+                            // Auto-detect: "10" → "10 kg", "+10" → "+10 kg", "10kg" → "10 kg" (Issue 4)
+                            let match = weightStr.match(/([\+\-]?\d+\.?\d*)\s*kg/);
+                            if (!match && !/^bw$/i.test(weightStr.trim())) {
+                                match = weightStr.match(/([\+\-]?\d+\.?\d*)/);
+                            }
+                            if (match && !/^bw$/i.test(weightStr.trim())) {
+                                const val = parseFloat(match[1]);
+                                if (!isNaN(val)) {
                                     const newVal = val + amount;
                                     const prefix = weightStr.startsWith('+') ? '+' : '';
                                     newWeight = prefix + newVal.toFixed(1) + ' kg';
                                     applied = true;
                                 }
-                            } else if (weightStr.trim().toUpperCase() === 'BW') {
+                            } else if (/^bw$/i.test(weightStr.trim())) {
                                 newWeight = 'BW';
-                            } else if (weightStr === '') {
-                                newWeight = '';
                             }
                         } else if (unit === 'reps') {
                             const repsStr = ex.reps || '0';
-                            const match = repsStr.match(/(\d+)/);
+                            let match = repsStr.match(/(\d+)/);
                             if (match) {
                                 const val = parseInt(match[1]);
-                                const newVal = val + amount;
-                                newReps = newVal + '';
-                                applied = true;
+                                if (!isNaN(val)) {
+                                    const newVal = val + amount;
+                                    newReps = newVal + '';
+                                    applied = true;
+                                }
                             }
                         } else if (unit === 's') {
                             const repsStr = ex.reps || '0s';
-                            const match = repsStr.match(/(\d+)s/);
+                            let match = repsStr.match(/(\d+)s/);
+                            if (!match) {
+                                match = repsStr.match(/(\d+)/);
+                            }
                             if (match) {
                                 const val = parseInt(match[1]);
-                                const newVal = val + amount;
-                                newReps = newVal + 's';
-                                applied = true;
+                                if (!isNaN(val)) {
+                                    const newVal = val + amount;
+                                    newReps = newVal + 's';
+                                    applied = true;
+                                }
                             }
                         }
                         if (applied) {
-                            newConsecutive = 0;
+                            newConsecutive = 0; // reset after progression
                         }
                     }
 
@@ -1649,8 +1888,9 @@
 
         function toggleDragMode() {
             dragMode = !dragMode;
-            if (dragMode && deleteMode) {
-                deleteMode = false;
+            if (dragMode) {
+                if (weekDeleteMode) weekDeleteMode = false;
+                if (managementMode) managementMode = false;
             }
             if (dragMode) {
                 document.querySelectorAll('#exb tr').forEach(tr => tr.classList.add('shake'));
@@ -1675,8 +1915,6 @@
             }
             render();
         }
-
-        let touchDragData = null;
 
         function handleDragStart(e) {
             if (!dragMode) return;
@@ -1820,9 +2058,7 @@
             if (!ex) return;
 
             const newName = document.getElementById('editName').value.trim();
-            if (newName) {
-                ex.name = newName;
-            }
+            if (newName) ex.name = newName;
 
             const inc = parseFloat(document.getElementById('editIncrement').value);
             if (isNaN(inc) || inc < 0) {
@@ -1895,8 +2131,18 @@
         }
 
         // ───────────────────────────────────────────────────────────────
-        // TIMER (tek buton toggle)
+        // TIMER (Issue 3 – background vibration + notification)
         // ───────────────────────────────────────────────────────────────
+
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(perm => {
+                    timerNotifyPermission = perm === 'granted';
+                });
+            } else if ('Notification' in window && Notification.permission === 'granted') {
+                timerNotifyPermission = true;
+            }
+        }
 
         function toggleTimer() {
             const container = document.getElementById('timerContainer');
@@ -1907,6 +2153,7 @@
                 timerSeconds = timerTotal;
                 updateTimerDisplay();
                 updateProgress();
+                requestNotificationPermission();
             } else {
                 container.style.display = 'none';
                 stopTimer();
@@ -1944,9 +2191,7 @@
                     btn.textContent = '▶';
                     btn.classList.remove('stop');
                     btn.classList.add('start');
-                    if (navigator.vibrate) {
-                        navigator.vibrate(3000);
-                    }
+                    onTimerEnd();
                 }
             }, 1000);
         }
@@ -1979,6 +2224,56 @@
         function updateProgress() {
             const pct = timerTotal > 0 ? ((timerTotal - timerSeconds) / timerTotal * 100) : 0;
             document.getElementById('timerProgressBar').style.width = Math.min(100, pct) + '%';
+        }
+
+        function onTimerEnd() {
+            // Vibration (Issue 3)
+            if (navigator.vibrate) {
+                navigator.vibrate([500, 200, 500, 200, 1000]);
+            }
+
+            // Notification (Issue 3)
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    new Notification('⏱️ Süre Doldu!', {
+                        body: 'Antrenman dinlenme süresi tamamlandı.',
+                        icon: 'favicon-32x32.png',
+                        silent: true,
+                        requireInteraction: true
+                    });
+                } catch (e) { /* ignore */ }
+            }
+
+            // Also try to use the service worker for notification if available
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'TIMER_END',
+                    message: 'Antrenman dinlenme süresi tamamlandı!'
+                });
+            }
+
+            // Play a beep using AudioContext if possible
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 880;
+                gain.gain.value = 0.3;
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+                setTimeout(() => {
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.frequency.value = 1100;
+                    gain2.gain.value = 0.3;
+                    osc2.start();
+                    osc2.stop(ctx.currentTime + 0.3);
+                }, 400);
+            } catch (e) { /* ignore */ }
         }
 
         // ───────────────────────────────────────────────────────────────
@@ -2073,17 +2368,23 @@
         }
 
         function confirmReset() {
-            localStorage.removeItem(getStorageKey());
+            localStorage.removeItem(STORAGE_KEY);
             programData = null;
             currentWeekIdx = 0;
             currentDayIdx = 0;
+            weekDeleteMode = false;
+            managementMode = false;
+            dragMode = false;
             closeResetModal();
             initProgram();
             render();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Close modals on overlay click
+        // ───────────────────────────────────────────────────────────────
+        // CLOSE MODALS ON OVERLAY CLICK
+        // ───────────────────────────────────────────────────────────────
+
         document.getElementById('addModal').addEventListener('click', function(e) {
             if (e.target === this) closeAddModal();
         });
@@ -2116,10 +2417,13 @@
         }
         currentDayIdx = 0;
 
+        // Request notification permission early
+        requestNotificationPermission();
+
         render();
 
         // ───────────────────────────────────────────────────────────────
-        // SERVICE WORKER (optional)
+        // SERVICE WORKER (with timer message support)
         // ───────────────────────────────────────────────────────────────
 
         if ('serviceWorker' in navigator) {
@@ -2128,7 +2432,7 @@
             }).then(() => {
                 caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key))));
             }).finally(() => {
-                navigator.serviceWorker.register('sw.js?v=3')
+                navigator.serviceWorker.register('sw.js?v=4')
                     .then(reg => {
                         reg.addEventListener('updatefound', () => {
                             const newWorker = reg.installing;
