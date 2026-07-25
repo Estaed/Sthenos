@@ -2131,7 +2131,7 @@
         }
 
         // ───────────────────────────────────────────────────────────────
-        // TIMER (Issue 3 – background vibration + notification)
+        // TIMER (Issue 3 – background vibration + notification, NO SOUND)
         // ───────────────────────────────────────────────────────────────
 
         function requestNotificationPermission() {
@@ -2226,64 +2226,33 @@
             document.getElementById('timerProgressBar').style.width = Math.min(100, pct) + '%';
         }
 
+        // ─── TIMER END: only vibration, no sound ────────────────────
         function onTimerEnd() {
-            // 1) Doğrudan titreşim (ön planda)
+            // 1) Direct vibration (foreground)
             if (navigator.vibrate) {
-                navigator.vibrate(3000); // 3 saniye kesintisiz
+                navigator.vibrate(3000); // 3 seconds continuous
             }
-        
-            // 2) Bildirim ile titreşim (arka planda da çalışır, ses yok)
+
+            // 2) Notification vibration (works in background, silent)
             if ('Notification' in window && Notification.permission === 'granted') {
                 try {
                     new Notification('⏱️ Süre Doldu!', {
                         body: 'Antrenman dinlenme süresi tamamlandı.',
                         icon: 'favicon-32x32.png',
-                        silent: true,          // ses çıkarmaz
+                        silent: true,          // no sound
                         requireInteraction: true,
-                        vibrate: [3000]        // bildirimle birlikte titreşim
+                        vibrate: [3000]        // vibrate with notification
                     });
-                } catch (_) { /* güvenli hata */ }
+                } catch (_) { /* safe ignore */ }
             }
-        
-            // 3) Servis çalışanına haber ver (opsiyonel)
+
+            // 3) Optional: ping service worker
             if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
                 navigator.serviceWorker.controller.postMessage({
                     type: 'TIMER_END',
                     message: 'Antrenman dinlenme süresi tamamlandı!'
                 });
             }
-        }
-
-            // Also try to use the service worker for notification if available
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'TIMER_END',
-                    message: 'Antrenman dinlenme süresi tamamlandı!'
-                });
-            }
-
-            // Play a beep using AudioContext if possible
-            try {
-                const ctx = new(window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.value = 880;
-                gain.gain.value = 0.3;
-                osc.start();
-                osc.stop(ctx.currentTime + 0.3);
-                setTimeout(() => {
-                    const osc2 = ctx.createOscillator();
-                    const gain2 = ctx.createGain();
-                    osc2.connect(gain2);
-                    gain2.connect(ctx.destination);
-                    osc2.frequency.value = 1100;
-                    gain2.gain.value = 0.3;
-                    osc2.start();
-                    osc2.stop(ctx.currentTime + 0.3);
-                }, 400);
-            } catch (e) { /* ignore */ }
         }
 
         // ───────────────────────────────────────────────────────────────
