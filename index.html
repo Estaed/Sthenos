@@ -2227,32 +2227,32 @@
         }
 
         function onTimerEnd() {
-    // 1) Doğrudan titreşim (ön planda)
-    if (navigator.vibrate) {
-        navigator.vibrate(3000); // 3 saniye kesintisiz
-    }
-
-    // 2) Bildirim ile titreşim (arka planda da çalışır, ses yok)
-    if ('Notification' in window && Notification.permission === 'granted') {
-        try {
-            new Notification('⏱️ Süre Doldu!', {
-                body: 'Antrenman dinlenme süresi tamamlandı.',
-                icon: 'favicon-32x32.png',
-                silent: true,          // ses çıkarmaz
-                requireInteraction: true,
-                vibrate: [3000]        // bildirimle birlikte titreşim
-            });
-        } catch (_) { /* güvenli hata */ }
-    }
-
-    // 3) Servis çalışanına haber ver (opsiyonel)
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-            type: 'TIMER_END',
-            message: 'Antrenman dinlenme süresi tamamlandı!'
-        });
-    }
-}
+            // 1) Doğrudan titreşim (ön planda)
+            if (navigator.vibrate) {
+                navigator.vibrate(3000); // 3 saniye kesintisiz
+            }
+        
+            // 2) Bildirim ile titreşim (arka planda da çalışır, ses yok)
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    new Notification('⏱️ Süre Doldu!', {
+                        body: 'Antrenman dinlenme süresi tamamlandı.',
+                        icon: 'favicon-32x32.png',
+                        silent: true,          // ses çıkarmaz
+                        requireInteraction: true,
+                        vibrate: [3000]        // bildirimle birlikte titreşim
+                    });
+                } catch (_) { /* güvenli hata */ }
+            }
+        
+            // 3) Servis çalışanına haber ver (opsiyonel)
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'TIMER_END',
+                    message: 'Antrenman dinlenme süresi tamamlandı!'
+                });
+            }
+        }
 
             // Also try to use the service worker for notification if available
             if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
