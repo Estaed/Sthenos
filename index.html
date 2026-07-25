@@ -14,7 +14,6 @@
     <meta name="apple-mobile-web-app-title" content="Calisthenics" />
 
     <style>
-        /* ── same as before, with a few additions ── */
         :root {
             --bg: #0f0f0f;
             --card: #1a1a1a;
@@ -140,13 +139,10 @@
             border-color: #555;
             color: var(--text);
         }
-        .week-nav-wrap .week-actions button.on {
-            border-color: var(--orange);
-            color: var(--orange);
-        }
         .week-nav-wrap .week-actions button.manage-on {
-            border-color: var(--green);
-            color: var(--green);
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-bg);
         }
 
         .pill {
@@ -186,26 +182,16 @@
             border-color: #2e7d32;
             color: var(--green);
         }
-        .pill.delete-mode {
-            border-color: var(--orange);
-            background: var(--orange-bg);
-            color: var(--orange);
+        /* Management mode – red */
+        .pill.manage-mode {
+            border-color: var(--red) !important;
+            background: var(--red-bg) !important;
+            color: var(--red) !important;
         }
-        .pill.delete-mode:hover {
-            background: #3d2a10;
-            border-color: #f9ab00;
-        }
-        .pill .del-week-btn {
-            background: none;
-            border: none;
-            color: var(--red);
-            font-size: 14px;
-            cursor: pointer;
-            padding: 0 2px;
-            margin-left: 2px;
-        }
-        .pill .del-week-btn:hover {
-            color: #ff6b5e;
+        .pill.manage-mode.on {
+            border-color: var(--red) !important;
+            background: #3d1a1a !important;
+            color: #ff6b5e !important;
         }
 
         .dpill {
@@ -239,21 +225,16 @@
             border-color: #b45309;
             color: var(--orange);
         }
-        .dpill.manage-mode .del-day-btn {
-            display: inline-block;
+        /* Management mode – red */
+        .dpill.manage-mode {
+            border-color: var(--red) !important;
+            background: var(--red-bg) !important;
+            color: var(--red) !important;
         }
-        .dpill .del-day-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--red);
-            font-size: 14px;
-            cursor: pointer;
-            padding: 0 2px;
-            margin-left: 2px;
-        }
-        .dpill .del-day-btn:hover {
-            color: #ff6b5e;
+        .dpill.manage-mode.on {
+            border-color: var(--red) !important;
+            background: #3d1a1a !important;
+            color: #ff6b5e !important;
         }
         .dpill.add-day-btn {
             border: 1px dashed var(--green);
@@ -831,19 +812,45 @@
             padding: 20px 0;
         }
 
-        /* Day name input inline */
-        .day-name-input {
-            background: var(--card2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            padding: 4px 8px;
-            font-size: 13px;
-            width: 100px;
+        /* Day action modal */
+        .day-action-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        .day-name-input:focus {
-            outline: none;
+        .day-action-options button {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--card2);
+            color: var(--text);
+            flex: 1;
+            min-width: 120px;
+            transition: all .15s;
+        }
+        .day-action-options button:hover {
             border-color: #555;
+        }
+        .day-action-options .del-day-action {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-bg);
+        }
+        .day-action-options .del-day-action:hover {
+            background: #3d1a1a;
+        }
+        .day-action-options .rename-day-action {
+            border-color: var(--orange);
+            color: var(--orange);
+            background: var(--orange-bg);
+        }
+        .day-action-options .rename-day-action:hover {
+            background: #3d2a10;
         }
 
         @media (max-width: 480px) {
@@ -911,9 +918,10 @@
                 padding: 5px 10px;
                 font-size: 12px;
             }
-            .day-name-input {
-                width: 70px;
-                font-size: 12px;
+            .day-action-options button {
+                padding: 8px 16px;
+                font-size: 13px;
+                min-width: 80px;
             }
         }
     </style>
@@ -942,8 +950,7 @@
         <div class="week-nav-wrap">
             <div class="scroll-row" id="weekNav"></div>
             <div class="week-actions">
-                <button id="weekManageToggle" onclick="toggleManagementMode()" title="Gün yönetimi modu">⚙</button>
-                <button id="weekDeleteToggle" onclick="toggleWeekDeleteMode()" title="Hafta silme modu">✕</button>
+                <button id="weekManageToggle" onclick="toggleManagementMode()" title="Yönetim modu">⚙</button>
             </div>
         </div>
 
@@ -1024,6 +1031,21 @@
         </div>
     </div>
 
+    <!-- Day Action Modal -->
+    <div class="modal-overlay" id="dayActionModal">
+        <div class="modal-box">
+            <h3 id="dayActionTitle">Gün İşlemi</h3>
+            <p style="color:var(--text2);font-size:14px;margin:8px 0;" id="dayActionDesc">Bu gün için ne yapmak istersiniz?</p>
+            <div class="day-action-options">
+                <button class="del-day-action" onclick="confirmDayDelete()">🗑️ Gün Sil</button>
+                <button class="rename-day-action" onclick="confirmDayRename()">✏️ İsim Değiştir</button>
+            </div>
+            <div class="modal-actions" style="margin-top:12px;">
+                <button class="btn-cancel" onclick="closeDayActionModal()">İptal</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Reset Confirm Modal -->
     <div class="modal-overlay" id="resetModal">
         <div class="modal-box">
@@ -1082,7 +1104,7 @@
 
     <script>
         // ───────────────────────────────────────────────────────────────
-        // DATA VERSIONING (Issue 5)
+        // DATA VERSIONING
         // ───────────────────────────────────────────────────────────────
 
         const DATA_VERSION = 2;
@@ -1223,14 +1245,13 @@
         }
 
         // ───────────────────────────────────────────────────────────────
-        // MIGRATIONS (Issue 5)
+        // MIGRATIONS
         // ───────────────────────────────────────────────────────────────
 
         function migrateData(data) {
             let version = data._version || 0;
             let needsSave = false;
 
-            // v0 → v1: add missing fields to exercises
             if (version < 1) {
                 if (data.weeks) {
                     data.weeks.forEach(w => {
@@ -1263,7 +1284,6 @@
                 version = 1;
             }
 
-            // v1 → v2: ensure all exercises have all fields (defensive)
             if (version < 2) {
                 if (data.weeks) {
                     data.weeks.forEach(w => {
@@ -1309,9 +1329,8 @@
         let currentDayIdx = 0;
         let editingExerciseId = null;
 
-        // Management modes
-        let managementMode = false; // for days
-        let weekDeleteMode = false; // for weeks
+        // Management mode
+        let managementMode = false;
         let dragMode = false;
         let dragSrcIndex = null;
         let touchDragData = null;
@@ -1321,7 +1340,9 @@
         let timerSeconds = 0;
         let timerTotal = 0;
         let timerRunning = false;
-        let timerNotifyPermission = false;
+
+        // Day action modal state
+        let pendingDayIdx = null;
 
         function loadData() {
             const raw = localStorage.getItem(STORAGE_KEY);
@@ -1451,20 +1472,21 @@
                 const wStatus = getWeekStatus(wkItem);
                 if (wStatus === 'done') cls += ' done';
                 else if (wStatus === 'partial') cls += ' partial';
-                if (weekDeleteMode && i > 0) cls += ' delete-mode';
+
+                // Management mode: red for all weeks except first
+                if (managementMode && i > 0) cls += ' manage-mode';
 
                 let label = 'H' + wkItem.weekNumber;
                 if (wkItem.completed) label += ' ✓';
 
-                let delBtn = '';
-                if (weekDeleteMode && i > 0) {
-                    delBtn = `<button class="del-week-btn" onclick="event.stopPropagation();deleteWeek(${i})">✕</button>`;
+                let clickHandler = `switchWeek(${i})`;
+                if (managementMode && i > 0) {
+                    clickHandler = `deleteWeekPrompt(${i})`;
                 }
 
-                return `<button class="${cls}" data-week-idx="${i}" onclick="handleWeekClick(${i})">${label}${delBtn}</button>`;
+                return `<button class="${cls}" onclick="${clickHandler}">${label}</button>`;
             }).join('');
 
-            document.getElementById('weekDeleteToggle').classList.toggle('on', weekDeleteMode);
             document.getElementById('weekManageToggle').classList.toggle('manage-on', managementMode);
 
             // ── Day tabs ──
@@ -1481,16 +1503,17 @@
                 }
                 if (allDone && anyDone) cls += ' done';
                 else if (anyDone) cls += ' partial';
+
+                // Management mode: red for all days
                 if (managementMode) cls += ' manage-mode';
 
-                let delBtn = '';
-                if (managementMode && wk.days.length > 1) {
-                    delBtn =
-                        `<button class="del-day-btn" onclick="event.stopPropagation();deleteDay(${j})">✕</button>`;
+                let clickHandler = `switchDay(${j})`;
+                if (managementMode) {
+                    clickHandler = `openDayActionModal(${j})`;
                 }
 
                 dayHTML +=
-                    `<button class="${cls}" onclick="switchDay(${j})">${escHtml(day.name)}${delBtn}</button>`;
+                    `<button class="${cls}" onclick="${clickHandler}">${escHtml(day.name)}</button>`;
             });
 
             // Add day button (management mode)
@@ -1612,14 +1635,6 @@
         // WEEK & DAY NAVIGATION
         // ───────────────────────────────────────────────────────────────
 
-        function handleWeekClick(idx) {
-            if (weekDeleteMode) {
-                // handled by deleteWeek via the button
-                return;
-            }
-            switchWeek(idx);
-        }
-
         function switchWeek(idx) {
             if (idx >= 0 && idx < programData.weeks.length) {
                 currentWeekIdx = idx;
@@ -1637,18 +1652,19 @@
         }
 
         // ───────────────────────────────────────────────────────────────
-        // WEEK DELETE MODE (Issue 2 – weeks)
+        // MANAGEMENT MODE
         // ───────────────────────────────────────────────────────────────
 
-        function toggleWeekDeleteMode() {
-            weekDeleteMode = !weekDeleteMode;
-            if (weekDeleteMode && managementMode) {
-                managementMode = false;
+        function toggleManagementMode() {
+            managementMode = !managementMode;
+            if (managementMode && dragMode) {
+                dragMode = false;
             }
             render();
         }
 
-        function deleteWeek(idx) {
+        // ── Week delete ──
+        function deleteWeekPrompt(idx) {
             if (idx === 0) {
                 alert('İlk hafta silinemez.');
                 return;
@@ -1664,19 +1680,27 @@
             }
         }
 
-        // ───────────────────────────────────────────────────────────────
-        // DAY MANAGEMENT (Issue 2 – days)
-        // ───────────────────────────────────────────────────────────────
-
-        function toggleManagementMode() {
-            managementMode = !managementMode;
-            if (managementMode && weekDeleteMode) {
-                weekDeleteMode = false;
-            }
-            render();
+        // ── Day actions ──
+        function openDayActionModal(idx) {
+            const w = getCurrentWeek();
+            if (!w) return;
+            if (idx < 0 || idx >= w.days.length) return;
+            pendingDayIdx = idx;
+            const dayName = w.days[idx].name;
+            document.getElementById('dayActionTitle').textContent = `"${dayName}"`;
+            document.getElementById('dayActionDesc').textContent = 'Bu gün için ne yapmak istersiniz?';
+            document.getElementById('dayActionModal').classList.add('open');
         }
 
-        function deleteDay(idx) {
+        function closeDayActionModal() {
+            document.getElementById('dayActionModal').classList.remove('open');
+            pendingDayIdx = null;
+        }
+
+        function confirmDayDelete() {
+            const idx = pendingDayIdx;
+            closeDayActionModal();
+            if (idx === null) return;
             const w = getCurrentWeek();
             if (!w) return;
             if (w.days.length <= 1) {
@@ -1693,6 +1717,21 @@
             render();
         }
 
+        function confirmDayRename() {
+            const idx = pendingDayIdx;
+            closeDayActionModal();
+            if (idx === null) return;
+            const w = getCurrentWeek();
+            if (!w) return;
+            const oldName = w.days[idx].name;
+            const newName = prompt('Günün yeni adı:', oldName);
+            if (newName === null || newName.trim() === '') return;
+            w.days[idx].name = newName.trim();
+            saveData();
+            render();
+        }
+
+        // ── Add day ──
         function addDay() {
             const w = getCurrentWeek();
             if (!w) return;
@@ -1763,7 +1802,7 @@
         }
 
         // ───────────────────────────────────────────────────────────────
-        // COMPLETE WEEK (Issue 1 – orange fix)
+        // COMPLETE WEEK
         // ───────────────────────────────────────────────────────────────
 
         function completeWeek() {
@@ -1785,22 +1824,18 @@
                     let newReps = ex.reps || '0';
                     let applied = false;
 
-                    // ── Issue 1: ONLY green (done) increments consecutiveGreen ──
                     if (ex.status === 'done') {
                         newConsecutive = ex.consecutiveGreen + 1;
                     } else {
-                        // partial or none → reset consecutive
                         newConsecutive = 0;
                     }
 
-                    // ── Only apply progression if status is 'done' AND consecutiveGreen >= requiredWeeks ──
                     if (ex.status === 'done' && newConsecutive >= ex.requiredWeeks) {
                         const unit = ex.incrementUnit;
                         const amount = ex.incrementAmount || 0;
 
                         if (unit === 'kg') {
                             const weightStr = ex.weight || '';
-                            // Auto-detect: "10" → "10 kg", "+10" → "+10 kg", "10kg" → "10 kg" (Issue 4)
                             let match = weightStr.match(/([\+\-]?\d+\.?\d*)\s*kg/);
                             if (!match && !/^bw$/i.test(weightStr.trim())) {
                                 match = weightStr.match(/([\+\-]?\d+\.?\d*)/);
@@ -1843,7 +1878,7 @@
                             }
                         }
                         if (applied) {
-                            newConsecutive = 0; // reset after progression
+                            newConsecutive = 0;
                         }
                     }
 
@@ -1888,9 +1923,8 @@
 
         function toggleDragMode() {
             dragMode = !dragMode;
-            if (dragMode) {
-                if (weekDeleteMode) weekDeleteMode = false;
-                if (managementMode) managementMode = false;
+            if (dragMode && managementMode) {
+                managementMode = false;
             }
             if (dragMode) {
                 document.querySelectorAll('#exb tr').forEach(tr => tr.classList.add('shake'));
@@ -2131,16 +2165,12 @@
         }
 
         // ───────────────────────────────────────────────────────────────
-        // TIMER (Issue 3 – background vibration + notification, NO SOUND)
+        // TIMER (only vibration, no sound)
         // ───────────────────────────────────────────────────────────────
 
         function requestNotificationPermission() {
             if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission().then(perm => {
-                    timerNotifyPermission = perm === 'granted';
-                });
-            } else if ('Notification' in window && Notification.permission === 'granted') {
-                timerNotifyPermission = true;
+                Notification.requestPermission();
             }
         }
 
@@ -2230,23 +2260,23 @@
         function onTimerEnd() {
             // 1) Direct vibration (foreground)
             if (navigator.vibrate) {
-                navigator.vibrate(3000); // 3 seconds continuous
+                navigator.vibrate(3000);
             }
 
-            // 2) Notification vibration (works in background, silent)
+            // 2) Notification vibration (background, silent)
             if ('Notification' in window && Notification.permission === 'granted') {
                 try {
                     new Notification('⏱️ Süre Doldu!', {
                         body: 'Antrenman dinlenme süresi tamamlandı.',
                         icon: 'favicon-32x32.png',
-                        silent: true,          // no sound
+                        silent: true,
                         requireInteraction: true,
-                        vibrate: [3000]        // vibrate with notification
+                        vibrate: [3000]
                     });
                 } catch (_) { /* safe ignore */ }
             }
 
-            // 3) Optional: ping service worker
+            // 3) Service worker ping
             if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
                 navigator.serviceWorker.controller.postMessage({
                     type: 'TIMER_END',
@@ -2351,7 +2381,6 @@
             programData = null;
             currentWeekIdx = 0;
             currentDayIdx = 0;
-            weekDeleteMode = false;
             managementMode = false;
             dragMode = false;
             closeResetModal();
@@ -2376,6 +2405,9 @@
         document.getElementById('historyContainer').addEventListener('click', function(e) {
             if (e.target === this) toggleHistory();
         });
+        document.getElementById('dayActionModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDayActionModal();
+        });
 
         // ───────────────────────────────────────────────────────────────
         // INIT
@@ -2396,13 +2428,11 @@
         }
         currentDayIdx = 0;
 
-        // Request notification permission early
         requestNotificationPermission();
-
         render();
 
         // ───────────────────────────────────────────────────────────────
-        // SERVICE WORKER (with timer message support)
+        // SERVICE WORKER
         // ───────────────────────────────────────────────────────────────
 
         if ('serviceWorker' in navigator) {
