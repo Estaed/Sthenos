@@ -386,6 +386,17 @@
             font-weight: 600;
             font-size: 14px;
         }
+        .ex-range {
+            color: var(--text2);
+            font-size: 11px;
+            margin-left: 4px;
+            white-space: nowrap;
+        }
+        .ex-prev {
+            color: var(--text2);
+            font-size: 11px;
+            margin-top: 2px;
+        }
 
         .ex-input {
             background: var(--card2);
@@ -1102,12 +1113,20 @@
             <label>Haftalık Artış Miktarı</label>
             <input id="editIncrement" type="number" step="0.1" min="0" value="2.5" />
             <label>Artış Birimi</label>
-            <select id="editUnit">
+            <select id="editUnit" onchange="updateEditRangeVisibility()">
                 <option value="kg">kg (ağırlık)</option>
                 <option value="reps">rep (tekrar)</option>
                 <option value="s">saniye (süre)</option>
                 <option value="yok">— Artış Yok —</option>
             </select>
+            <div id="editRangeFields" style="display:none;">
+                <label>Tekrar min</label>
+                <input id="editRepMin" type="number" min="1" step="1" placeholder="Boş = kapalı" value="" />
+                <label>Tekrar max</label>
+                <input id="editRepMax" type="number" min="1" step="1" placeholder="Boş = kapalı" value="" />
+                <label>Kilo adımı (kg)</label>
+                <input id="editLoadStep" type="number" min="0" step="0.5" placeholder="2.5" value="" />
+            </div>
             <label>Kaç Hafta Üst Üste Yeşil Olmalı</label>
             <input id="editRequiredWeeks" type="number" min="1" value="1" />
             <div style="font-size:12px;color:var(--text2);margin-top:8px;">
@@ -1256,20 +1275,38 @@
         // DATA VERSIONING
         // ───────────────────────────────────────────────────────────────
 
-        const DATA_VERSION = 3;
+        const DATA_VERSION = 4;
         const STORAGE_KEY = 'cali4_program_data';
 
         // Default day order per plan; mapped to day ids in this order by orderedPlanIds()
         const PLAN_DAY_NAMES = {
             '3': ['Push', 'Pull', 'Leg'],
             '4': ['Push', 'Lower Quad', 'Pull', 'Lower Posterior'],
-            '5': ['Push', 'Pull', 'Leg', 'Upper', 'Lower']
+            '5': ['Push', 'Pull', 'Leg', 'Upper', 'Lower'],
+            'ev': ['Ev A', 'Ev B']
         };
 
         function getStorageKey() { return STORAGE_KEY; }
 
         function genId() {
             return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+        }
+
+        // Optional numeric field: null when unset or not a finite number
+        function optionalNumber(value) {
+            if (value === undefined || value === null || value === '') {
+                return null;
+            }
+            const num = Number(value);
+            return Number.isFinite(num) ? num : null;
+        }
+
+        function isValidPlanValue(plan) {
+            return plan === 'ev' || [3, 4, 5].includes(plan);
+        }
+
+        function planLabel(plan) {
+            return plan === 'ev' ? 'Ev' : `${plan} Gün`;
         }
 
         // ───────────────────────────────────────────────────────────────
@@ -1402,6 +1439,7 @@
                 day.id = genId();
             });
             week.days.push(...buildFourDayExtraDays());
+            week.days.push(...buildHomeDays());
             week.plan = 5;
             week.activeDayIds = orderedPlanIds(week.days, PLAN_DAY_NAMES['5']);
             return week;
@@ -1453,6 +1491,49 @@
             ];
         }
 
+        // Bodyweight home days. Weight stays empty (rendered as BW) so a fresh install is still pristine for sync.
+        function buildHomeDays() {
+            const homeExercise = (name, reps, incrementAmount, incrementUnit) => ({
+                id: genId(),
+                name: name,
+                sets: 2,
+                reps: reps,
+                weight: '',
+                status: 'none',
+                incrementAmount: incrementAmount,
+                incrementUnit: incrementUnit,
+                requiredWeeks: 1,
+                consecutiveGreen: 0
+            });
+
+            return [
+                {
+                    id: genId(),
+                    name: 'Ev A',
+                    exercises: [
+                        homeExercise('Pull-up', '8', 1, 'reps'),
+                        homeExercise('Push-up (ayak yükseltili)', '12', 1, 'reps'),
+                        homeExercise('Bodyweight Squat (3 sn iniş)', '20', 1, 'reps'),
+                        homeExercise('Bulgarian Split Squat (her bacak)', '10', 1, 'reps'),
+                        homeExercise('Single-leg Calf Raise', '15', 1, 'reps'),
+                        homeExercise('Dead Bug', '8', 1, 'reps')
+                    ]
+                },
+                {
+                    id: genId(),
+                    name: 'Ev B',
+                    exercises: [
+                        homeExercise('Pull-up', '8', 1, 'reps'),
+                        homeExercise('Pike Push-up (ayak yükseltili)', '8', 1, 'reps'),
+                        homeExercise('Reverse Lunge (her bacak)', '10', 1, 'reps'),
+                        homeExercise('Sliding Leg Curl (havlu)', '8', 1, 'reps'),
+                        homeExercise('Plank', '50s', 2, 's'),
+                        homeExercise('Side Plank', '34s', 2, 's')
+                    ]
+                }
+            ];
+        }
+
         function normalizeDayName(name) {
             return String(name || '').trim().toLocaleLowerCase('tr-TR');
         }
@@ -1499,6 +1580,9 @@
 
             if (originalVersion < 3 && !localStorage.getItem('cali4_program_data_backup_v2')) {
                 localStorage.setItem('cali4_program_data_backup_v2', migrationRaw || JSON.stringify(data));
+            }
+            if (originalVersion < 4 && !localStorage.getItem('cali4_program_data_backup_v3')) {
+                localStorage.setItem('cali4_program_data_backup_v3', migrationRaw || JSON.stringify(data));
             }
 
             const idsByName = new Map();
@@ -1567,7 +1651,11 @@
                 if (originalVersion < 3) {
                     week.plan = [3, 4, 5].includes(week.days.length) ? week.days.length : 5;
                     changed = true;
-                } else if (![3, 4, 5].includes(Number(week.plan))) {
+                } else if ([3, 4, 5].includes(Number(week.plan)) && typeof week.plan !== 'number') {
+                    // Numeric strings would miss the strict plan comparisons in the UI
+                    week.plan = Number(week.plan);
+                    changed = true;
+                } else if (!isValidPlanValue(week.plan)) {
                     week.plan = [3, 4, 5].includes(week.activeDayIds.length) ?
                         week.activeDayIds.length : 5;
                     changed = true;
@@ -1595,6 +1683,16 @@
                     });
                 }
 
+                // Home days belong to the v3 -> v4 upgrade only, for the same reason
+                if (originalVersion < 4) {
+                    buildHomeDays().forEach(template => {
+                        if (!orderedPlanIds(lastWeek.days, [template.name]).length) {
+                            lastWeek.days.push(template);
+                            changed = true;
+                        }
+                    });
+                }
+
                 const validIds = new Set(lastWeek.days.map(day => day.id));
                 const existingPlans = !upgrading && data.plans && typeof data.plans === 'object' ? data.plans : {};
                 const plans = {};
@@ -1612,9 +1710,17 @@
                     }
                     plans[key] = ids;
                 });
+
+                // Ev plan: set from names on upgrade; afterwards keep the stored order, rebuilt only when emptied
+                const namedHome = orderedPlanIds(lastWeek.days, PLAN_DAY_NAMES.ev);
+                let homeIds = Array.isArray(existingPlans.ev) ? existingPlans.ev.filter(id => validIds.has(id)) : [];
+                if (originalVersion < 4 || (!homeIds.length && namedHome.length === PLAN_DAY_NAMES.ev.length)) {
+                    homeIds = namedHome;
+                }
+                plans.ev = homeIds;
                 data.plans = plans;
             } else {
-                data.plans = { '3': [], '4': [], '5': [] };
+                data.plans = { '3': [], '4': [], '5': [], 'ev': [] };
             }
             if (JSON.stringify(data.plans) !== plansBefore) {
                 changed = true;
@@ -1746,7 +1852,8 @@
                     plans: {
                         '3': orderedPlanIds(week.days, PLAN_DAY_NAMES['3']),
                         '4': orderedPlanIds(week.days, PLAN_DAY_NAMES['4']),
-                        '5': week.activeDayIds.slice()
+                        '5': week.activeDayIds.slice(),
+                        'ev': orderedPlanIds(week.days, PLAN_DAY_NAMES.ev)
                     },
                     weeks: [week]
                 };
@@ -1818,6 +1925,21 @@
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
+        // Muted reference to the same exercise on the same day of the previous week
+        function lastWeekReference(dayId, exerciseName) {
+            const previousWeek = programData.weeks[currentWeekIdx - 1];
+            const previousDay = previousWeek && Array.isArray(previousWeek.days) ?
+                previousWeek.days.find(day => day.id === dayId) : null;
+            const previous = previousDay && Array.isArray(previousDay.exercises) ?
+                previousDay.exercises.find(ex => ex.name === exerciseName) : null;
+            if (!previous) {
+                return '';
+            }
+            const marks = { done: '✓', partial: '◐' };
+            const mark = marks[previous.status] || '–';
+            return `<div class="ex-prev">geçen: ${escHtml(previous.weight || 'BW')} × ${escHtml(previous.reps)} ${mark}</div>`;
+        }
+
         // ───────────────────────────────────────────────────────────────
         // RENDER
         // ───────────────────────────────────────────────────────────────
@@ -1884,10 +2006,11 @@
 
             document.getElementById('weekManageToggle').classList.toggle('manage-on', managementMode);
 
-            const planButtons = [3, 4, 5].map(plan => {
+            const planButtons = [3, 4, 5, 'ev'].map(plan => {
                 const current = wk.plan === plan ? ' on' : '';
                 const disabled = wk.completed ? ' disabled' : '';
-                return `<button class="${current.trim()}"${disabled} onclick="selectPlan(${plan})">${plan} Gün</button>`;
+                const planArg = plan === 'ev' ? `'ev'` : plan;
+                return `<button class="${current.trim()}"${disabled} onclick="selectPlan(${planArg})">${planLabel(plan)}</button>`;
             }).join('');
             document.getElementById('planSelector').innerHTML = `${planButtons}
                 <button class="plan-edit" onclick="openPlanEditor()">✎ Planı düzenle</button>`;
@@ -1956,6 +2079,10 @@
                     const isDone = ex.status === 'done';
                     const isPartial = ex.status === 'partial';
                     const weightVal = ex.weight || '';
+                    const repMin = optionalNumber(ex.repMin);
+                    const repMax = optionalNumber(ex.repMax);
+                    const rangeLabel = repMin !== null && repMax !== null ?
+                        `<span class="ex-range">${repMin}–${repMax}</span>` : '';
                     return `<tr data-ex-idx="${idx}" draggable="${dragMode}">
                         <td>
                             <div class="status-group">
@@ -1967,7 +2094,8 @@
                         </td>
                         <td>
                             ${dragMode ? `<span class="drag-handle" title="Sürükle">⠿</span>` : ''}
-                            <span class="ex-name">${escHtml(ex.name)}</span>
+                            <span class="ex-name">${escHtml(ex.name)}</span>${rangeLabel}
+                            ${lastWeekReference(d.id, ex.name)}
                         </td>
                         <td><input class="ex-input ex-input-sm" type="number" min="1" value="${ex.sets}" 
                                 onchange="updateField(${idx}, 'sets', this.value)" /></td>
@@ -2108,7 +2236,7 @@
             const restIds = week.days.map(day => day.id).filter(id => !planEditorSelected.has(id));
             planEditorIds = planIds.concat(restIds);
 
-            document.getElementById('planEditorTitle').textContent = `Plan Düzenle — ${week.plan} Gün`;
+            document.getElementById('planEditorTitle').textContent = `Plan Düzenle — ${planLabel(week.plan)}`;
             renderPlanEditorRows();
             document.getElementById('planEditorModal').classList.add('open');
         }
@@ -2253,9 +2381,9 @@
 
             w.days.splice(w.days.indexOf(day), 1);
             w.activeDayIds = activeDays.map(item => item.id).filter(id => id !== day.id);
-            ['3', '4', '5'].forEach(key => {
+            ['3', '4', '5', 'ev'].forEach(key => {
                 const remaining = (programData.plans[key] || []).filter(id => id !== day.id);
-                programData.plans[key] = remaining.length ? remaining : w.activeDayIds.slice();
+                programData.plans[key] = remaining.length || key === 'ev' ? remaining : w.activeDayIds.slice();
             });
             if (currentDayIdx >= w.activeDayIds.length) {
                 currentDayIdx = w.activeDayIds.length - 1;
@@ -2363,6 +2491,35 @@
         // COMPLETE WEEK
         // ───────────────────────────────────────────────────────────────
 
+        // Optional double-progression fields travel with the exercise only when set
+        function withRangeFields(target, source) {
+            ['repMin', 'repMax', 'loadStep'].forEach(key => {
+                if (optionalNumber(source[key]) !== null) {
+                    target[key] = source[key];
+                }
+            });
+            return target;
+        }
+
+        // Adds one load step in the kg progression format; null when the weight cannot be parsed
+        function increaseLoad(weight, step) {
+            const amount = step !== null && step > 0 ? step : 2.5;
+            const weightStr = String(weight || '');
+            if (!weightStr.trim() || /^bw$/i.test(weightStr.trim())) {
+                return '+' + amount.toFixed(1) + ' kg';
+            }
+            let match = weightStr.match(/([\+\-]?\d+\.?\d*)\s*kg/);
+            if (!match) {
+                match = weightStr.match(/([\+\-]?\d+\.?\d*)/);
+            }
+            const val = match ? parseFloat(match[1]) : NaN;
+            if (isNaN(val)) {
+                return null;
+            }
+            const prefix = weightStr.startsWith('+') ? '+' : '';
+            return prefix + (val + amount).toFixed(1) + ' kg';
+        }
+
         function completeWeek() {
             const w = getCurrentWeek();
             if (!w) return;
@@ -2383,7 +2540,7 @@
                     return {
                         id: day.id,
                         name: day.name,
-                        exercises: day.exercises.map(ex => ({
+                        exercises: day.exercises.map(ex => withRangeFields({
                             id: genId(),
                             name: ex.name,
                             sets: ex.sets,
@@ -2394,7 +2551,7 @@
                             incrementUnit: ex.incrementUnit,
                             requiredWeeks: ex.requiredWeeks,
                             consecutiveGreen: ex.consecutiveGreen
-                        }))
+                        }, ex))
                     };
                 }
 
@@ -2438,7 +2595,17 @@
                                 const val = parseInt(match[1]);
                                 if (!isNaN(val)) {
                                     const newVal = val + amount;
-                                    newReps = newVal + '';
+                                    const repMax = optionalNumber(ex.repMax);
+                                    const loadedWeight = repMax !== null && newVal > repMax ?
+                                        increaseLoad(ex.weight, optionalNumber(ex.loadStep)) : null;
+                                    if (loadedWeight !== null) {
+                                        // Double progression: top of the range reached, add load and restart at repMin
+                                        const repMin = optionalNumber(ex.repMin);
+                                        newReps = (repMin !== null ? repMin : val) + '';
+                                        newWeight = loadedWeight;
+                                    } else {
+                                        newReps = newVal + '';
+                                    }
                                     applied = true;
                                 }
                             }
@@ -2462,7 +2629,7 @@
                         }
                     }
 
-                    return {
+                    return withRangeFields({
                         id: genId(),
                         name: ex.name,
                         sets: ex.sets,
@@ -2473,7 +2640,7 @@
                         incrementUnit: ex.incrementUnit,
                         requiredWeeks: ex.requiredWeeks,
                         consecutiveGreen: newConsecutive
-                    };
+                    }, ex);
                 });
                 return {
                     id: day.id,
@@ -2663,7 +2830,38 @@
             document.getElementById('editUnit').value = ex.incrementUnit || 'kg';
             document.getElementById('editRequiredWeeks').value = ex.requiredWeeks || 1;
             document.getElementById('editCurrentGreen').textContent = ex.consecutiveGreen || 0;
+            document.getElementById('editRepMin').value = optionalNumber(ex.repMin) !== null ? ex.repMin : '';
+            document.getElementById('editRepMax').value = optionalNumber(ex.repMax) !== null ? ex.repMax : '';
+            document.getElementById('editLoadStep').value = optionalNumber(ex.loadStep) !== null ? ex.loadStep : '';
+            updateEditRangeVisibility();
             document.getElementById('editModal').classList.add('open');
+        }
+
+        // Rep range inputs only apply to rep progression
+        function updateEditRangeVisibility() {
+            const isReps = document.getElementById('editUnit').value === 'reps';
+            document.getElementById('editRangeFields').style.display = isReps ? 'block' : 'none';
+        }
+
+        // Reads the optional double-progression inputs; alerts and returns null when invalid
+        function readEditRangeFields() {
+            const repMin = optionalNumber(document.getElementById('editRepMin').value.trim());
+            const repMax = optionalNumber(document.getElementById('editRepMax').value.trim());
+            const loadStep = optionalNumber(document.getElementById('editLoadStep').value.trim());
+            const badRep = [repMin, repMax].some(value => value !== null && (!Number.isInteger(value) || value < 1));
+            if (badRep) {
+                alert('Tekrar min ve max pozitif tam sayı olmalı.');
+                return null;
+            }
+            if (loadStep !== null && loadStep <= 0) {
+                alert('Kilo adımı sıfırdan büyük olmalı.');
+                return null;
+            }
+            if (repMin !== null && repMax !== null && repMin > repMax) {
+                alert('Tekrar min, tekrar max değerinden büyük olamaz.');
+                return null;
+            }
+            return { repMin: repMin, repMax: repMax, loadStep: loadStep };
         }
 
         function closeEditModal() {
@@ -2676,6 +2874,14 @@
             if (!d) return;
             const ex = d.exercises.find(e => e.id === editingExerciseId);
             if (!ex) return;
+
+            let range = null;
+            if (document.getElementById('editUnit').value === 'reps') {
+                range = readEditRangeFields();
+                if (!range) {
+                    return;
+                }
+            }
 
             const newName = document.getElementById('editName').value.trim();
             if (newName) ex.name = newName;
@@ -2693,6 +2899,15 @@
                 return;
             }
             ex.requiredWeeks = req;
+            if (range) {
+                ['repMin', 'repMax', 'loadStep'].forEach(key => {
+                    if (range[key] === null) {
+                        delete ex[key];
+                    } else {
+                        ex[key] = range[key];
+                    }
+                });
+            }
             saveData();
             closeEditModal();
             render();

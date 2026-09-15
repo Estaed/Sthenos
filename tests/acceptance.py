@@ -149,9 +149,10 @@ def main():
         page = new_page(browser, url, gh0, errors, "fresh")
         d = page.evaluate("() => programData")
         lib = [x["name"] for x in d["weeks"][-1]["days"]]
-        check("T1 version 3", d.get("_version") == 3, d.get("_version"))
-        check("T1 library has 7 days", lib == ["Push", "Pull", "Leg", "Upper", "Lower", "Lower Quad", "Lower Posterior"], lib)
-        check("T1 plan sizes", [len(d["plans"][k]) for k in ("3", "4", "5")] == [3, 4, 5], d.get("plans"))
+        check("T1 version 4", d.get("_version") == 4, d.get("_version"))
+        check("T1 library has 9 days", lib == ["Push", "Pull", "Leg", "Upper", "Lower", "Lower Quad", "Lower Posterior", "Ev A", "Ev B"], lib)
+        check("T1 plan sizes", [len(d["plans"][k]) for k in ("3", "4", "5", "ev")] == [3, 4, 5, 2], d.get("plans"))
+        check("T1 no mobility data", "mobility" not in d, list(d))
         check("T1 week plan 5 and 5 tabs", d["weeks"][0]["plan"] == 5 and page.locator("#dayTabs button").count() == 5,
               page.locator("#dayTabs button").count())
 
@@ -182,7 +183,7 @@ def main():
                                                      "buffer": json.dumps(v2_seed()).encode("utf-8")}])
         page.wait_for_timeout(500)
         d = page.evaluate("() => programData")
-        check("T13 backup upload migrated", len(d["weeks"]) == 2 and d["_version"] == 3, (len(d["weeks"]), d.get("_version")))
+        check("T13 backup upload migrated", len(d["weeks"]) == 2 and d["_version"] == 4, (len(d["weeks"]), d.get("_version")))
         page.context.close()
 
         # T3 v2 migration (phone)
@@ -196,12 +197,13 @@ def main():
         check("T3 backup of raw v2 kept", backup is not None and json.loads(backup) == json.loads(seed), (backup or "")[:80])
         w1, w2 = d["weeks"]
         check("T3 day ids stable across weeks", [x["id"] for x in w1["days"]] == [x["id"] for x in w2["days"][:5]])
-        check("T3 last week gets Lower Quad/Posterior", [x["name"] for x in w2["days"]][5:] == ["Lower Quad", "Lower Posterior"],
+        check("T3 last week gets Lower Quad/Posterior", [x["name"] for x in w2["days"]][5:] == ["Lower Quad", "Lower Posterior", "Ev A", "Ev B"],
               [x["name"] for x in w2["days"]])
         check("T3 active days = original 5", phone.evaluate(ACTIVE_NAMES) == ["Push", "Pull", "Leg", "Upper", "Lower"], phone.evaluate(ACTIVE_NAMES))
         byid = {x["id"]: x["name"] for x in w2["days"]}
         check("T3 plan 4 order", [byid[i] for i in d["plans"]["4"]] == ["Push", "Lower Quad", "Pull", "Lower Posterior"], d["plans"]["4"])
         check("T3 plan 3", [byid[i] for i in d["plans"]["3"]] == ["Push", "Pull", "Leg"], d["plans"]["3"])
+        check("T3 v4 adds ev plan", [byid[i] for i in d["plans"]["ev"]] == ["Ev A", "Ev B"], d.get("plans"))
         check("T3 weights intact", w2["days"][0]["exercises"][0]["weight"] == "+10 kg")
 
         # T4 phone pushes to empty cloud
@@ -276,7 +278,7 @@ def main():
         gh.sha = "newer"
         puts = gh.puts
         phone.evaluate("() => syncNow({manual: true})")
-        check("T10 newer cloud not overwritten", gh.puts == puts and phone.evaluate("() => programData._version") == 3)
+        check("T10 newer cloud not overwritten", gh.puts == puts and phone.evaluate("() => programData._version") == 4)
         gh.text, gh.sha = good_text, good_sha
 
         # T11 sw.js only handles same-origin GET
@@ -316,6 +318,63 @@ def main():
             check(f"T15 {name}: message visible", pg.locator("#syncModal.open").count() == 1 and expect in status, status)
             check(f"T15 {name}: nothing written", gh_bad.puts == 0, gh_bad.puts)
             pg.context.close()
+
+
+        # T16 automatic double progression
+        dp = new_page(browser, url, MockGitHub(), errors, "dp")
+        dp.evaluate("""() => {
+            const w = getCurrentWeek();
+            const day = getActiveDays(w)[0];
+            const base = day.exercises[0];
+            const mk = (id, name, reps, weight, lo, hi) => Object.assign({}, base, {
+                id, name, reps, weight, status: 'none', incrementAmount: 1, incrementUnit: 'reps',
+                requiredWeeks: 1, consecutiveGreen: 0, repMin: lo, repMax: hi, loadStep: 2.5 });
+            day.exercises = [mk('dp1', 'DP top', '10', '+10 kg', 6, 10), mk('dp2', 'DP mid', '7', 'BW', 6, 10),
+                             mk('dp3', 'DP bw top', '8', 'BW', 4, 8), mk('dp4', 'DP abs top', '12', '50 kg', 8, 12)];
+            saveData();
+            getActiveDays(w).forEach((d, j) => { switchDay(j); d.exercises.forEach((_, i) => setStatus(i, 'done')); });
+            completeWeek();
+        }""")
+        byn = {e["name"]: e for e in dp.evaluate("() => getActiveDays(getCurrentWeek())[0].exercises")}
+        check("T16 top of range: +load, reps to min", byn["DP top"]["reps"] == "6" and byn["DP top"]["weight"] == "+12.5 kg", byn.get("DP top"))
+        check("T16 inside range: +1 rep only", byn["DP mid"]["reps"] == "8" and byn["DP mid"]["weight"] == "BW", byn.get("DP mid"))
+        check("T16 bodyweight top becomes +2.5 kg", byn["DP bw top"]["reps"] == "4" and byn["DP bw top"]["weight"] == "+2.5 kg", byn.get("DP bw top"))
+        check("T16 absolute load top", byn["DP abs top"]["reps"] == "8" and byn["DP abs top"]["weight"] == "52.5 kg", byn.get("DP abs top"))
+        check("T16 range fields carried", byn["DP top"].get("repMax") == 10 and byn["DP top"].get("loadStep") == 2.5, byn.get("DP top"))
+
+        # T19 last-week reference
+        dp.evaluate("() => switchDay(0)")
+        body = dp.locator("#exb").inner_text()
+        check("T19 last-week reference shown", "geçen: +10 kg × 10" in body, body[:300])
+        check("T19 range label shown", "6–10" in body, body[:300])
+
+        # T18 Ev plan
+        dp.evaluate("() => selectPlan('ev')")
+        check("T18 ev plan tabs", dp.evaluate(ACTIVE_NAMES) == ["Ev A", "Ev B"], dp.evaluate(ACTIVE_NAMES))
+        check("T18 Ev button present", dp.get_by_role("button", name="Ev", exact=True).count() >= 1)
+        dp.evaluate("""() => {
+            getActiveDays(getCurrentWeek()).forEach((d, j) => { switchDay(j); d.exercises.forEach((_, i) => setStatus(i, 'done')); });
+            completeWeek();
+        }""")
+        check("T18 ev plan carried to next week", dp.evaluate("() => getCurrentWeek().plan") == "ev", dp.evaluate("() => getCurrentWeek().plan"))
+        dp.context.close()
+
+        # T20 real v3 program (2026-09-15 reset) upgrades to v4 without touching the program
+        fx = (ROOT / "tests" / "fixtures" / "v3-program.json").read_text(encoding="utf-8")
+        src = json.loads(fx)
+        v3 = new_page(browser, url, MockGitHub(), errors, "v3")
+        v3.evaluate("s => localStorage.setItem('cali4_program_data', s)", fx)
+        v3.reload()
+        d = v3.evaluate("() => programData")
+        names = [x["name"] for x in d["weeks"][0]["days"]]
+        check("T20 keeps days, appends Ev A/B", names == [x["name"] for x in src["weeks"][0]["days"]] + ["Ev A", "Ev B"], names)
+        bk = v3.evaluate("() => localStorage.getItem('cali4_program_data_backup_v3')")
+        check("T20 backup_v3 is the raw v3 data", bk is not None and json.loads(bk) == src)
+        check("T20 active days and 3/4/5 plans unchanged", d["weeks"][0]["activeDayIds"] == src["weeks"][0]["activeDayIds"]
+              and all(d["plans"][k] == src["plans"][k] for k in ("3", "4", "5")))
+        check("T20 exercises unchanged", d["weeks"][0]["days"][:5] == src["weeks"][0]["days"])
+        check("T20 no mobility data", "mobility" not in d, list(d))
+        v3.context.close()
 
         browser.close()
     srv.shutdown()
