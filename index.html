@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" translate="no">
 <head>
+    <meta name="google" content="notranslate" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0f0f0f" />
@@ -34,6 +35,10 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
         }
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -1021,6 +1026,120 @@
                 min-width: 80px;
             }
         }
+
+        /* Phones: slightly smaller UI, and the exercise table becomes a 2-line card-row grid
+           instead of the fixed 6-column table (real-device overflow fix). */
+        @media (max-width: 560px) {
+            body {
+                font-size: 14px;
+            }
+            .pill,
+            .dpill {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            .stage-actions button {
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+            .week-nav-wrap .week-actions button {
+                width: 34px;
+                height: 34px;
+            }
+
+            #exTable thead {
+                display: none;
+            }
+            #exTable {
+                display: block;
+                width: 100%;
+            }
+            #exTable tbody {
+                display: block;
+                width: 100%;
+            }
+            #exb tr {
+                display: grid;
+                grid-template-columns: auto 44px 46px 1fr 30px;
+                column-gap: 6px;
+                row-gap: 4px;
+                align-items: center;
+                width: 100%;
+                padding: 10px 0;
+                border-bottom: 1px solid var(--border);
+            }
+            #exb tr td {
+                padding: 0;
+                border-bottom: none;
+                min-width: 0;
+            }
+            #exb tr td:nth-child(1) {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            #exb tr td:nth-child(2) {
+                grid-column: 1 / 5;
+                grid-row: 1;
+                min-width: 0;
+            }
+            #exb tr td:nth-child(3) {
+                grid-column: 2;
+                grid-row: 2;
+            }
+            #exb tr td:nth-child(4) {
+                grid-column: 3;
+                grid-row: 2;
+            }
+            #exb tr td:nth-child(5) {
+                grid-column: 4 / 6;
+                grid-row: 2;
+            }
+            #exb tr td:nth-child(6) {
+                grid-column: 5;
+                grid-row: 1;
+                justify-self: end;
+            }
+            #exb tr td:nth-child(3),
+            #exb tr td:nth-child(4),
+            #exb tr td:nth-child(5) {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                min-width: 0;
+            }
+            #exb tr td:nth-child(3)::before,
+            #exb tr td:nth-child(4)::before,
+            #exb tr td:nth-child(5)::before {
+                font-size: 9px;
+                color: var(--text2);
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                line-height: 1;
+            }
+            #exb tr td:nth-child(3)::before {
+                content: 'set';
+            }
+            #exb tr td:nth-child(4)::before {
+                content: 'rep';
+            }
+            #exb tr td:nth-child(5)::before {
+                content: 'kg';
+            }
+            #exb .ex-input-sm,
+            #exb .ex-input-med {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+            }
+            #exb .status-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            #exb .ex-name {
+                font-size: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1495,14 +1614,14 @@
             ];
         }
 
-        // Bodyweight home days. Weight stays empty (rendered as BW) so a fresh install is still pristine for sync.
+        // Bodyweight home days. Weight is 'BW' (isPristine treats it like empty) so a fresh install stays pristine for sync.
         function buildHomeDays() {
             const homeExercise = (name, reps, incrementAmount, incrementUnit) => ({
                 id: genId(),
                 name: name,
                 sets: 2,
                 reps: reps,
-                weight: '',
+                weight: 'BW',
                 status: 'none',
                 incrementAmount: incrementAmount,
                 incrementUnit: incrementUnit,
@@ -3490,7 +3609,10 @@
                 return false;
             }
             return (data.weeks[0].days || []).every(day => {
-                return (day.exercises || []).every(ex => ex.status === 'none' && !ex.weight);
+                return (day.exercises || []).every(ex => {
+                    const w = (ex.weight || '').toString().trim().toLowerCase();
+                    return ex.status === 'none' && (w === '' || w === 'bw');
+                });
             });
         }
 

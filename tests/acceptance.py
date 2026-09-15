@@ -436,6 +436,40 @@ def main():
         check("T23 reference comes from last trained week", "geçen: +10 kg × 8" in body, body[:200])
         lw.context.close()
 
+        # T24 narrow phones: nothing overflows sideways, rows stay compact (real Samsung bug)
+        fx_real = (ROOT / "tests" / "fixtures" / "v3-program.json").read_text(encoding="utf-8")
+        for width in (320, 360):
+            nctx = browser.new_context(service_workers="block", viewport={"width": width, "height": 780},
+                                       is_mobile=True, has_touch=True, device_scale_factor=3)
+            nctx.route("https://api.github.com/**", MockGitHub().handle)
+            npg = nctx.new_page()
+            npg.on("pageerror", lambda e: errors.append(f"[t24] pageerror: {e}"))
+            npg.goto(url)
+            npg.evaluate("s => localStorage.setItem('cali4_program_data', s)", fx_real)
+            npg.reload()
+            npg.evaluate("() => selectPlan(3)")
+            for day_idx in range(3):
+                npg.evaluate(f"() => switchDay({day_idx})")
+                over = npg.evaluate("""() => {
+                    const w = window.innerWidth;
+                    // the real-phone bug overflowed the exercise card, not the viewport: measure against the card too
+                    const table = document.getElementById('exTable');
+                    const card = table.parentElement;
+                    const cardRight = Math.min(card.getBoundingClientRect().right, w);
+                    const outOfCard = [...document.querySelectorAll('#exTable, #exb *')]
+                        .filter(el => el.offsetParent !== null && el.getBoundingClientRect().right > cardRight + 0.5)
+                        .map(el => (el.className || el.tagName) + ':' + Math.round(el.getBoundingClientRect().right));
+                    const outOfView = [...document.querySelectorAll('#weekNav, #planSelector, #dayTabs, #stages, .content')]
+                        .filter(el => el.getBoundingClientRect().right > w + 0.5)
+                        .map(el => (el.id || el.className) + ':' + Math.round(el.getBoundingClientRect().right));
+                    return { page: document.documentElement.scrollWidth - w, cardRight: Math.round(cardRight),
+                             bad: outOfCard.concat(outOfView).slice(0, 6) };
+                }""")
+                check(f"T24 {width}px day {day_idx}: no sideways overflow", over["page"] <= 0 and not over["bad"], over)
+            rows = npg.evaluate("""() => [...document.querySelectorAll('#exb tr')].map(tr => Math.round(tr.getBoundingClientRect().height))""")
+            check(f"T24 {width}px rows compact (<= 110px)", rows and max(rows) <= 110, rows)
+            nctx.close()
+
         browser.close()
     srv.shutdown()
     check("no page/console errors", not errors, "\n".join(errors[:10]))
