@@ -18,7 +18,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TOKEN = "TESTTOKEN"
-API_PATH = "/repos/Estaed/Calisthenics-Data/contents/calisthenics-data.json"
+REPO_PATH = "/repos/Estaed/Calisthenics-Data"
+API_PATH = REPO_PATH + "/contents/calisthenics-data.json"
 FAILS = []
 
 
@@ -43,10 +44,11 @@ def start_server():
 
 # ── mock GitHub ────────────────────────────────────────────────────
 class MockGitHub:
-    def __init__(self):
+    def __init__(self, repo_visible=True):
         self.text = None
         self.sha = None
         self.puts = 0
+        self.repo_visible = repo_visible
 
     CORS = {
         "access-control-allow-origin": "*",
@@ -58,10 +60,14 @@ class MockGitHub:
         req = route.request
         if req.method == "OPTIONS":
             return route.fulfill(status=204, headers=self.CORS)
-        if API_PATH not in req.url:
-            return route.fulfill(status=404, headers=self.CORS, body="{}")
         if req.headers.get("authorization") != f"Bearer {TOKEN}":
             return route.fulfill(status=401, headers=self.CORS, body='{"message":"Bad credentials"}')
+        if req.url.split("?")[0].endswith(REPO_PATH):
+            # GitHub answers 404 for a private repo the token cannot see
+            return route.fulfill(status=200 if self.repo_visible else 404, headers=self.CORS,
+                                 content_type="application/json", body="{}")
+        if API_PATH not in req.url or not self.repo_visible:
+            return route.fulfill(status=404, headers=self.CORS, body='{"message":"Not Found"}')
         if req.method == "GET":
             if self.text is None:
                 return route.fulfill(status=404, headers=self.CORS, body='{"message":"Not Found"}')
@@ -277,6 +283,39 @@ def main():
         sw = (ROOT / "sw.js").read_text(encoding="utf-8")
         check("T11 sw guards method/origin", "'GET'" in sw or '"GET"' in sw, "no GET guard")
         check("T11 sw cache bumped", "cali-v4" in sw)
+
+        # T14 real phone flow: token typed into the modal, one button saves + syncs, result stays visible
+        gh14 = MockGitHub()
+        ui = new_page(browser, url, gh14, errors, "ui")
+        ui.evaluate("s => localStorage.setItem('cali4_program_data', s)", json.dumps(v2_seed()))
+        ui.reload()
+        ui.evaluate("() => openSyncModal()")
+        ui.fill("#syncToken", TOKEN)
+        ui.fill("#syncDeviceName", "phone")
+        ui.get_by_role("button", name="Kaydet ve senkronla").click()
+        ui.wait_for_timeout(1500)
+        status = ui.locator("#syncStatus").inner_text()
+        check("T14 save button pushes to cloud", gh14.puts >= 1, gh14.puts)
+        check("T14 modal stays open with success", ui.locator("#syncModal.open").count() == 1 and "Senkronize" in status, status)
+        check("T14 no separate 'Şimdi senkronla' button", ui.get_by_role("button", name="Şimdi senkronla").count() == 0)
+        ui.context.close()
+
+        # T15 failures are shown inside the open modal, nothing is written
+        cases = [
+            ("repo not visible", MockGitHub(repo_visible=False), TOKEN, "Repo bulunamadı"),
+            ("bad token", MockGitHub(), "WRONG", "Token geçersiz"),
+            ("empty token", MockGitHub(), "", "Token boş"),
+        ]
+        for name, gh_bad, token, expect in cases:
+            pg = new_page(browser, url, gh_bad, errors, f"t15-{name}")
+            pg.evaluate("() => openSyncModal()")
+            pg.fill("#syncToken", token)
+            pg.get_by_role("button", name="Kaydet ve senkronla").click()
+            pg.wait_for_timeout(1500)
+            status = pg.locator("#syncStatus").inner_text()
+            check(f"T15 {name}: message visible", pg.locator("#syncModal.open").count() == 1 and expect in status, status)
+            check(f"T15 {name}: nothing written", gh_bad.puts == 0, gh_bad.puts)
+            pg.context.close()
 
         browser.close()
     srv.shutdown()

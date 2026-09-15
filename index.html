@@ -927,6 +927,9 @@
             color: var(--text2);
             font-size: 13px;
         }
+        .sync-error {
+            color: var(--red);
+        }
         .sync-help {
             color: var(--text2);
             font-size: 12px;
@@ -1188,8 +1191,8 @@
                 onchange="uploadBackup(event)" />
             <div class="modal-actions">
                 <button class="btn-danger" onclick="disconnectSync()">Bağlantıyı kes</button>
-                <button class="btn-cancel" onclick="syncNow({ manual: true })">Şimdi senkronla</button>
-                <button class="btn-add" onclick="saveSyncConfig()">Kaydet ve senkronla</button>
+                <button class="btn-cancel" onclick="closeSyncModal()">Kapat</button>
+                <button class="btn-add" id="syncSaveButton" onclick="saveSyncConfig()">Kaydet ve senkronla</button>
             </div>
         </div>
     </div>
@@ -3005,6 +3008,7 @@
 
         const SYNC_CONFIG_KEY = 'cali_sync_config';
         const SYNC_STATE_KEY = 'cali_sync_state';
+        const REPO_NOT_FOUND_MESSAGE = 'Repo bulunamadı veya token bu repoya erişemiyor. Token ayarında Repository access altında Calisthenics-Data seçili mi?';
 
         let syncTimer = null;
         let syncPromise = null;   // promise of the running sync incl. queued reruns; never rejects
@@ -3086,18 +3090,53 @@
             return btoa(binary);
         }
 
+        // A thrown TypeError from fetch (offline, DNS, CORS) becomes a readable message
+        async function safeFetch(url, options) {
+            try {
+                return await fetch(url, options);
+            } catch (_) {
+                throw new Error('GitHub\'a ulaşılamadı (ağ hatası).');
+            }
+        }
+
+        // 401/403 mean the same thing on every GitHub Contents API call
+        function authStatusError(status) {
+            if (status === 401) {
+                return new Error('Token geçersiz veya süresi dolmuş.');
+            }
+            if (status === 403) {
+                return new Error('Token\'ın yazma/okuma izni yok: Permissions → Contents → Read and write olmalı.');
+            }
+            return null;
+        }
+
         async function remoteGet() {
             const config = getSyncConfig();
             const url = `${syncUrl(config)}?ref=${encodeURIComponent(config.branch)}`;
-            const response = await fetch(url, {
+            const response = await safeFetch(url, {
                 headers: githubHeaders(config),
                 cache: 'no-store'
             });
             if (response.status === 404) {
-                return { exists: false };
+                // A 404 here is ambiguous: missing file, missing repo, or a token that cannot see the repo
+                const repoResponse = await safeFetch(`https://api.github.com/repos/${config.owner}/${config.repo}`, {
+                    headers: githubHeaders(config),
+                    cache: 'no-store'
+                });
+                if (repoResponse.status === 200) {
+                    return { exists: false };
+                }
+                if (repoResponse.status === 404) {
+                    throw new Error(REPO_NOT_FOUND_MESSAGE);
+                }
+                if (repoResponse.status === 401) {
+                    throw new Error('Token geçersiz veya süresi dolmuş.');
+                }
+                throw new Error(`Bulut verisi alınamadı (${repoResponse.status}).`);
             }
-            if (response.status === 401 || response.status === 403) {
-                throw new Error('Token geçersiz veya gerekli izne sahip değil.');
+            const authError = authStatusError(response.status);
+            if (authError) {
+                throw authError;
             }
             if (!response.ok) {
                 throw new Error(`Bulut verisi alınamadı (${response.status}).`);
@@ -3107,10 +3146,14 @@
             let text = json.content ? decodeBase64Utf8(json.content) : '';
             if (!text && json.size > 0) {
                 // Files over 1 MB come without inline content: fetch the raw body instead
-                const raw = await fetch(url, {
+                const raw = await safeFetch(url, {
                     headers: githubHeaders(config, { Accept: 'application/vnd.github.raw+json' }),
                     cache: 'no-store'
                 });
+                const rawAuthError = authStatusError(raw.status);
+                if (rawAuthError) {
+                    throw rawAuthError;
+                }
                 if (!raw.ok) {
                     throw new Error(`Bulut verisi alınamadı (${raw.status}).`);
                 }
@@ -3130,7 +3173,7 @@
                 body.sha = sha;
             }
 
-            const response = await fetch(syncUrl(config), {
+            const response = await safeFetch(syncUrl(config), {
                 method: 'PUT',
                 headers: githubHeaders(config, { 'Content-Type': 'application/json' }),
                 cache: 'no-store',
@@ -3140,6 +3183,13 @@
                 const error = new Error('Bulut verisi değişti.');
                 error.stale = true;
                 throw error;
+            }
+            if (response.status === 404) {
+                throw new Error(REPO_NOT_FOUND_MESSAGE);
+            }
+            const authError = authStatusError(response.status);
+            if (authError) {
+                throw authError;
             }
             if (!response.ok) {
                 throw new Error(`Buluta yazılamadı (${response.status}).`);
@@ -3194,7 +3244,8 @@
             if (status) {
                 const lastSynced = state.lastSyncedAt ?
                     new Date(state.lastSyncedAt).toLocaleString('tr-TR') : 'henüz yok';
-                const errorLine = state.lastError ? `<br>${escHtml(state.lastError)}` : '';
+                const errorLine = state.lastError ?
+                    `<br><span class="sync-error">${escHtml(state.lastError)}</span>` : '';
                 status.innerHTML = `${escHtml(syncText())}<br>Son senkron: ${lastSynced}${errorLine}`;
             }
         }
@@ -3456,7 +3507,7 @@
             document.getElementById('syncModal').classList.remove('open');
         }
 
-        function saveSyncConfig() {
+        async function saveSyncConfig() {
             const config = {
                 owner: document.getElementById('syncOwner').value.trim(),
                 repo: document.getElementById('syncRepo').value.trim(),
@@ -3467,8 +3518,27 @@
             };
             localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(config));
             syncPaused = false;
-            closeSyncModal();
-            syncNow({ manual: true });
+
+            const status = document.getElementById('syncStatus');
+            if (!config.token) {
+                if (status) {
+                    status.innerHTML = `<span class="sync-error">${escHtml('Token boş.')}</span>`;
+                }
+                return;
+            }
+
+            const saveButton = document.getElementById('syncSaveButton');
+            if (saveButton) {
+                saveButton.disabled = true;
+            }
+            if (status) {
+                status.textContent = 'Senkronlanıyor…';
+            }
+            await syncNow({ manual: true });
+            if (saveButton) {
+                saveButton.disabled = false;
+            }
+            updateSyncIndicator();
         }
 
         function disconnectSync() {
