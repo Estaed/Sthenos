@@ -1,14 +1,14 @@
 // sw.js
-const CACHE_NAME = 'cali-v3';
+const CACHE_NAME = 'cali-v4';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll([
-        '/',
-        '/index.html',
-        '/manifest.json'
+        './',
+        './index.html',
+        './manifest.json'
       ]);
     })
   );
@@ -26,6 +26,9 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) {
+    return;
+  }
   event.respondWith(
     fetch(event.request)
       .then(response => {

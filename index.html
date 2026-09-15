@@ -781,6 +781,7 @@
             gap: 10px;
             margin-top: 18px;
             justify-content: flex-end;
+            flex-wrap: wrap;
         }
         .modal-actions button {
             padding: 8px 20px;
@@ -851,6 +852,86 @@
         }
         .day-action-options .rename-day-action:hover {
             background: #3d2a10;
+        }
+
+        .plan-selector {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+        .plan-selector button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 18px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .plan-selector button.on {
+            border-color: var(--green);
+            color: var(--green);
+            background: var(--green-bg);
+        }
+        .plan-selector button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+        .plan-selector .plan-edit {
+            margin-left: auto;
+        }
+        .sync-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-left: 4px;
+            background: #777;
+        }
+        .sync-dot.synced {
+            background: var(--green);
+        }
+        .sync-dot.pending {
+            background: var(--orange);
+        }
+        .sync-dot.error {
+            background: var(--red);
+        }
+        .plan-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .plan-row input[type="checkbox"] {
+            width: auto;
+            flex: 0 0 auto;
+            margin: 0;
+        }
+        .plan-row span {
+            flex: 1;
+            text-align: left;
+        }
+        .plan-row button {
+            padding: 3px 8px;
+        }
+        .sync-status {
+            margin-top: 12px;
+            padding: 10px;
+            background: var(--card2);
+            border-radius: 8px;
+            color: var(--text2);
+            font-size: 13px;
+        }
+        .sync-help {
+            color: var(--text2);
+            font-size: 12px;
+            line-height: 1.55;
+            margin-top: 10px;
         }
 
         @media (max-width: 480px) {
@@ -941,6 +1022,9 @@
         <div class="stage-bar">
             <div class="scroll-row" id="stages"></div>
             <div class="stage-actions">
+                <button id="syncButton" onclick="openSyncModal()" title="Senkron ayarlanmamış">
+                    ☁<span id="syncDot" class="sync-dot"></span>
+                </button>
                 <button onclick="toggleTimer()">⏱️ Timer</button>
                 <button onclick="toggleHistory()">📊 Geçmiş</button>
                 <button class="reset-btn" onclick="resetAll()">🔄 Sıfırla</button>
@@ -953,6 +1037,8 @@
                 <button id="weekManageToggle" onclick="toggleManagementMode()" title="Yönetim modu">⚙</button>
             </div>
         </div>
+
+        <div class="plan-selector" id="planSelector"></div>
 
         <div class="week-hdr" id="weekHdr"></div>
 
@@ -1052,11 +1138,71 @@
             <h3>⚠️ Tüm Verileri Sıfırla</h3>
             <p style="color:var(--text2);font-size:14px;margin:10px 0;">
                 Bu işlem tüm antrenman verilerini, ilerlemeleri ve ayarları kalıcı olarak silecektir.
-                Geri alınamaz. Devam etmek istediğinize emin misiniz?
+                Geri alınamaz. Senkron açıksa buluttaki kopya da sıfırlanır.
+                Devam etmek istediğinize emin misiniz?
             </p>
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeResetModal()">İptal</button>
                 <button class="btn-danger" onclick="confirmReset()">Evet, Sıfırla</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="planEditorModal">
+        <div class="modal-box">
+            <h3 id="planEditorTitle">Plan Düzenle</h3>
+            <div id="planEditorRows"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closePlanEditor()">İptal</button>
+                <button class="btn-add" onclick="savePlanEditor()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="syncModal">
+        <div class="modal-box">
+            <h3>Bulut Senkronu</h3>
+            <label>Owner</label>
+            <input id="syncOwner" />
+            <label>Repo</label>
+            <input id="syncRepo" />
+            <label>Branch</label>
+            <input id="syncBranch" />
+            <label>Dosya yolu</label>
+            <input id="syncPath" />
+            <label>Token</label>
+            <input id="syncToken" type="password" />
+            <label>Cihaz adı</label>
+            <input id="syncDeviceName" />
+            <div class="sync-status" id="syncStatus"></div>
+            <p class="sync-help">
+                Özel bir <strong>Calisthenics-Data</strong> deposu (README ile) oluşturun.
+                Bu depoya sınırlı, <strong>Contents: Read and write</strong> izinli fine-grained
+                kişisel erişim anahtarı oluşturun. Anahtarı her cihaza yapıştırın; yalnızca bu cihazda saklanır.
+            </p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="downloadBackup()">JSON indir</button>
+                <button class="btn-cancel" onclick="document.getElementById('backupInput').click()">JSON yükle</button>
+            </div>
+            <input id="backupInput" type="file" accept="application/json" style="display:none"
+                onchange="uploadBackup(event)" />
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="disconnectSync()">Bağlantıyı kes</button>
+                <button class="btn-cancel" onclick="syncNow({ manual: true })">Şimdi senkronla</button>
+                <button class="btn-add" onclick="saveSyncConfig()">Kaydet ve senkronla</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="conflictModal">
+        <div class="modal-box">
+            <h3>Senkron Çakışması</h3>
+            <div id="conflictInfo"
+                style="display:grid;grid-template-columns:1fr 1fr;gap:12px;color:var(--text2);font-size:13px;"></div>
+            <div class="modal-actions" style="flex-wrap:wrap;">
+                <button class="btn-add" onclick="useLocalConflict()">Bu cihazdakini kullan</button>
+                <button class="btn-cancel" onclick="useRemoteConflict()">Buluttakini al</button>
+                <button class="btn-danger" onclick="cancelConflict()">Şimdilik iptal</button>
             </div>
         </div>
     </div>
@@ -1107,8 +1253,15 @@
         // DATA VERSIONING
         // ───────────────────────────────────────────────────────────────
 
-        const DATA_VERSION = 2;
+        const DATA_VERSION = 3;
         const STORAGE_KEY = 'cali4_program_data';
+
+        // Default day order per plan; mapped to day ids in this order by orderedPlanIds()
+        const PLAN_DAY_NAMES = {
+            '3': ['Push', 'Pull', 'Leg'],
+            '4': ['Push', 'Lower Quad', 'Pull', 'Lower Posterior'],
+            '5': ['Push', 'Pull', 'Leg', 'Upper', 'Lower']
+        };
 
         function getStorageKey() { return STORAGE_KEY; }
 
@@ -1121,7 +1274,7 @@
         // ───────────────────────────────────────────────────────────────
 
         function buildInitialWeek() {
-            return {
+            const week = {
                 weekNumber: 1,
                 completed: false,
                 days: [{
@@ -1242,81 +1395,230 @@
                     ]
                 }]
             };
+            week.days.forEach(day => {
+                day.id = genId();
+            });
+            week.days.push(...buildFourDayExtraDays());
+            week.plan = 5;
+            week.activeDayIds = orderedPlanIds(week.days, PLAN_DAY_NAMES['5']);
+            return week;
+        }
+
+        function buildFourDayExtraDays() {
+            function exercise(name, sets, reps, incrementAmount, incrementUnit) {
+                return {
+                    id: genId(),
+                    name: name,
+                    sets: sets,
+                    reps: reps,
+                    weight: '',
+                    status: 'none',
+                    incrementAmount: incrementAmount,
+                    incrementUnit: incrementUnit,
+                    requiredWeeks: 1,
+                    consecutiveGreen: 0
+                };
+            }
+
+            return [
+                {
+                    id: genId(),
+                    name: 'Lower Quad',
+                    exercises: [
+                        exercise('Leg Press Orta Ayak', 2, '8', 5, 'kg'),
+                        exercise('Leg Extension', 2, '12', 2.5, 'kg'),
+                        exercise('Lying Leg Curl', 2, '12', 2.5, 'kg'),
+                        exercise('Standing Calf Raise', 2, '12', 2.5, 'kg'),
+                        exercise('Hip Abduction', 2, '15', 2.5, 'kg'),
+                        exercise('Hanging Knee Raise', 2, '12', 1, 'reps'),
+                        exercise('Plank', 2, '60s', 2, 's')
+                    ]
+                },
+                {
+                    id: genId(),
+                    name: 'Lower Posterior',
+                    exercises: [
+                        exercise('Leg Press Yüksek Ayak', 2, '8', 5, 'kg'),
+                        exercise('Leg Extension', 2, '12', 2.5, 'kg'),
+                        exercise('Lying Leg Curl', 2, '12', 2.5, 'kg'),
+                        exercise('Seated Calf Raise', 2, '12', 2.5, 'kg'),
+                        exercise('Hip Abduction', 2, '15', 2.5, 'kg'),
+                        exercise('L-sit Pratiği (parallette)', 3, '15s', 2, 's'),
+                        exercise('Side Plank (her taraf)', 2, '30s', 2, 's')
+                    ]
+                }
+            ];
+        }
+
+        function normalizeDayName(name) {
+            return String(name || '').trim().toLocaleLowerCase('tr-TR');
+        }
+
+        // Shared name -> id helper: returns ids in the order of `names` (not library order)
+        function orderedPlanIds(days, names) {
+            return names.map(name => {
+                const match = days.find(day => {
+                    return normalizeDayName(day.name) === normalizeDayName(name);
+                });
+                return match ? match.id : null;
+            }).filter(Boolean);
         }
 
         // ───────────────────────────────────────────────────────────────
         // MIGRATIONS
         // ───────────────────────────────────────────────────────────────
 
+        function migrationFlag(data, key, value) {
+            Object.defineProperty(data, key, {
+                value: value,
+                configurable: true,
+                writable: true,
+                enumerable: false
+            });
+        }
+
         function migrateData(data) {
-            let version = data._version || 0;
-            let needsSave = false;
+            if (!data || typeof data !== 'object') {
+                return data;
+            }
 
-            if (version < 1) {
-                if (data.weeks) {
-                    data.weeks.forEach(w => {
-                        if (w.days) {
-                            w.days.forEach(d => {
-                                if (d.exercises) {
-                                    d.exercises.forEach(ex => {
-                                        if (!ex.id) { ex.id = genId();
-                                            needsSave = true; }
-                                        if (!ex.status) { ex.status = "none";
-                                            needsSave = true; }
-                                        if (ex.incrementAmount === undefined) { ex
-                                                .incrementAmount = 2.5;
-                                            needsSave = true; }
-                                        if (!ex.incrementUnit) { ex.incrementUnit =
-                                                "kg";
-                                            needsSave = true; }
-                                        if (ex.requiredWeeks === undefined) { ex
-                                                .requiredWeeks = 1;
-                                            needsSave = true; }
-                                        if (ex.consecutiveGreen === undefined) { ex
-                                                .consecutiveGreen = 0;
-                                            needsSave = true; }
-                                    });
-                                }
-                            });
+            const originalVersion = Number(data._version || 0);
+            if (originalVersion > DATA_VERSION) {
+                migrationFlag(data, '__migrationRefused', true);
+                return data;
+            }
+
+            let changed = false;
+            if (!Array.isArray(data.weeks)) {
+                data.weeks = [];
+                changed = true;
+            }
+
+            if (originalVersion < 3 && !localStorage.getItem('cali4_program_data_backup_v2')) {
+                localStorage.setItem('cali4_program_data_backup_v2', migrationRaw || JSON.stringify(data));
+            }
+
+            const idsByName = new Map();
+            data.weeks.forEach(week => {
+                if (!Array.isArray(week.days)) {
+                    week.days = [];
+                    changed = true;
+                }
+
+                week.days.forEach(day => {
+                    const name = normalizeDayName(day.name);
+                    if (!day.id) {
+                        day.id = idsByName.get(name) || genId();
+                        changed = true;
+                    }
+                    if (name && !idsByName.has(name)) {
+                        idsByName.set(name, day.id);
+                    }
+                    if (!Array.isArray(day.exercises)) {
+                        day.exercises = [];
+                        changed = true;
+                    }
+
+                    day.exercises.forEach(exercise => {
+                        if (!exercise.id) {
+                            exercise.id = genId();
+                            changed = true;
+                        }
+                        if (!exercise.status) {
+                            exercise.status = 'none';
+                            changed = true;
+                        }
+                        if (exercise.incrementAmount === undefined) {
+                            exercise.incrementAmount = 2.5;
+                            changed = true;
+                        }
+                        if (!exercise.incrementUnit) {
+                            exercise.incrementUnit = 'kg';
+                            changed = true;
+                        }
+                        if (exercise.requiredWeeks === undefined) {
+                            exercise.requiredWeeks = 1;
+                            changed = true;
+                        }
+                        if (exercise.consecutiveGreen === undefined) {
+                            exercise.consecutiveGreen = 0;
+                            changed = true;
+                        }
+                    });
+                });
+            });
+
+            data.weeks.forEach(week => {
+                const validIds = new Set(week.days.map(day => day.id));
+                if (originalVersion < 3 || !Array.isArray(week.activeDayIds)) {
+                    week.activeDayIds = week.days.map(day => day.id);
+                    changed = true;
+                } else {
+                    const activeDayIds = week.activeDayIds.filter(id => validIds.has(id));
+                    if (activeDayIds.length !== week.activeDayIds.length) {
+                        week.activeDayIds = activeDayIds;
+                        changed = true;
+                    }
+                }
+
+                if (originalVersion < 3) {
+                    week.plan = [3, 4, 5].includes(week.days.length) ? week.days.length : 5;
+                    changed = true;
+                } else if (![3, 4, 5].includes(Number(week.plan))) {
+                    week.plan = [3, 4, 5].includes(week.activeDayIds.length) ?
+                        week.activeDayIds.length : 5;
+                    changed = true;
+                }
+            });
+
+            const lastWeek = data.weeks[data.weeks.length - 1];
+            const plansBefore = JSON.stringify(data.plans === undefined ? null : data.plans);
+            if (lastWeek) {
+                const upgrading = originalVersion < 3;
+                let defaultFive = lastWeek.days.map(day => day.id);
+                if (!upgrading) {
+                    const namedFive = orderedPlanIds(lastWeek.days, PLAN_DAY_NAMES['5']);
+                    defaultFive = namedFive.length ? namedFive : defaultFive;
+                }
+
+                // Library completion belongs to the v2 -> v3 upgrade only; on v3 data the user may
+                // have deleted these days on purpose.
+                if (upgrading) {
+                    buildFourDayExtraDays().forEach(template => {
+                        if (!orderedPlanIds(lastWeek.days, [template.name]).length) {
+                            lastWeek.days.push(template);
+                            changed = true;
                         }
                     });
                 }
-                version = 1;
+
+                const validIds = new Set(lastWeek.days.map(day => day.id));
+                const existingPlans = !upgrading && data.plans && typeof data.plans === 'object' ? data.plans : {};
+                const plans = {};
+                ['5', '4', '3'].forEach(key => {
+                    let ids;
+                    if (Array.isArray(existingPlans[key])) {
+                        ids = existingPlans[key].filter(id => validIds.has(id));
+                    } else if (key === '5') {
+                        ids = defaultFive.slice();
+                    } else {
+                        ids = orderedPlanIds(lastWeek.days, PLAN_DAY_NAMES[key]);
+                    }
+                    if (!ids.length) {
+                        ids = key === '5' ? defaultFive.slice() : plans['5'].slice();
+                    }
+                    plans[key] = ids;
+                });
+                data.plans = plans;
+            } else {
+                data.plans = { '3': [], '4': [], '5': [] };
+            }
+            if (JSON.stringify(data.plans) !== plansBefore) {
+                changed = true;
             }
 
-            if (version < 2) {
-                if (data.weeks) {
-                    data.weeks.forEach(w => {
-                        if (w.days) {
-                            w.days.forEach(d => {
-                                if (d.exercises) {
-                                    d.exercises.forEach(ex => {
-                                        const defaults = {
-                                            id: genId(),
-                                            status: "none",
-                                            incrementAmount: 2.5,
-                                            incrementUnit: "kg",
-                                            requiredWeeks: 1,
-                                            consecutiveGreen: 0
-                                        };
-                                        for (const [k, v] of Object.entries(
-                                            defaults)) {
-                                            if (ex[k] === undefined) { ex[k] = v;
-                                                needsSave = true; }
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-                version = 2;
-            }
-
-            data._version = version;
-            if (needsSave) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            }
+            data._version = DATA_VERSION;
+            migrationFlag(data, '__migrationChanged', changed || originalVersion !== DATA_VERSION);
             return data;
         }
 
@@ -1328,6 +1630,11 @@
         let currentWeekIdx = 0;
         let currentDayIdx = 0;
         let editingExerciseId = null;
+        let migrationRaw = null;
+
+        // Save dedupe: last written content (without updatedAt) and a counter of real local changes
+        let lastSavedContent = null;
+        let localChangeCounter = 0;
 
         // Management mode
         let managementMode = false;
@@ -1344,80 +1651,163 @@
         // Day action modal state
         let pendingDayIdx = null;
 
-        function loadData() {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    if (parsed && parsed.weeks && parsed.weeks.length > 0) {
-                        const migrated = migrateData(parsed);
-                        programData = migrated;
-                        return true;
-                    }
-                } catch (e) { /* fall through */ }
-            }
-            return false;
+        function contentString(data) {
+            const copy = Object.assign({}, data);
+            delete copy.updatedAt;
+            return JSON.stringify(copy);
         }
 
-        function initProgram() {
-            if (loadData()) {
-                if (currentWeekIdx >= programData.weeks.length) currentWeekIdx = programData.weeks.length - 1;
-                if (currentWeekIdx < 0) currentWeekIdx = 0;
-                const w = programData.weeks[currentWeekIdx];
-                if (w && currentDayIdx >= w.days.length) currentDayIdx = w.days.length - 1;
-                if (currentDayIdx < 0) currentDayIdx = 0;
+        function saveLocalOnly(data) {
+            programData = data || programData;
+            if (!programData) {
                 return;
             }
-            const initial = {
-                _version: DATA_VERSION,
-                programName: "Calisthenic Program",
-                weeks: [buildInitialWeek()]
-            };
-            programData = initial;
-            saveData();
+            programData._version = DATA_VERSION;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(programData));
+            lastSavedContent = contentString(programData);
         }
 
         function saveData() {
-            if (programData) {
-                programData._version = DATA_VERSION;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(programData));
+            if (!programData || programData.__migrationRefused) {
+                return;
+            }
+
+            programData._version = DATA_VERSION;
+            const content = contentString(programData);
+            if (content === lastSavedContent) {
+                return;
+            }
+
+            programData.updatedAt = new Date().toISOString();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(programData));
+            lastSavedContent = contentString(programData);
+            localChangeCounter++;
+
+            const state = getSyncState();
+            state.dirty = true;
+            setSyncState(state);
+            scheduleSync(4000);
+        }
+
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+                return false;
+            }
+
+            try {
+                const parsed = JSON.parse(raw);
+                if (!parsed || !Array.isArray(parsed.weeks) || !parsed.weeks.length) {
+                    return false;
+                }
+                migrationRaw = raw;
+                programData = migrateData(parsed);
+                migrationRaw = null;
+                return true;
+            } catch (_) {
+                migrationRaw = null;
+                return false;
             }
         }
 
+        function clampIndexes() {
+            if (!programData || !programData.weeks.length) {
+                return;
+            }
+
+            currentWeekIdx = Math.max(0, Math.min(currentWeekIdx, programData.weeks.length - 1));
+            const activeDays = getActiveDays(programData.weeks[currentWeekIdx]);
+            currentDayIdx = activeDays.length ?
+                Math.max(0, Math.min(currentDayIdx, activeDays.length - 1)) : 0;
+        }
+
+        function selectLastIncompleteWeek() {
+            let selectedIndex = programData.weeks.length - 1;
+            for (let index = programData.weeks.length - 1; index >= 0; index--) {
+                if (!programData.weeks[index].completed) {
+                    selectedIndex = index;
+                    break;
+                }
+            }
+            currentWeekIdx = Math.max(0, selectedIndex);
+            currentDayIdx = 0;
+        }
+
+        function initProgram() {
+            if (!loadData()) {
+                const week = buildInitialWeek();
+                programData = {
+                    _version: DATA_VERSION,
+                    programName: 'Calisthenic Program',
+                    updatedAt: new Date().toISOString(),
+                    plans: {
+                        '3': orderedPlanIds(week.days, PLAN_DAY_NAMES['3']),
+                        '4': orderedPlanIds(week.days, PLAN_DAY_NAMES['4']),
+                        '5': week.activeDayIds.slice()
+                    },
+                    weeks: [week]
+                };
+                saveData();
+            } else if (programData.__migrationRefused) {
+                alert('Daha yeni bir uygulama sürümünün verisi var, lütfen sayfayı yenileyin.');
+                return;
+            } else if (programData.__migrationChanged) {
+                saveData();
+            } else {
+                saveLocalOnly(programData);
+            }
+
+            selectLastIncompleteWeek();
+            clampIndexes();
+        }
+
+        function getActiveDays(week) {
+            if (!week || !Array.isArray(week.days)) {
+                return [];
+            }
+            const ids = Array.isArray(week.activeDayIds) ?
+                week.activeDayIds : week.days.map(day => day.id);
+            return ids.map(id => week.days.find(day => day.id === id)).filter(Boolean);
+        }
+
         function getCurrentWeek() {
-            if (!programData || programData.weeks.length === 0) return null;
-            if (currentWeekIdx >= programData.weeks.length) currentWeekIdx = programData.weeks.length - 1;
+            if (!programData || !programData.weeks.length) {
+                return null;
+            }
+            clampIndexes();
             return programData.weeks[currentWeekIdx];
         }
 
         function getCurrentDay() {
-            const w = getCurrentWeek();
-            if (!w) return null;
-            if (currentDayIdx >= w.days.length) currentDayIdx = w.days.length - 1;
-            return w.days[currentDayIdx];
+            const week = getCurrentWeek();
+            if (!week) {
+                return null;
+            }
+            const activeDays = getActiveDays(week);
+            if (!activeDays.length) {
+                return null;
+            }
+            currentDayIdx = Math.min(currentDayIdx, activeDays.length - 1);
+            return activeDays[currentDayIdx];
         }
 
-        function isWeekFullyDone(w) {
-            for (const day of w.days) {
-                for (const ex of day.exercises) {
-                    if (ex.status === 'none') return false;
-                }
-            }
-            return true;
+        function isWeekFullyDone(week) {
+            const activeDays = getActiveDays(week);
+            return activeDays.length > 0 && activeDays.every(day => {
+                return day.exercises.every(exercise => exercise.status !== 'none');
+            });
         }
 
-        function getWeekStatus(w) {
-            let allDone = true;
-            let anyDone = false;
-            for (const day of w.days) {
-                for (const ex of day.exercises) {
-                    if (ex.status === 'done' || ex.status === 'partial') anyDone = true;
-                    else if (ex.status === 'none') allDone = false;
-                }
+        function getWeekStatus(week) {
+            const exercises = getActiveDays(week).flatMap(day => day.exercises);
+            if (!exercises.length) {
+                return 'none';
             }
-            if (allDone && anyDone) return 'done';
-            if (anyDone) return 'partial';
-            return 'none';
+            const hasProgress = exercises.some(exercise => exercise.status !== 'none');
+            if (!hasProgress) {
+                return 'none';
+            }
+            return exercises.every(exercise => exercise.status !== 'none') ? 'done' : 'partial';
         }
 
         function escHtml(str) {
@@ -1454,6 +1844,7 @@
                 document.getElementById('exb').innerHTML = '';
                 document.getElementById('weekNav').innerHTML = '';
                 document.getElementById('dayTabs').innerHTML = '';
+                document.getElementById('planSelector').innerHTML = '';
                 document.getElementById('dinfo').textContent = '';
                 document.getElementById('weekCompleteArea').innerHTML = '';
                 document.getElementById('stages').innerHTML = '';
@@ -1462,6 +1853,7 @@
 
             const d = getCurrentDay();
             const exercises = d ? d.exercises : [];
+            const activeDays = getActiveDays(wk);
 
             // ── Week navigation ──
             const weekNav = document.getElementById('weekNav');
@@ -1489,10 +1881,18 @@
 
             document.getElementById('weekManageToggle').classList.toggle('manage-on', managementMode);
 
+            const planButtons = [3, 4, 5].map(plan => {
+                const current = wk.plan === plan ? ' on' : '';
+                const disabled = wk.completed ? ' disabled' : '';
+                return `<button class="${current.trim()}"${disabled} onclick="selectPlan(${plan})">${plan} Gün</button>`;
+            }).join('');
+            document.getElementById('planSelector').innerHTML = `${planButtons}
+                <button class="plan-edit" onclick="openPlanEditor()">✎ Planı düzenle</button>`;
+
             // ── Day tabs ──
             const dayTabs = document.getElementById('dayTabs');
             let dayHTML = '';
-            wk.days.forEach((day, j) => {
+            activeDays.forEach((day, j) => {
                 let cls = 'dpill';
                 if (j === currentDayIdx) cls += ' on';
                 let allDone = true;
@@ -1535,7 +1935,7 @@
                 }
             }
             const doneBadge = (allDoneDay && anyDoneDay) ? '<span class="day-done-badge">✅ Gün Tamamlandı</span>' : '';
-            document.getElementById('dinfo').innerHTML = dayName + ' ' + doneBadge;
+            document.getElementById('dinfo').innerHTML = d ? dayName + ' ' + doneBadge : 'Bu plan için etkin gün yok';
 
             // ── Week header ──
             const totalEx = d ? d.exercises.length : 0;
@@ -1628,6 +2028,7 @@
             document.getElementById('dragToggle').classList.toggle('on', dragMode);
             document.getElementById('exTable').classList.toggle('drag-mode-on', dragMode);
 
+            updateSyncIndicator();
             saveData();
         }
 
@@ -1644,11 +2045,145 @@
         }
 
         function switchDay(idx) {
-            const w = getCurrentWeek();
-            if (w && idx >= 0 && idx < w.days.length) {
+            const activeDays = getActiveDays(getCurrentWeek());
+            if (idx >= 0 && idx < activeDays.length) {
                 currentDayIdx = idx;
                 render();
             }
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // PLAN SELECTOR & EDITOR
+        // ───────────────────────────────────────────────────────────────
+
+        // Plan editor state: day ids in display order, included ids, and the plan being edited
+        let planEditorIds = [];
+        let planEditorSelected = new Set();
+        let planEditorPlan = null;
+
+        function selectPlan(n) {
+            const week = getCurrentWeek();
+            if (!week || week.completed || week.plan === n) {
+                return;
+            }
+
+            const nextIds = (programData.plans[String(n)] || []).filter(id => {
+                return week.days.some(day => day.id === id);
+            });
+            if (!nextIds.length) {
+                alert('Bu plan için kullanılabilir gün yok.');
+                return;
+            }
+
+            const nextSet = new Set(nextIds);
+            const dropsMarkedDay = getActiveDays(week)
+                .filter(day => !nextSet.has(day.id))
+                .some(day => day.exercises.some(ex => ex.status !== 'none'));
+            const message = 'Bu haftada işaretlenmiş ama yeni planda olmayan günler var. İşaretleri yok sayılacak. Devam?';
+            if (dropsMarkedDay && !confirm(message)) {
+                return;
+            }
+
+            week.plan = n;
+            week.activeDayIds = nextIds;
+            currentDayIdx = 0;
+            saveData();
+            render();
+        }
+
+        function openPlanEditor() {
+            const week = getCurrentWeek();
+            if (!week) {
+                return;
+            }
+
+            planEditorPlan = week.plan;
+            const planIds = (programData.plans[String(week.plan)] || []).filter(id => {
+                return week.days.some(day => day.id === id);
+            });
+            planEditorSelected = new Set(planIds);
+            const restIds = week.days.map(day => day.id).filter(id => !planEditorSelected.has(id));
+            planEditorIds = planIds.concat(restIds);
+
+            document.getElementById('planEditorTitle').textContent = `Plan Düzenle — ${week.plan} Gün`;
+            renderPlanEditorRows();
+            document.getElementById('planEditorModal').classList.add('open');
+        }
+
+        function renderPlanEditorRows() {
+            const week = getCurrentWeek();
+            if (!week) {
+                return;
+            }
+
+            const included = planEditorIds.filter(id => planEditorSelected.has(id));
+            const excluded = planEditorIds.filter(id => !planEditorSelected.has(id));
+            document.getElementById('planEditorRows').innerHTML = included.concat(excluded).map(id => {
+                const day = week.days.find(item => item.id === id);
+                if (!day) {
+                    return '';
+                }
+                const on = planEditorSelected.has(id);
+                const upAttr = on ? `onclick="movePlanDay('${id}', -1)"` : 'disabled';
+                const downAttr = on ? `onclick="movePlanDay('${id}', 1)"` : 'disabled';
+                return `<div class="plan-row">
+                    <input type="checkbox" data-plan-id="${id}" ${on ? 'checked' : ''}
+                        onchange="togglePlanDay('${id}', this.checked)">
+                    <span>${escHtml(day.name)}</span>
+                    <button ${upAttr}>↑</button>
+                    <button ${downAttr}>↓</button>
+                </div>`;
+            }).join('');
+        }
+
+        function togglePlanDay(id, checked) {
+            if (checked) {
+                planEditorSelected.add(id);
+            } else {
+                planEditorSelected.delete(id);
+            }
+            renderPlanEditorRows();
+        }
+
+        function movePlanDay(id, delta) {
+            const included = planEditorIds.filter(value => planEditorSelected.has(value));
+            const index = included.indexOf(id);
+            const target = index + delta;
+            if (index < 0 || target < 0 || target >= included.length) {
+                return;
+            }
+            [included[index], included[target]] = [included[target], included[index]];
+            const excluded = planEditorIds.filter(value => !planEditorSelected.has(value));
+            planEditorIds = included.concat(excluded);
+            renderPlanEditorRows();
+        }
+
+        function closePlanEditor() {
+            document.getElementById('planEditorModal').classList.remove('open');
+        }
+
+        function savePlanEditor() {
+            const week = getCurrentWeek();
+            if (!week || planEditorPlan === null) {
+                return;
+            }
+
+            const ids = planEditorIds.filter(id => {
+                return planEditorSelected.has(id) && week.days.some(day => day.id === id);
+            });
+            if (!ids.length) {
+                alert('En az 1 gün gerekli.');
+                return;
+            }
+
+            programData.plans[String(planEditorPlan)] = ids;
+            if (!week.completed && week.plan === planEditorPlan) {
+                week.activeDayIds = ids.slice();
+            }
+            clampIndexes();
+            closePlanEditor();
+            saveData();
+            render();
         }
 
         // ───────────────────────────────────────────────────────────────
@@ -1684,9 +2219,10 @@
         function openDayActionModal(idx) {
             const w = getCurrentWeek();
             if (!w) return;
-            if (idx < 0 || idx >= w.days.length) return;
+            const activeDays = getActiveDays(w);
+            if (idx < 0 || idx >= activeDays.length) return;
             pendingDayIdx = idx;
-            const dayName = w.days[idx].name;
+            const dayName = activeDays[idx].name;
             document.getElementById('dayActionTitle').textContent = `"${dayName}"`;
             document.getElementById('dayActionDesc').textContent = 'Bu gün için ne yapmak istersiniz?';
             document.getElementById('dayActionModal').classList.add('open');
@@ -1703,15 +2239,23 @@
             if (idx === null) return;
             const w = getCurrentWeek();
             if (!w) return;
-            if (w.days.length <= 1) {
-                alert('En az bir gün olmalı.');
+            const activeDays = getActiveDays(w);
+            const day = activeDays[idx];
+            if (!day) return;
+            if (activeDays.length <= 1) {
+                alert('En az bir etkin gün olmalı.');
                 return;
             }
-            const dayName = w.days[idx].name;
-            if (!confirm(`"${dayName}" gününü silmek istediğinize emin misiniz?`)) return;
-            w.days.splice(idx, 1);
-            if (currentDayIdx >= w.days.length) {
-                currentDayIdx = w.days.length - 1;
+            if (!confirm(`"${day.name}" gününü silmek istediğinize emin misiniz?`)) return;
+
+            w.days.splice(w.days.indexOf(day), 1);
+            w.activeDayIds = activeDays.map(item => item.id).filter(id => id !== day.id);
+            ['3', '4', '5'].forEach(key => {
+                const remaining = (programData.plans[key] || []).filter(id => id !== day.id);
+                programData.plans[key] = remaining.length ? remaining : w.activeDayIds.slice();
+            });
+            if (currentDayIdx >= w.activeDayIds.length) {
+                currentDayIdx = w.activeDayIds.length - 1;
             }
             saveData();
             render();
@@ -1723,10 +2267,12 @@
             if (idx === null) return;
             const w = getCurrentWeek();
             if (!w) return;
-            const oldName = w.days[idx].name;
+            const day = getActiveDays(w)[idx];
+            if (!day) return;
+            const oldName = day.name;
             const newName = prompt('Günün yeni adı:', oldName);
             if (newName === null || newName.trim() === '') return;
-            w.days[idx].name = newName.trim();
+            day.name = newName.trim();
             saveData();
             render();
         }
@@ -1738,11 +2284,20 @@
             const name = prompt('Yeni gün adı:', 'Gün ' + (w.days.length + 1));
             if (name === null || name.trim() === '') return;
             const newDay = {
+                id: genId(),
                 name: name.trim(),
                 exercises: []
             };
             w.days.push(newDay);
-            currentDayIdx = w.days.length - 1;
+            if (!w.completed) {
+                const planKey = String(w.plan);
+                if (!Array.isArray(programData.plans[planKey])) {
+                    programData.plans[planKey] = [];
+                }
+                w.activeDayIds.push(newDay.id);
+                programData.plans[planKey].push(newDay.id);
+                currentDayIdx = getActiveDays(w).length - 1;
+            }
             saveData();
             render();
         }
@@ -1817,7 +2372,29 @@
                 return;
             }
 
+            // Progression applies to active days only; library order is preserved
+            const activeIds = new Set(getActiveDays(w).map(day => day.id));
             const newDays = w.days.map(day => {
+                if (!activeIds.has(day.id)) {
+                    // Inactive this week: carry the day over unchanged, only reset the marks
+                    return {
+                        id: day.id,
+                        name: day.name,
+                        exercises: day.exercises.map(ex => ({
+                            id: genId(),
+                            name: ex.name,
+                            sets: ex.sets,
+                            reps: ex.reps,
+                            weight: ex.weight,
+                            status: "none",
+                            incrementAmount: ex.incrementAmount,
+                            incrementUnit: ex.incrementUnit,
+                            requiredWeeks: ex.requiredWeeks,
+                            consecutiveGreen: ex.consecutiveGreen
+                        }))
+                    };
+                }
+
                 const newExercises = day.exercises.map(ex => {
                     let newConsecutive = ex.consecutiveGreen;
                     let newWeight = ex.weight || '';
@@ -1896,14 +2473,20 @@
                     };
                 });
                 return {
+                    id: day.id,
                     name: day.name,
                     exercises: newExercises
                 };
             });
 
+            const planIds = (programData.plans[String(w.plan)] || []).filter(id => {
+                return newDays.some(day => day.id === id);
+            });
             const newWeek = {
                 weekNumber: w.weekNumber + 1,
                 completed: false,
+                plan: w.plan,
+                activeDayIds: planIds.length ? planIds : Array.from(activeIds),
                 days: newDays
             };
 
@@ -2305,7 +2888,7 @@
             }
             let html = '';
             programData.weeks.forEach(w => {
-                w.days.forEach(day => {
+                getActiveDays(w).forEach(day => {
                     day.exercises.forEach(ex => {
                         const statusCls = ex.status === 'done' ? 'done' : (ex.status === 'partial' ?
                             'partial' : 'none');
@@ -2336,7 +2919,7 @@
             }
             let csv = 'Hafta,Gün,Egzersiz,Set,Rep,Ağırlık,Durum\n';
             programData.weeks.forEach(w => {
-                w.days.forEach(day => {
+                getActiveDays(w).forEach(day => {
                     day.exercises.forEach(ex => {
                         const statusText = ex.status === 'done' ? 'Tam' : (ex.status === 'partial' ?
                             'Eksik' : 'Boş');
@@ -2408,6 +2991,563 @@
         document.getElementById('dayActionModal').addEventListener('click', function(e) {
             if (e.target === this) closeDayActionModal();
         });
+        document.getElementById('planEditorModal').addEventListener('click', function(e) {
+            if (e.target === this) closePlanEditor();
+        });
+        document.getElementById('syncModal').addEventListener('click', function(e) {
+            if (e.target === this) closeSyncModal();
+        });
+        // conflictModal intentionally has no overlay close: the user must pick an option
+
+        // ───────────────────────────────────────────────────────────────
+        // SYNC (GitHub Contents API)
+        // ───────────────────────────────────────────────────────────────
+
+        const SYNC_CONFIG_KEY = 'cali_sync_config';
+        const SYNC_STATE_KEY = 'cali_sync_state';
+
+        let syncTimer = null;
+        let syncPromise = null;   // promise of the running sync incl. queued reruns; never rejects
+        let syncRerun = false;
+        let syncPaused = false;
+        let pendingConflict = null;
+
+        // ── Config & state ──
+        function getSyncConfig() {
+            const fallback = {
+                owner: 'Estaed',
+                repo: 'Calisthenics-Data',
+                branch: 'main',
+                path: 'calisthenics-data.json',
+                token: '',
+                deviceName: ''
+            };
+            try {
+                return Object.assign(fallback, JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || '{}'));
+            } catch (_) {
+                return fallback;
+            }
+        }
+
+        function getSyncState() {
+            const fallback = {
+                lastSha: null,
+                lastSyncedAt: null,
+                dirty: false,
+                lastError: null
+            };
+            try {
+                return Object.assign(fallback, JSON.parse(localStorage.getItem(SYNC_STATE_KEY) || '{}'));
+            } catch (_) {
+                return fallback;
+            }
+        }
+
+        function setSyncState(next) {
+            localStorage.setItem(SYNC_STATE_KEY, JSON.stringify(next));
+            updateSyncIndicator();
+        }
+
+        function syncConfigured() {
+            const config = getSyncConfig();
+            return !!(config.owner && config.repo && config.token);
+        }
+
+        // ── GitHub API helpers ──
+        function encodePath(path) {
+            return String(path || '').split('/').filter(Boolean).map(encodeURIComponent).join('/');
+        }
+
+        function syncUrl(config) {
+            return `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${encodePath(config.path)}`;
+        }
+
+        function githubHeaders(config, extra) {
+            return Object.assign({
+                Authorization: `Bearer ${config.token}`,
+                Accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            }, extra || {});
+        }
+
+        function decodeBase64Utf8(value) {
+            const binary = atob(String(value).replace(/\s/g, ''));
+            const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+            return new TextDecoder('utf-8').decode(bytes);
+        }
+
+        function encodeBase64Utf8(value) {
+            const bytes = new TextEncoder().encode(value);
+            let binary = '';
+            // Chunked so large payloads do not overflow the argument list
+            for (let i = 0; i < bytes.length; i += 0x8000) {
+                binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+            }
+            return btoa(binary);
+        }
+
+        async function remoteGet() {
+            const config = getSyncConfig();
+            const url = `${syncUrl(config)}?ref=${encodeURIComponent(config.branch)}`;
+            const response = await fetch(url, {
+                headers: githubHeaders(config),
+                cache: 'no-store'
+            });
+            if (response.status === 404) {
+                return { exists: false };
+            }
+            if (response.status === 401 || response.status === 403) {
+                throw new Error('Token geçersiz veya gerekli izne sahip değil.');
+            }
+            if (!response.ok) {
+                throw new Error(`Bulut verisi alınamadı (${response.status}).`);
+            }
+
+            const json = await response.json();
+            let text = json.content ? decodeBase64Utf8(json.content) : '';
+            if (!text && json.size > 0) {
+                // Files over 1 MB come without inline content: fetch the raw body instead
+                const raw = await fetch(url, {
+                    headers: githubHeaders(config, { Accept: 'application/vnd.github.raw+json' }),
+                    cache: 'no-store'
+                });
+                if (!raw.ok) {
+                    throw new Error(`Bulut verisi alınamadı (${raw.status}).`);
+                }
+                text = await raw.text();
+            }
+            return { exists: true, sha: json.sha, text: text };
+        }
+
+        async function remotePut(text, sha) {
+            const config = getSyncConfig();
+            const body = {
+                message: `sync: ${config.deviceName || 'cihaz'} ${new Date().toISOString()}`,
+                content: encodeBase64Utf8(text),
+                branch: config.branch
+            };
+            if (sha) {
+                body.sha = sha;
+            }
+
+            const response = await fetch(syncUrl(config), {
+                method: 'PUT',
+                headers: githubHeaders(config, { 'Content-Type': 'application/json' }),
+                cache: 'no-store',
+                body: JSON.stringify(body)
+            });
+            if (response.status === 409 || response.status === 422) {
+                const error = new Error('Bulut verisi değişti.');
+                error.stale = true;
+                throw error;
+            }
+            if (!response.ok) {
+                throw new Error(`Buluta yazılamadı (${response.status}).`);
+            }
+            const json = await response.json();
+            return json.content.sha;
+        }
+
+        // ── Indicator ──
+        function syncText() {
+            const state = getSyncState();
+            if (!syncConfigured()) {
+                return 'Senkron ayarlanmamış';
+            }
+            if (navigator.onLine === false) {
+                return 'Çevrimdışı';
+            }
+            if (syncPaused) {
+                return 'Senkron bekletildi';
+            }
+            if (syncPromise || state.dirty) {
+                return 'Senkron bekliyor';
+            }
+            if (state.lastError) {
+                return state.lastError;
+            }
+            return 'Senkronize';
+        }
+
+        function updateSyncIndicator() {
+            const button = document.getElementById('syncButton');
+            const dot = document.getElementById('syncDot');
+            if (!button || !dot) {
+                return;
+            }
+
+            const state = getSyncState();
+            let dotClass = '';
+            if (syncConfigured()) {
+                if (navigator.onLine === false || syncPaused || state.lastError) {
+                    dotClass = 'error';
+                } else if (syncPromise || state.dirty) {
+                    dotClass = 'pending';
+                } else {
+                    dotClass = 'synced';
+                }
+            }
+            dot.className = dotClass ? `sync-dot ${dotClass}` : 'sync-dot';
+            button.title = syncText();
+
+            const status = document.getElementById('syncStatus');
+            if (status) {
+                const lastSynced = state.lastSyncedAt ?
+                    new Date(state.lastSyncedAt).toLocaleString('tr-TR') : 'henüz yok';
+                const errorLine = state.lastError ? `<br>${escHtml(state.lastError)}` : '';
+                status.innerHTML = `${escHtml(syncText())}<br>Son senkron: ${lastSynced}${errorLine}`;
+            }
+        }
+
+        // ── Sync core ──
+        function isPristine(data) {
+            if (!data || !Array.isArray(data.weeks) || data.weeks.length !== 1) {
+                return false;
+            }
+            return (data.weeks[0].days || []).every(day => {
+                return (day.exercises || []).every(ex => ex.status === 'none' && !ex.weight);
+            });
+        }
+
+        function scheduleSync(ms) {
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(() => {
+                syncNow();
+            }, ms);
+        }
+
+        function syncFailure(error) {
+            const state = getSyncState();
+            state.lastError = error && error.message ? error.message : 'Senkron hatası.';
+            setSyncState(state);
+        }
+
+        async function syncPush(sha) {
+            const counter = localChangeCounter;
+            const text = JSON.stringify(programData, null, 1);
+            const newSha = await remotePut(text, sha);
+            const state = getSyncState();
+            state.lastSha = newSha;
+            state.lastSyncedAt = new Date().toISOString();
+            state.lastError = null;
+            // A local edit during the upload keeps the state dirty and pushes again shortly
+            state.dirty = localChangeCounter !== counter;
+            setSyncState(state);
+            if (state.dirty) {
+                scheduleSync(1000);
+            }
+        }
+
+        function adoptRemote(data, sha) {
+            const wasPristine = isPristine(programData);
+            migrationRaw = JSON.stringify(data);
+            const migrated = migrateData(data);
+            migrationRaw = null;
+            if (migrated.__migrationRefused) {
+                throw new Error('Bulutta daha yeni bir uygulama sürümünün verisi var, sayfayı yenile.');
+            }
+
+            programData = migrated;
+            saveLocalOnly(programData);
+
+            const state = getSyncState();
+            state.lastSha = sha;
+            // Older cloud data that migration changed is pushed back
+            state.dirty = !!migrated.__migrationChanged;
+            state.lastSyncedAt = new Date().toISOString();
+            state.lastError = null;
+            setSyncState(state);
+
+            // First sync on a fresh device, or an index the new data no longer has: jump to the current week
+            if (wasPristine || currentWeekIdx >= programData.weeks.length) {
+                selectLastIncompleteWeek();
+            }
+            clampIndexes();
+            render();
+            if (state.dirty) {
+                scheduleSync(1000);
+            }
+        }
+
+        // One pass of the sync algorithm; throws on failure
+        async function syncAttempt() {
+            if (!programData || programData.__migrationRefused) {
+                throw new Error('Bu cihazdaki veri daha yeni bir uygulama sürümüne ait, sayfayı yenile.');
+            }
+
+            const remote = await remoteGet();
+            const state = getSyncState();
+            if (!remote.exists) {
+                await syncPush(null);
+                return;
+            }
+            if (remote.sha === state.lastSha) {
+                if (state.dirty) {
+                    await syncPush(remote.sha);
+                } else if (state.lastError) {
+                    state.lastError = null;
+                    setSyncState(state);
+                }
+                return;
+            }
+
+            let remoteData = null;
+            try {
+                remoteData = JSON.parse(remote.text);
+            } catch (_) {
+                remoteData = null;
+            }
+            if (!remoteData || typeof remoteData !== 'object' || !Array.isArray(remoteData.weeks)) {
+                throw new Error('Buluttaki veri geçerli JSON değil; üzerine yazılmadı.');
+            }
+            if (Number(remoteData._version) > DATA_VERSION) {
+                throw new Error('Bulutta daha yeni bir uygulama sürümünün verisi var, sayfayı yenile.');
+            }
+
+            const canAdopt = state.lastSha ? !state.dirty : isPristine(programData);
+            if (canAdopt) {
+                adoptRemote(remoteData, remote.sha);
+                return;
+            }
+            openConflictModal(remoteData, remote.sha);
+        }
+
+        // At most two attempts: a stale PUT (409/422) re-reads the cloud once
+        async function syncWithRetry() {
+            for (let attempt = 1; attempt <= 2; attempt++) {
+                try {
+                    await syncAttempt();
+                    return;
+                } catch (error) {
+                    if (!(error && error.stale) || attempt === 2) {
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        async function runSyncLoop() {
+            try {
+                do {
+                    syncRerun = false;
+                    try {
+                        await syncWithRetry();
+                    } catch (error) {
+                        syncFailure(error);
+                    }
+                } while (syncRerun && !syncPaused);
+            } finally {
+                syncPromise = null;
+                syncRerun = false;
+                updateSyncIndicator();
+            }
+        }
+
+        // Single-flight entry point. The returned promise never rejects; errors land in state.lastError.
+        function syncNow({ manual = false } = {}) {
+            if (!syncConfigured() || navigator.onLine === false) {
+                updateSyncIndicator();
+                return Promise.resolve();
+            }
+            if (manual) {
+                syncPaused = false;
+            }
+            if (syncPromise) {
+                // Queue one rerun; the running promise resolves after it has finished too
+                syncRerun = true;
+                return syncPromise;
+            }
+            if (syncPaused) {
+                return Promise.resolve();
+            }
+
+            syncPromise = runSyncLoop().catch(error => {
+                console.warn('Senkron hatası:', error);
+            });
+            updateSyncIndicator();
+            return syncPromise;
+        }
+
+        function setupSyncTriggers() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' || getSyncState().dirty) {
+                    syncNow();
+                }
+            });
+            window.addEventListener('online', () => {
+                syncNow();
+            });
+            window.addEventListener('pagehide', () => {
+                if (getSyncState().dirty) {
+                    syncNow();
+                }
+            });
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    syncNow();
+                }
+            }, 60000);
+        }
+
+        // ── Conflict modal ──
+        function conflictSummary(data) {
+            const weeks = Array.isArray(data.weeks) ? data.weeks : [];
+            const last = weeks[weeks.length - 1];
+            const updated = data.updatedAt ? new Date(data.updatedAt).toLocaleString('tr-TR') : 'bilinmiyor';
+            const lastNumber = last ? escHtml(String(last.weekNumber)) : 'bilinmiyor';
+            return `Güncelleme: ${updated}<br>Hafta: ${weeks.length}<br>Son hafta: ${lastNumber}`;
+        }
+
+        function openConflictModal(remoteData, remoteSha) {
+            pendingConflict = { remoteData: remoteData, remoteSha: remoteSha };
+            document.getElementById('conflictInfo').innerHTML = `
+                <div><strong>Bu cihaz</strong><br>${conflictSummary(programData)}</div>
+                <div><strong>Bulut</strong><br>${conflictSummary(remoteData)}</div>
+            `;
+            document.getElementById('conflictModal').classList.add('open');
+        }
+
+        function closeConflictModal() {
+            document.getElementById('conflictModal').classList.remove('open');
+            const conflict = pendingConflict;
+            pendingConflict = null;
+            return conflict;
+        }
+
+        function useLocalConflict() {
+            const conflict = closeConflictModal();
+            if (conflict) {
+                syncPush(conflict.remoteSha).catch(syncFailure);
+            }
+        }
+
+        function useRemoteConflict() {
+            const conflict = closeConflictModal();
+            if (!conflict) {
+                return;
+            }
+            try {
+                adoptRemote(conflict.remoteData, conflict.remoteSha);
+            } catch (error) {
+                syncFailure(error);
+            }
+        }
+
+        function cancelConflict() {
+            closeConflictModal();
+            syncPaused = true;
+            updateSyncIndicator();
+        }
+
+        // ── Sync modal ──
+        function openSyncModal() {
+            const config = getSyncConfig();
+            document.getElementById('syncOwner').value = config.owner;
+            document.getElementById('syncRepo').value = config.repo;
+            document.getElementById('syncBranch').value = config.branch;
+            document.getElementById('syncPath').value = config.path;
+            document.getElementById('syncToken').value = config.token;
+            document.getElementById('syncDeviceName').value = config.deviceName;
+            updateSyncIndicator();
+            document.getElementById('syncModal').classList.add('open');
+        }
+
+        function closeSyncModal() {
+            document.getElementById('syncModal').classList.remove('open');
+        }
+
+        function saveSyncConfig() {
+            const config = {
+                owner: document.getElementById('syncOwner').value.trim(),
+                repo: document.getElementById('syncRepo').value.trim(),
+                branch: document.getElementById('syncBranch').value.trim() || 'main',
+                path: document.getElementById('syncPath').value.trim() || 'calisthenics-data.json',
+                token: document.getElementById('syncToken').value.trim(),
+                deviceName: document.getElementById('syncDeviceName').value.trim()
+            };
+            localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(config));
+            syncPaused = false;
+            closeSyncModal();
+            syncNow({ manual: true });
+        }
+
+        function disconnectSync() {
+            if (!confirm('Bulut bağlantısı kesilsin mi? Yerel veriler korunur.')) {
+                return;
+            }
+            const config = getSyncConfig();
+            config.token = '';
+            localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(config));
+            localStorage.setItem(SYNC_STATE_KEY, JSON.stringify({
+                lastSha: null,
+                lastSyncedAt: null,
+                dirty: false,
+                lastError: null
+            }));
+            syncPaused = false;
+            updateSyncIndicator();
+        }
+
+        // ── Backup ──
+        function downloadBackup() {
+            const blob = new Blob([JSON.stringify(programData, null, 1)], { type: 'application/json' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = `calisthenics-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function uploadBackup(event) {
+            const input = event.target;
+            const file = input.files && input.files[0];
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                let data = null;
+                try {
+                    data = JSON.parse(reader.result);
+                } catch (_) {
+                    data = null;
+                }
+                if (!data || !Array.isArray(data.weeks) || !data.weeks.length) {
+                    alert('Geçerli bir yedek dosyası seçin.');
+                    return;
+                }
+                if (!confirm('Yerel veriler yedekle değiştirilsin mi?')) {
+                    return;
+                }
+
+                let migrated;
+                try {
+                    migrationRaw = reader.result;
+                    migrated = migrateData(data);
+                } catch (_) {
+                    alert('Geçerli bir yedek dosyası seçin.');
+                    return;
+                } finally {
+                    migrationRaw = null;
+                }
+                if (migrated.__migrationRefused) {
+                    alert('Daha yeni bir uygulama sürümünün verisi var.');
+                    return;
+                }
+
+                programData = migrated;
+                saveData();
+                selectLastIncompleteWeek();
+                clampIndexes();
+                render();
+            };
+            reader.readAsText(file, 'utf-8');
+            input.value = '';
+        }
 
         // ───────────────────────────────────────────────────────────────
         // INIT
@@ -2430,6 +3570,8 @@
 
         requestNotificationPermission();
         render();
+        setupSyncTriggers();
+        syncNow();
 
         // ───────────────────────────────────────────────────────────────
         // SERVICE WORKER
@@ -2441,7 +3583,7 @@
             }).then(() => {
                 caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key))));
             }).finally(() => {
-                navigator.serviceWorker.register('sw.js?v=4')
+                navigator.serviceWorker.register('sw.js?v=5')
                     .then(reg => {
                         reg.addEventListener('updatefound', () => {
                             const newWorker = reg.installing;
