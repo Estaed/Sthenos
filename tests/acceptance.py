@@ -376,6 +376,66 @@ def main():
         check("T20 no mobility data", "mobility" not in d, list(d))
         v3.context.close()
 
+        # T21 single-user UI cleanup (phone viewport)
+        ctx = browser.new_context(service_workers="block", viewport={"width": 390, "height": 844},
+                                  is_mobile=True, has_touch=True)
+        ctx.route("https://api.github.com/**", MockGitHub().handle)
+        ui = ctx.new_page()
+        ui.on("pageerror", lambda e: errors.append(f"[t21] pageerror: {e}"))
+        ui.on("dialog", lambda dlg: dlg.accept())
+        ui.goto(url)
+        ui.evaluate("() => selectPlan(3)")
+        text = ui.locator("body").inner_text()
+        check("T21 tips box removed", "Antrenman İpuçları" not in text)
+        check("T21 week shown once", text.count("Hafta 1") == 1, text.count("Hafta 1"))
+        check("T21 header title has plan", "Hafta 1 · 3 Gün" in ui.locator("#stages").inner_text(), ui.locator("#stages").inner_text())
+        pills = [t.strip() for t in ui.locator("#weekNav button").all_inner_texts()]
+        check("T21 week pill shows plan", pills and pills[0].startswith("H1 (3)"), pills)
+        check("T21 no reset button in header", ui.get_by_role("button", name="Sıfırla").count() == 0
+              and "Sıfırla" not in ui.locator("#stages").locator("xpath=..").inner_text())
+        ui.evaluate("() => openSyncModal()")
+        check("T21 reset lives in settings modal", ui.locator("#syncModal").get_by_role("button", name="Programı sıfırla").count() == 1)
+        ui.evaluate("() => closeSyncModal()")
+        check("T21 no per-row delete", ui.locator("#exb .del-btn").count() == 0)
+        check("T21 incomplete week shows no hint", ui.locator("#weekCompleteArea").inner_text().strip() == "",
+              ui.locator("#weekCompleteArea").inner_text())
+        check("T21 dinfo is the progress line", "yapıldı" in ui.locator("#dinfo").inner_text(), ui.locator("#dinfo").inner_text())
+        ui.evaluate("() => updateField(0, 'weight', '112.5 kg')")
+        clip = ui.evaluate("""() => { const i = [...document.querySelectorAll('#exb input')].find(x => x.value === '112.5 kg');
+                                      return i ? i.scrollWidth - i.clientWidth : 999; }""")
+        check("T21 weight input fits 112.5 kg", clip <= 1, clip)
+        check("T21 no horizontal page scroll", not ui.evaluate("() => document.documentElement.scrollWidth > window.innerWidth"))
+        before = ui.evaluate("() => getCurrentDay().exercises.length")
+        ui.evaluate("() => openEditModal(getCurrentDay().exercises[0].id)")
+        ui.get_by_role("button", name="Egzersizi sil").click()
+        check("T21 delete from edit modal", ui.evaluate("() => getCurrentDay().exercises.length") == before - 1)
+        ctx.close()
+
+        # T22 desktop width is capped
+        wide = new_page(browser, url, MockGitHub(), errors, "wide")
+        wide.set_viewport_size({"width": 1280, "height": 900})
+        width = wide.evaluate("() => document.getElementById('exTable').getBoundingClientRect().width")
+        check("T22 table capped on desktop", width <= 720, width)
+        wide.context.close()
+
+        # T23 last-week reference skips weeks where the day was not trained
+        lw = new_page(browser, url, MockGitHub(), errors, "lastweek")
+        lw.evaluate("""() => {
+            const doneAll = () => getActiveDays(getCurrentWeek()).forEach((d, j) => {
+                switchDay(j); d.exercises.forEach((_, i) => setStatus(i, 'done')); });
+            const push = getCurrentWeek().days.find(d => d.name === 'Push');
+            push.exercises[0].weight = '+10 kg';
+            push.exercises[0].reps = '8';
+            saveData();
+            doneAll(); completeWeek();          // H1: 5-day, Push trained → H2 Push +12.5 kg
+            selectPlan('ev'); doneAll(); completeWeek();   // H2: Ev, Push not trained → H3 Push carried
+            selectPlan(5);
+            switchDay(getActiveDays(getCurrentWeek()).findIndex(d => d.name === 'Push'));
+        }""")
+        body = lw.locator("#exb").inner_text()
+        check("T23 reference comes from last trained week", "geçen: +10 kg × 8" in body, body[:200])
+        lw.context.close()
+
         browser.close()
     srv.shutdown()
     check("no page/console errors", not errors, "\n".join(errors[:10]))

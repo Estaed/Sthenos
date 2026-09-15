@@ -247,6 +247,8 @@
 
         .content {
             padding: 0 12px;
+            max-width: 720px;
+            margin: 0 auto;
         }
 
         .card {
@@ -255,20 +257,6 @@
             background: var(--card);
             padding: 14px 16px;
             margin-bottom: 12px;
-        }
-
-        .tipbox {
-            background: #0d1a2b;
-            border: 1px solid #1e3d6e;
-            border-radius: var(--radius);
-            padding: 12px 14px;
-            margin-bottom: 12px;
-            font-size: 13px;
-            color: #b8d0f0;
-            line-height: 1.6;
-        }
-        .tipbox strong {
-            color: #90c0ff;
         }
 
         .week-hdr {
@@ -319,26 +307,26 @@
             letter-spacing: .06em;
         }
         .ex-table th:first-child {
-            width: 70px;
+            width: 66px;
         }
         .ex-table th:nth-child(2) {
             width: 99%;
         }
         .ex-table th:nth-child(3) {
-            width: 46px;
+            width: 40px;
         }
         .ex-table th:nth-child(4) {
-            width: 50px;
+            width: 44px;
         }
         .ex-table th:nth-child(5) {
-            width: 70px;
+            width: 92px;
         }
         .ex-table th:last-child {
-            width: 64px;
+            width: 34px;
         }
 
         .ex-table td {
-            padding: 9px 6px 9px 0;
+            padding: 9px 4px 9px 0;
             border-bottom: 1px solid var(--border);
             vertical-align: middle;
         }
@@ -352,8 +340,8 @@
             align-items: center;
         }
         .status-btn {
-            width: 28px;
-            height: 28px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             border: 2px solid var(--border);
             background: transparent;
@@ -416,10 +404,11 @@
             border-color: #555;
         }
         .ex-input-sm {
-            max-width: 44px;
+            max-width: 40px;
         }
         .ex-input-med {
-            max-width: 62px;
+            max-width: 84px;
+            min-width: 84px;
         }
 
         .action-btn {
@@ -760,6 +749,8 @@
             padding: 24px;
             max-width: 420px;
             width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .modal-box h3 {
             margin-bottom: 16px;
@@ -949,30 +940,41 @@
         }
 
         @media (max-width: 480px) {
+            .ex-table th:first-child,
+            .ex-table td:first-child {
+                width: 76px;
+            }
             .ex-table th:nth-child(3),
             .ex-table td:nth-child(3) {
-                width: 40px;
+                width: 34px;
             }
             .ex-table th:nth-child(4),
             .ex-table td:nth-child(4) {
-                width: 44px;
+                width: 38px;
             }
             .ex-table th:nth-child(5),
             .ex-table td:nth-child(5) {
-                width: 58px;
+                width: 88px;
+            }
+            .ex-table td {
+                padding: 8px 3px 8px 0;
+            }
+            .status-group {
+                gap: 3px;
             }
             .status-btn {
-                width: 24px;
-                height: 24px;
-                font-size: 12px;
+                width: 34px;
+                height: 34px;
+                font-size: 13px;
             }
             .ex-input-sm {
-                max-width: 36px;
+                max-width: 32px;
                 font-size: 12px;
-                padding: 3px 4px;
+                padding: 3px 3px;
             }
             .ex-input-med {
-                max-width: 52px;
+                min-width: 76px;
+                max-width: 76px;
                 font-size: 12px;
                 padding: 3px 4px;
             }
@@ -1025,23 +1027,14 @@
 
     <div class="content">
 
-        <div class="tipbox" style="margin-top:12px">
-            💡 <strong>Antrenman İpuçları</strong><br />
-            • Setler arası 2-3 dk dinlenin.<br />
-            • Kontrollü iniş (2-3s) – patlayıcı çıkış (1s). Form her zaman ağırlıktan önce.<br />
-            • <strong>Yeşil</strong> = tamamlandı → ilerleme uygulanır.<br />
-            • <strong>Turuncu</strong> = yapıldı ama eksik rep → <strong>ilerleme uygulanmaz</strong>, hafta tamamlanmış sayılır.
-        </div>
-
         <div class="stage-bar">
             <div class="scroll-row" id="stages"></div>
             <div class="stage-actions">
-                <button id="syncButton" onclick="openSyncModal()" title="Senkron ayarlanmamış">
+                <button onclick="toggleTimer()" title="Timer">⏱️</button>
+                <button onclick="toggleHistory()" title="Geçmiş">📊</button>
+                <button id="syncButton" onclick="openSyncModal()" title="Bulut ve ayarlar">
                     ☁<span id="syncDot" class="sync-dot"></span>
                 </button>
-                <button onclick="toggleTimer()">⏱️ Timer</button>
-                <button onclick="toggleHistory()">📊 Geçmiş</button>
-                <button class="reset-btn" onclick="resetAll()">🔄 Sıfırla</button>
             </div>
         </div>
 
@@ -1133,6 +1126,9 @@
                 Mevcut yeşil hafta sayısı: <span id="editCurrentGreen">0</span>
             </div>
             <div class="modal-actions">
+                <button class="btn-danger" onclick="deleteEditingExercise()">Egzersizi sil</button>
+            </div>
+            <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeEditModal()">İptal</button>
                 <button class="btn-add" onclick="confirmEditExercise()">Kaydet</button>
             </div>
@@ -1183,7 +1179,7 @@
 
     <div class="modal-overlay" id="syncModal">
         <div class="modal-box">
-            <h3>Bulut Senkronu</h3>
+            <h3>Bulut ve Ayarlar</h3>
             <label>Owner</label>
             <input id="syncOwner" />
             <label>Repo</label>
@@ -1208,6 +1204,9 @@
             </div>
             <input id="backupInput" type="file" accept="application/json" style="display:none"
                 onchange="uploadBackup(event)" />
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="resetAll()">Programı sıfırla</button>
+            </div>
             <div class="modal-actions">
                 <button class="btn-danger" onclick="disconnectSync()">Bağlantıyı kes</button>
                 <button class="btn-cancel" onclick="closeSyncModal()">Kapat</button>
@@ -1307,6 +1306,11 @@
 
         function planLabel(plan) {
             return plan === 'ev' ? 'Ev' : `${plan} Gün`;
+        }
+
+        // Short form used in the week pills, e.g. "3" or "Ev"
+        function planShortLabel(plan) {
+            return plan === 'ev' ? 'Ev' : `${plan}`;
         }
 
         // ───────────────────────────────────────────────────────────────
@@ -1925,13 +1929,20 @@
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
-        // Muted reference to the same exercise on the same day of the previous week
+        // Muted reference to the same exercise on the same day, taken from the most recent earlier
+        // week where that day was active (weeks where the day was inactive are skipped).
         function lastWeekReference(dayId, exerciseName) {
-            const previousWeek = programData.weeks[currentWeekIdx - 1];
-            const previousDay = previousWeek && Array.isArray(previousWeek.days) ?
-                previousWeek.days.find(day => day.id === dayId) : null;
-            const previous = previousDay && Array.isArray(previousDay.exercises) ?
-                previousDay.exercises.find(ex => ex.name === exerciseName) : null;
+            let previous = null;
+            for (let i = currentWeekIdx - 1; i >= 0; i--) {
+                const week = programData.weeks[i];
+                if (!week || !Array.isArray(week.activeDayIds) || !week.activeDayIds.includes(dayId)) {
+                    continue;
+                }
+                const day = Array.isArray(week.days) ? week.days.find(item => item.id === dayId) : null;
+                previous = day && Array.isArray(day.exercises) ?
+                    day.exercises.find(ex => ex.name === exerciseName) : null;
+                break;
+            }
             if (!previous) {
                 return '';
             }
@@ -1993,7 +2004,7 @@
                 // Management mode: red for all weeks except first
                 if (managementMode && i > 0) cls += ' manage-mode';
 
-                let label = 'H' + wkItem.weekNumber;
+                let label = `H${wkItem.weekNumber} (${planShortLabel(wkItem.plan)})`;
                 if (wkItem.completed) label += ' ✓';
 
                 let clickHandler = `switchWeek(${i})`;
@@ -2013,7 +2024,7 @@
                 return `<button class="${current.trim()}"${disabled} onclick="selectPlan(${planArg})">${planLabel(plan)}</button>`;
             }).join('');
             document.getElementById('planSelector').innerHTML = `${planButtons}
-                <button class="plan-edit" onclick="openPlanEditor()">✎ Planı düzenle</button>`;
+                <button class="plan-edit" onclick="openPlanEditor()" title="Planı düzenle">✎</button>`;
 
             // ── Day tabs ──
             const dayTabs = document.getElementById('dayTabs');
@@ -2061,17 +2072,16 @@
                 }
             }
             const doneBadge = (allDoneDay && anyDoneDay) ? '<span class="day-done-badge">✅ Gün Tamamlandı</span>' : '';
-            document.getElementById('dinfo').innerHTML = d ? dayName + ' ' + doneBadge : 'Bu plan için etkin gün yok';
 
-            // ── Week header ──
+            // ── Progress line (day name + status, the single place this shows) ──
             const totalEx = d ? d.exercises.length : 0;
             const doneEx = d ? d.exercises.filter(e => e.status === 'done' || e.status === 'partial').length : 0;
             const greenEx = d ? d.exercises.filter(e => e.status === 'done').length : 0;
-            const progText = d ? `${doneEx}/${totalEx} yapıldı (${greenEx} yeşil)` : '';
-            document.getElementById('weekHdr').innerHTML = `
-                <div class="wfocus">Hafta ${wk.weekNumber} · ${dayName}</div>
-                <div class="wnote">${progText} ${wk.completed ? '✅ Hafta tamamlandı!' : ''}</div>
-            `;
+            const progText = d ? `${escHtml(dayName)} · ${doneEx}/${totalEx} yapıldı (${greenEx} yeşil)` : 'Bu plan için etkin gün yok';
+            document.getElementById('dinfo').innerHTML = d ? progText + ' ' + doneBadge : progText;
+
+            // ── Week header: title already shown once in #stages, nothing to render here ──
+            document.getElementById('weekHdr').innerHTML = '';
 
             // ── Exercise table ──
             if (d) {
@@ -2105,7 +2115,6 @@
                                 placeholder="Boş" onchange="updateField(${idx}, 'weight', this.value)" /></td>
                         <td>
                             <button class="action-btn" onclick="openEditModal('${ex.id}')" title="İlerleme ayarları">⚙</button>
-                            <button class="action-btn del-btn" onclick="deleteExercise(${idx})" title="Sil">✕</button>
                         </td>
                     </tr>`;
                 }).join('');
@@ -2132,7 +2141,7 @@
             // ── Week complete area ──
             const area = document.getElementById('weekCompleteArea');
             if (wk.completed) {
-                area.innerHTML = `<div class="week-done-badge">✅ Hafta ${wk.weekNumber} Tamamlandı</div>`;
+                area.innerHTML = `<div class="week-done-badge">✅ Tamamlandı</div>`;
             } else {
                 const fullyDone = isWeekFullyDone(wk);
                 if (fullyDone && d && d.exercises.length > 0) {
@@ -2141,19 +2150,12 @@
                         <div style="font-size:12px;color:var(--text2);margin-top:6px;">Tüm egzersizler yapıldı! Yeni hafta oluştur.</div>
                     `;
                 } else {
-                    const total = d ? d.exercises.length : 0;
-                    const done = d ? d.exercises.filter(e => e.status === 'done' || e.status === 'partial').length : 0;
-                    area.innerHTML = `
-                        <div style="font-size:13px;color:var(--text2);">
-                            ${done}/${total} egzersiz yapıldı. 
-                            ${total > 0 && done < total ? 'Tümünü yeşil veya turuncu yaparak haftayı tamamlayın.' : ''}
-                        </div>
-                    `;
+                    area.innerHTML = '';
                 }
             }
 
             document.getElementById('stages').innerHTML = `
-                <span style="color:var(--text);font-size:14px;font-weight:600;padding:8px 0;">Hafta ${wk.weekNumber}</span>
+                <span style="color:var(--text);font-size:14px;font-weight:600;padding:8px 0;">Hafta ${wk.weekNumber} · ${planLabel(wk.plan)}</span>
             `;
 
             document.getElementById('dragToggle').classList.toggle('on', dragMode);
@@ -2867,6 +2869,23 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.remove('open');
             editingExerciseId = null;
+        }
+
+        // Deletes the exercise currently open in the edit modal (danger button inside the modal)
+        function deleteEditingExercise() {
+            const d = getCurrentDay();
+            if (!d) return;
+            const idx = d.exercises.findIndex(e => e.id === editingExerciseId);
+            if (idx === -1) return;
+            if (d.exercises.length <= 1) {
+                alert('En az bir egzersiz olmalı.');
+                return;
+            }
+            if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
+            d.exercises.splice(idx, 1);
+            closeEditModal();
+            saveData();
+            render();
         }
 
         function confirmEditExercise() {
