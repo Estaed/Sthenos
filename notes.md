@@ -15,9 +15,22 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 ## Decided (Tarık, 2026-10-24)
 - **Separate app**, not a tab inside Pantry ("antreman uygulaması ayrı kalsın"); Pantry's notes
   planned a v1.2 merge, which is now *After v1* at most.
-- **Built the way Pantry was:** same stack (PWA, vanilla JS, no build step, one script per feature
-  under `app/`, GitHub Pages, private data repo sync), same process (notes → Blueprint → waves with
-  `plan-wave` and `otopilot`), same design language (Tarik Base v6 + Pantry layer).
+- **Built the way Pantry was** ("pantryde yaptığımız development ile ilerleyeceğiz"): same process
+  (notes → Blueprint → waves with `plan-wave` and `otopilot`) and design language (Tarik Base v6 +
+  Pantry layer). The stack is still a decision (round below): he named the process, not the stack.
+
+## Open decisions for Blueprint (round 1, for Tarık in the morning; "evet" takes the recommendation)
+1. **Stack:** PWA like Pantry (vanilla JS, `app/` one script per feature, GitHub Pages, data repo
+   sync) — recommended: the Monday deadline, the sync and v4 data already exist, his phone runs
+   Pantry the same way. Rejected for v1: Flutter/Kotlin native (the blueprint skill notes Pantry's
+   web build fell short in scrolling and feel, 2026-10-21; if the workout app feels the same, native
+   goes to *After v1* with the measured complaint).
+2. **Design:** one of round 3's clickable prototypes (`design/proto-sheet.html`, `proto-dock.html`,
+   `proto-notebook.html`) or named parts of them.
+3. **Data:** same private repo `Estaed/Calisthenics-Data`, schema v5 (per-set reps, workout
+   start/finish) migrated from v4 — recommended (git history stays one time series). Rejected: a new repo.
+4. **Old app:** the new one takes the same URL (his home-screen icon keeps working), the old
+   `index.html` moves to `legacy/` until v1 has run a week — recommended. Rejected: a second URL.
 - **Look:** round 1 of `design/yonler.html` kept P3 Focus (one exercise big, thumb buttons) and
   P4 Sets (each set its own cell); round 2 in `design/yonler-2.html`. Taste record in `design/DESIGN.md`.
 
