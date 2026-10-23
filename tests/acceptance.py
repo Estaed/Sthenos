@@ -229,16 +229,22 @@ def main():
         check("T6 turkish name round-trip", d_pc["weeks"][1]["days"][4]["exercises"][0]["name"] == "Leg Press Yüksek Ayak ğşı",
               d_pc["weeks"][1]["days"][4]["exercises"][0]["name"])
 
-        # T7 pc edit -> debounced push -> phone pulls
+        # T7 an edit waits on the device (no push until the day is finished or a manual sync), then phone pulls
+        puts = gh.puts
         pc.evaluate("() => { switchDay(0); updateField(0, 'weight', '+12.5 kg'); }")
         pc.wait_for_timeout(6000)
-        check("T7 pc pushed edit", '+12.5 kg' in (gh.text or ""), gh.puts)
+        check("T7 edit alone does not push", gh.puts == puts and '+12.5 kg' not in (gh.text or ""), gh.puts)
+        check("T7 indicator says it waits for the day", pc.evaluate("() => syncText()") == 'Gün bitince gönderilecek',
+              pc.evaluate("() => syncText()"))
+        pc.evaluate("() => syncNow({manual: true})")
+        check("T7 manual sync pushes the edit", '+12.5 kg' in (gh.text or ""), gh.puts)
         phone.evaluate("() => syncNow({manual: true})")
         w = phone.evaluate("() => programData.weeks[1].days[0].exercises[0].weight")
         check("T7 phone adopted pc edit", w == "+12.5 kg", w)
 
         # T8 completeWeek on 3-day plan: inactive days carried unchanged
         phone.evaluate("() => { currentWeekIdx = 1; selectPlan(3); }")
+        puts8 = gh.puts
         phone.evaluate("""() => {
             const act = getActiveDays(getCurrentWeek());
             act.forEach((day, j) => { switchDay(j); day.exercises.forEach((_, i) => setStatus(i, 'done')); });
@@ -252,6 +258,9 @@ def main():
         check("T8 inactive day unchanged", byname["Upper"]["exercises"][0]["weight"] == "40 kg"
               and byname["Upper"]["exercises"][0]["status"] == "none", byname["Upper"]["exercises"][0])
         check("T8 day ids preserved", [x["id"] for x in nw["days"]] == [x["id"] for x in d["weeks"][1]["days"]])
+        phone.wait_for_timeout(2500)
+        check("T8 finished days and week pushed without a manual sync", gh.puts > puts8 and '"completed": true' in (gh.text or ""),
+              (gh.puts, puts8))
         check("T8 history shows active days only",
               phone.evaluate("() => { renderHistory(); return document.getElementById('historyBody').innerText; }").count("Machine Row") == 1)
         phone.wait_for_timeout(6000)

@@ -1917,8 +1917,49 @@
 
             const state = getSyncState();
             state.dirty = true;
+            if (!state.dirtySince) {
+                state.dirtySince = new Date().toISOString();
+            }
+            const pushed = new Set(state.pushedComplete || []);
+            const finishedNow = completedKeys().some(key => !pushed.has(key));
+            if (finishedNow) {
+                state.pushDue = true;
+            }
             setSyncState(state);
-            scheduleSync(4000);
+            if (finishedNow) {
+                scheduleSync(1500);
+            } else {
+                updateSyncIndicator();
+            }
+        }
+
+        // Push policy (Tarık, 2026-10-24: "hep atmasın, program tamamlanınca atsın"): a change waits on this
+        // phone until a day's workout or the week is finished, the cloud button is pressed, or it is older than
+        // PUSH_AFTER_MS (so a day left half-done is still backed up). Pulls are unchanged.
+        const PUSH_AFTER_MS = 12 * 60 * 60 * 1000;
+
+        // A finished day: every exercise marked done or partial; a finished week: completed
+        function completedKeys() {
+            const keys = [];
+            (programData.weeks || []).forEach((week, wi) => {
+                if (week.completed) {
+                    keys.push(`w${wi}`);
+                }
+                (week.days || []).forEach(day => {
+                    const list = day.exercises || [];
+                    if (list.length && list.every(ex => ex.status !== 'none')) {
+                        keys.push(`${wi}:${day.id}`);
+                    }
+                });
+            });
+            return keys;
+        }
+
+        function pushAllowed(state) {
+            if (state.pushDue) {
+                return true;
+            }
+            return !!state.dirtySince && Date.now() - Date.parse(state.dirtySince) > PUSH_AFTER_MS;
         }
 
         function loadData() {
@@ -3568,6 +3609,9 @@
             if (syncPaused) {
                 return 'Senkron bekletildi';
             }
+            if (state.dirty && !syncPromise && !pushAllowed(state)) {
+                return 'Gün bitince gönderilecek';
+            }
             if (syncPromise || state.dirty) {
                 return 'Senkron bekliyor';
             }
@@ -3644,6 +3688,11 @@
             state.lastError = null;
             // A local edit during the upload keeps the state dirty and pushes again shortly
             state.dirty = localChangeCounter !== counter;
+            if (!state.dirty) {
+                state.pushDue = false;
+                state.dirtySince = null;
+                state.pushedComplete = completedKeys();
+            }
             setSyncState(state);
             if (state.dirty) {
                 scheduleSync(1000);
@@ -3664,8 +3713,11 @@
 
             const state = getSyncState();
             state.lastSha = sha;
+            state.pushedComplete = completedKeys();
             // Older cloud data that migration changed is pushed back
             state.dirty = !!migrated.__migrationChanged;
+            state.pushDue = state.dirty;
+            state.dirtySince = state.dirty ? new Date().toISOString() : null;
             state.lastSyncedAt = new Date().toISOString();
             state.lastError = null;
             setSyncState(state);
@@ -3694,7 +3746,7 @@
                 return;
             }
             if (remote.sha === state.lastSha) {
-                if (state.dirty) {
+                if (state.dirty && pushAllowed(state)) {
                     await syncPush(remote.sha);
                 } else if (state.lastError) {
                     state.lastError = null;
@@ -3763,6 +3815,11 @@
             }
             if (manual) {
                 syncPaused = false;
+                const state = getSyncState();
+                if (state.dirty) {
+                    state.pushDue = true;
+                    setSyncState(state);
+                }
             }
             if (syncPromise) {
                 // Queue one rerun; the running promise resolves after it has finished too
