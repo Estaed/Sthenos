@@ -2142,8 +2142,13 @@
                 const planArg = plan === 'ev' ? `'ev'` : plan;
                 return `<button class="${current.trim()}"${disabled} onclick="selectPlan(${planArg})">${planLabel(plan)}</button>`;
             }).join('');
-            document.getElementById('planSelector').innerHTML = `${planButtons}
+            const planSelector = document.getElementById('planSelector');
+            planSelector.innerHTML = `${planButtons}
                 <button class="plan-edit" onclick="openPlanEditor()" title="Planı düzenle">✎</button>`;
+            // A single program (every plan holds the same days) needs no plan choice
+            const distinctPlans = new Set(Object.values(programData.plans || {})
+                .filter(ids => Array.isArray(ids) && ids.length).map(ids => ids.join()));
+            planSelector.style.display = distinctPlans.size > 1 ? '' : 'none';
 
             // ── Day tabs ──
             const dayTabs = document.getElementById('dayTabs');
