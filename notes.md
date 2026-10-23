@@ -37,10 +37,23 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 - <to fill with Tarık>
 - (eye) <to fill with Tarık>
 
+## Must (Tarık, 2026-10-24 night)
+- The whole day's program in one view; reps done entered fast; a short set entered just as fast,
+  keeping its real number ("eksik sette kaç tekrar yaptığımı da kaydedelim ki ilerideki haftalarda
+  ona göre programı düzenleriz, log tutalım her şeyin").
+- Workout Start and Finish: start time, finish time, duration ("spora başla sporu bitir yapalım ne
+  kadar süre geçirdiğimi de hesaplarız").
+- What the old app provides: weeks with double progression on finish, days, program editing,
+  history, rest timer, sync, JSON backup (`design/brief-r3.md`).
+- Sync pushes when a day or week is finished, not after every change (already live in the old app,
+  `b47cf0c`); Pantry keeps its own policy (Tarık: "pantry kalsın aynen").
+- Deadline: gym reopens Monday 2026-10-26; the app should be ready for that day.
+
 ## Ideas
 - Set-by-set logging (P4) with a focus view for the current exercise (P3).
 - Rest timer between alternated pairs (~90 s).
 - Last week's value under every exercise; "+2.5 kg next" when the range top is reached.
+- Round 3 (clickable, `design/proto-*.html`): Day sheet, Program + dock, Notebook.
 
 ## Screens
 <Eko fills it by asking before the Blueprint: v1 main flow, screen list, states>
