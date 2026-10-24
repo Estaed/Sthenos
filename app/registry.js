@@ -7,3 +7,6 @@
 self.CALI_FEATURES = [];
 CALI_FEATURES.push('app/workout.js');
 CALI_FEATURES.push('app/progress.js');
+CALI_FEATURES.push('app/workout.css');
+CALI_FEATURES.push('app/summary.js');
+CALI_FEATURES.push('app/summary.css');
