@@ -40,7 +40,7 @@
 .workout-row + .workout-row, .workout-ed + .workout-row { border-top: 1px solid var(--divider); }
 .workout-cols { min-height: 14px; margin: 3px 0 -3px; font-size: 0.75rem; font-weight: 600; color: var(--ink-subtle); line-height: 14px; }
 .workout-cols span:nth-child(2) { text-align: center; white-space: nowrap; }
-.workout-cols span:nth-child(3) { padding-left: 2px; white-space: nowrap; }
+.workout-cols span:nth-child(3) { padding-left: 14px; white-space: nowrap; }
 .workout-card { flex: none; }   /* no clipping: the '−1' badge reaches over a card's top edge, as on screen 8 */
 .workout-ex { min-width: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center; text-align: left; color: var(--ink); }
 button.workout-ex[aria-expanded="true"] .workout-name { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
