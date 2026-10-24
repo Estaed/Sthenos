@@ -46,12 +46,13 @@ def scenario(browser, url, errors):
         return ev("""() => { const d = document.querySelector('[data-screen="day"]'); if (!d) return null;
             const pill = document.querySelector('.timer-pill'), open = document.querySelector('.timer-open');
             return { pill: pill.hidden ? null : pill.textContent, label: pill.getAttribute('aria-label'), open: !open.hidden,
-                     inBar: d.contains(pill) && d.contains(open), right: Math.round(open.getBoundingClientRect().right) }; }""")
+                     inBar: d.contains(pill) && d.contains(open),
+                     edge: Math.round(open.parentElement.getBoundingClientRect().right - open.getBoundingClientRect().right) }; }""")
 
     # ── the top bar with nothing running; the button opens screen 4 ──
     got = top()
-    A.check("with no timer running the day's top bar shows the timer button at its right end and no pill",
-            got and got["pill"] is None and got["open"] and got["inBar"] and got["right"] >= 340, got)
+    A.check("with no timer running the day's top bar shows the timer button at the right end of its holder (before Start/Finish) and no pill",
+            got and got["pill"] is None and got["open"] and got["inBar"] and got["edge"] <= 1, got)
     tap(".timer-open")
     page.wait_for_selector('[data-screen="timer"] [data-timer="left"]')
     A.check("the timer button opens the timer screen (route 'timer') with the countdown at 1:00 ready to start",
