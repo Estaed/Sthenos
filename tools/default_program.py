@@ -13,7 +13,9 @@ Sources, field by field:
   durations a check row's countdown, from the minutes in its name ("Esneme 4 dk" -> 240 s).
   defaults  loadStep 2.5 (Blueprint -> settings) where the v4 row has none; time and check rows have no
             rep range (repMin and repMax null).
-No logs and no notes come over: the v4 file has no notes, and old logs stay out (Blueprint -> What v1 is).
+  NOTES     below: form and health cues kept out of the names, in the exercise's `note` (2026-10-24: the repo is
+            public and the names show on every stranger's screen).
+No logs come over: old logs stay out (Blueprint -> What v1 is); the v4 file has no notes of its own.
 """
 import argparse
 import json
@@ -43,13 +45,22 @@ ENGLISH = {
     "A Ağır": "A Heavy",
     "B Hacim": "B Volume",
     "C Bacak": "C Legs",
-    "Bilek ısınması 1 dk (daire + dört ayakta ağrısız sallanma)": "Wrist warm-up 1 min (circles + pain-free rocking on all fours)",
-    "Captain's Chair Knee Raise (diz bükük)": "Captain's Chair Knee Raise (knees bent)",
-    "Esneme 4 dk: sinir kayması 10/bacak + hamstring havlu 1 dk/bacak (diz arkası yanmadan, ayak serbest)": "Stretch 4 min: nerve glide 10/leg + towel hamstring 1 min/leg (no burn behind the knee, foot free)",
+    "Bilek ısınması 1 dk (daire + dört ayakta ağrısız sallanma)": "Wrist warm-up 1 min",
+    "Captain's Chair Knee Raise (diz bükük)": "Captain's Chair Knee Raise",
+    "Esneme 4 dk: sinir kayması 10/bacak + hamstring havlu 1 dk/bacak (diz arkası yanmadan, ayak serbest)": "Stretch 4 min: hamstring",
     "Eğimli Yürüyüş 22 dk (5,0 km/h · %6, her hafta +%2 → %12)": "Incline Walk 22 min (5.0 km/h · 6%, +2% a week → 12%)",
     "Glute Kickback (makine/kablo)": "Glute Kickback (machine/cable)",
     "Leg Press (ayak yüksek)": "Leg Press (feet high)",
-    "Pike Push-up (dambıl/paralet üstünde, bilek düz)": "Pike Push-up (on dumbbells/parallettes, wrists straight)",
+    "Pike Push-up (dambıl/paralet üstünde, bilek düz)": "Pike Push-up",
+}
+
+# The cues the Turkish names carried, by the same names, written to `note` instead of the English name.
+NOTES = {
+    "Bilek ısınması 1 dk (daire + dört ayakta ağrısız sallanma)": "Circles + pain-free rocking on all fours",
+    "Captain's Chair Knee Raise (diz bükük)": "Knees bent",
+    "Esneme 4 dk: sinir kayması 10/bacak + hamstring havlu 1 dk/bacak (diz arkası yanmadan, ayak serbest)":
+        "Nerve glide 10/leg + towel hamstring 1 min/leg; no burn behind the knee, foot free",
+    "Pike Push-up (dambıl/paralet üstünde, bilek düz)": "On dumbbells or parallettes, wrists straight",
 }
 
 
@@ -125,6 +136,8 @@ def build(v4):
     for d in days:
         d["name"] = ENGLISH.get(d["name"], d["name"])
         for e in d["exercises"]:
+            if e["name"] in NOTES:
+                e["note"] = NOTES[e["name"]]
             e["name"] = ENGLISH.get(e["name"], e["name"])
     return {"id": PROGRAM_ID, "name": PROGRAM_NAME, "days": days}
 

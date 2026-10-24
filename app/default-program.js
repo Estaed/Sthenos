@@ -121,7 +121,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2crf3j_300t",
-          "name": "Stretch 4 min: nerve glide 10/leg + towel hamstring 1 min/leg (no burn behind the knee, foot free)",
+          "name": "Stretch 4 min: hamstring",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -129,7 +129,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "duration": 240
+          "duration": 240,
+          "note": "Nerve glide 10/leg + towel hamstring 1 min/leg; no burn behind the knee, foot free"
         },
         {
           "id": "mh4v2nzrtm_c05q",
@@ -151,7 +152,7 @@ self.CALI_DEFAULT_PROGRAM = {
       "exercises": [
         {
           "id": "mh4wrrjxde_juu9",
-          "name": "Wrist warm-up 1 min (circles + pain-free rocking on all fours)",
+          "name": "Wrist warm-up 1 min",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -159,7 +160,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "duration": 60
+          "duration": 60,
+          "note": "Circles + pain-free rocking on all fours"
         },
         {
           "id": "mh4v2olheb_vrf8",
@@ -189,7 +191,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2e4fug_lqan",
-          "name": "Pike Push-up (on dumbbells/parallettes, wrists straight)",
+          "name": "Pike Push-up",
           "kind": "reps",
           "sets": 2,
           "target": 6,
@@ -198,7 +200,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 0,
           "loadStep": 2.5,
           "bodyweight": true,
-          "pair": "p2"
+          "pair": "p2",
+          "note": "On dumbbells or parallettes, wrists straight"
         },
         {
           "id": "mh4v2de4vr_8gwr",
@@ -262,7 +265,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2csh9z_ynj5",
-          "name": "Captain's Chair Knee Raise (knees bent)",
+          "name": "Captain's Chair Knee Raise",
           "kind": "reps",
           "sets": 2,
           "target": 10,
@@ -270,11 +273,12 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 15,
           "load": 0,
           "loadStep": 2.5,
-          "bodyweight": true
+          "bodyweight": true,
+          "note": "Knees bent"
         },
         {
           "id": "mh4v2l2yvg_acl9",
-          "name": "Stretch 4 min: nerve glide 10/leg + towel hamstring 1 min/leg (no burn behind the knee, foot free)",
+          "name": "Stretch 4 min: hamstring",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -282,7 +286,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "duration": 240
+          "duration": 240,
+          "note": "Nerve glide 10/leg + towel hamstring 1 min/leg; no burn behind the knee, foot free"
         },
         {
           "id": "mh4v2rd5cu_jbph",
@@ -437,7 +442,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v26e2mb_f54j",
-          "name": "Stretch 4 min: nerve glide 10/leg + towel hamstring 1 min/leg (no burn behind the knee, foot free)",
+          "name": "Stretch 4 min: hamstring",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -445,7 +450,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "duration": 240
+          "duration": 240,
+          "note": "Nerve glide 10/leg + towel hamstring 1 min/leg; no burn behind the knee, foot free"
         },
         {
           "id": "mh4v2aqrsm_08jg",

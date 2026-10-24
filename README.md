@@ -8,7 +8,7 @@
 up on their own when you hit the top of the range.**
 
 <p align="center">
-  <img src="docs/img/sthenos-flow.gif" width="360" alt="Sthenos on a phone: the day's sets, a tap logging a set and starting the rest timer, a short set, the exercise editor, the day's summary and Finish week">
+  <img src="docs/img/sthenos-flow-2.gif" width="360" alt="Sthenos on a phone: the day's sets, a tap logging a set and starting the rest timer, a short set, the exercise editor, the day's summary and Finish week">
 </p>
 
 You walk into the gym and open Sthenos. Today is A Heavy: pull-ups 3 × 6, dips 3 × 8, and so on, each set a
