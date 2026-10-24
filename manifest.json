@@ -1,7 +1,7 @@
 {
   "id": "./index.html",
-  "name": "Calisthenics",
-  "short_name": "Calisthenics",
+  "name": "Sthenos",
+  "short_name": "Sthenos",
   "description": "Tarık's workout log: the day's program on one screen, a set logged by a tap.",
   "lang": "en",
   "start_url": "./index.html",
