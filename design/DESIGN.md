@@ -27,3 +27,7 @@ below. None yet.
   Read (hypothesis): the block was the all-grey sheet that hid how the workout is going, and a second hue is
   still unwanted. Round 6 (`design/r6/proto.html`) is the clickable prototype: short sets fill up to reps/target,
   the current set moves to a neutral ink ring, plus settings and an independent timer.
+- 2026-10-24, app icon round 1 (`design/icons.html`, 20 per app): torn between C16 Muscle-up (bar + orange
+  arrow rising over it) and C07 Sets row (orange set cells, the last one partial), liking the orange detail ("turuncu
+  detay güzel"). Read (hypothesis): the icon should show the app's own moment (a set logged, a rep over the bar) with
+  orange as the result, not an object in plain ink. Round 2 (`design/icons-2.html`) derives 10 from those two.

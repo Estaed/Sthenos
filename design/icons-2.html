@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Icons Round 2</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="fonts/archivo.css">
+<style>
+@font-face { font-family: 'Manrope'; font-weight: 200 800; font-display: swap; src: url(fonts/Manrope.woff2) format('woff2'); }
+:root { --ic-bg: #0E0E0E; --ic-ink: #EEEEEE; --ic-or: #FF5A00; }
+:root[data-icon="light"] { --ic-bg: #F7F7F7; --ic-ink: #121212; --ic-or: #D34303; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: 'Manrope', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+h1, h2 { font-family: 'Archivo', sans-serif; font-stretch: 118%; font-weight: 700; margin: 0; }
+h1 { font-size: 32px; letter-spacing: -.01em; }
+h2 { font-size: 22px; margin-top: 48px; }
+.bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 12px; padding: 4px; }
+.seg button { font: 600 14px 'Manrope', sans-serif; color: var(--ink-muted); background: none; border: 0;
+  border-radius: 9px; padding: 10px 14px; min-height: 44px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--action, var(--ink)); color: var(--on-action, var(--canvas)); }
+.seg button:focus-visible, .tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.names { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 16px; }
+.name { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 12px; padding: 16px; }
+.name b { display: block; font-family: 'Archivo', sans-serif; font-stretch: 118%; font-size: 24px; }
+.name p { margin: 6px 0 0; color: var(--ink-muted); font-size: 14px; line-height: 1.45; }
+.name.rec { background: var(--anchor); color: var(--on-anchor); border-color: transparent; box-shadow: var(--shadow-anchor); }
+.name.rec p { color: var(--on-anchor-muted); }
+.name.rec i { font-style: normal; color: var(--on-anchor-accent); font-weight: 700; font-size: 13px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(184px, 1fr)); gap: 12px; margin-top: 16px; }
+.tile { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px;
+  display: flex; flex-direction: column; gap: 10px; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.tile[aria-pressed="true"] { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.big { width: 100%; aspect-ratio: 1; border-radius: 22%; display: block; }
+.row { display: flex; align-items: center; gap: 10px; }
+.small { width: 48px; height: 48px; border-radius: 50%; flex: none; }
+.row b { font-family: 'Archivo', sans-serif; font-stretch: 118%; font-size: 15px; display: block; }
+.row span { color: var(--ink-subtle); font-size: 13px; }
+.or { color: var(--primary-text); font-size: 12px; font-weight: 700; }
+svg .s { fill: none; stroke: var(--ic-ink); stroke-linecap: round; stroke-linejoin: round; }
+svg .o { fill: none; stroke: var(--ic-or); stroke-linecap: round; stroke-linejoin: round; }
+svg .f { fill: var(--ic-ink); stroke: none; }
+svg .fo { fill: var(--ic-or); stroke: none; }
+svg .bg { fill: var(--ic-bg); }
+.pick { position: sticky; bottom: 0; background: var(--surface-3, var(--surface-2)); border-top: 1px solid var(--hairline);
+  padding: 14px 16px; font-weight: 600; text-align: center; }
+.pick code { font-family: 'Archivo', sans-serif; font-stretch: 118%; color: var(--primary-text); }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">
+    <h1>Icons, round 2</h1>
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Page theme">
+        <button data-theme-btn="dark" aria-pressed="true">Page dark</button>
+        <button data-theme-btn="light" aria-pressed="false">Page light</button>
+      </div>
+      <div class="seg" role="group" aria-label="Icon ground">
+        <button data-icon-btn="dark" aria-pressed="true">Icon dark</button>
+        <button data-icon-btn="light" aria-pressed="false">Icon light</button>
+      </div>
+    </div>
+  </div>
+
+  <h2>Calisthenics name</h2>
+  <div class="names">
+    <div class="name rec"><b>Chalk</b><p>What you put on your hands before the bar, and the marks you tally sets with. One plain object, like Pantry.</p><i>Recommended</i></div>
+    <div class="name"><b>Tally</b><p>Counting sets by a tap; says what the app does.</p></div>
+    <div class="name"><b>Rings</b><p>The gymnastics rings; pure calisthenics, misses the weighted work.</p></div>
+    <div class="name"><b>Grip</b><p>Hands on the bar; short, physical.</p></div>
+    <div class="name"><b>Notch</b><p>One notch up each week; about progression.</p></div>
+    <div class="name"><b>Hang</b><p>The first move on a bar; quiet, a bit vague.</p></div>
+  </div>
+
+  <h2>Calisthenics icon · from C07 and C16</h2>
+  <div class="grid" id="cali"></div>
+
+  <h2>Pantry icon · from P11 and P15</h2>
+  <div class="grid" id="pantry"></div>
+</main>
+<div class="pick" aria-live="polite">Tap to choose: <code id="pick">name? · C? · P?</code></div>
+
+<script>
+const S = (w, d) => `<path class="s" stroke-width="${w}" d="${d}"/>`;
+const O = (w, d) => `<path class="o" stroke-width="${w}" d="${d}"/>`;
+const T = (w, d) => `<path class="s" stroke-opacity=".22" stroke-width="${w}" d="${d}"/>`;
+const JAR = 'M200 166v14c0 8-12 14-28 24-16 10-22 22-22 40v114c0 22 14 36 36 36h140c22 0 36-14 36-36V244c0-18-6-30-22-40-16-10-28-16-28-24v-14';
+const CORN = 'M136 196V152a16 16 0 0 1 16-16h44M316 136h44a16 16 0 0 1 16 16v44M376 316v44a16 16 0 0 1-16 16h-44M196 376h-44a16 16 0 0 1-16-16v-44';
+const BARS = S(14, 'M200 200V312M228 200V312M312 200V312') + S(24, 'M258 200V312M286 200V312');
+const APPLE = 'M256 168c-40-20-120-20-120 70 0 80 50 150 90 150 14 0 20-8 30-8s16 8 30 8c40 0 90-70 90-150 0-90-80-90-120-70ZM256 168V122M256 142c20-30 50-30 66-22-14 30-40 36-66 22Z';
+const scaled = (inner, k, cy) => `<g transform="translate(256 256) scale(${k}) translate(-256 -${cy})">${inner}</g>`;
+const partial = (x, y, w, h, rx, frx) => `<rect class="o" stroke-width="16" x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}"/><rect class="fo" x="${x}" y="${y + h / 2}" width="${w}" height="${h / 2}" rx="${frx}"/>`;
+
+const cali = [
+  ['C07', 'Sets row', 'round 1', 1, '<rect class="fo" x="111" y="181" width="56" height="150" rx="14"/><rect class="fo" x="189" y="181" width="56" height="150" rx="14"/>' +
+    partial(275, 189, 40, 134, 10, 6) + '<rect class="s" stroke-width="16" x="353" y="189" width="40" height="134" rx="10"/>'],
+  ['C16', 'Muscle-up', 'round 1', 1, S(28, 'M128 272H384') + O(28, 'M184 384C184 250 328 250 328 152M292 188L328 152L364 188')],
+  ['C21', 'Muscle-up, bold', 'from C16: heavier bar, steeper rise', 1, S(40, 'M120 280H392') + O(34, 'M196 392C196 240 316 260 316 150M274 192L316 150L358 192')],
+  ['C22', 'Head over the bar', 'from C16: the arc ends in a head', 1, S(32, 'M120 300H392') + O(28, 'M168 380C168 230 300 230 322 186') + '<circle class="fo" cx="334" cy="160" r="30"/>'],
+  ['C23', 'Rise', 'from C16: bar and one chevron', 1, S(36, 'M120 312H392') + O(36, 'M176 244L256 164L336 244')],
+  ['C24', 'Rising sets', 'C07 + C13: sets that climb', 1, '<rect class="fo" x="111" y="270" width="56" height="90" rx="14"/><rect class="fo" x="189" y="230" width="56" height="130" rx="14"/>' +
+    partial(275, 198, 40, 154, 10, 6) + '<rect class="s" stroke-width="16" x="353" y="158" width="40" height="194" rx="10"/>'],
+  ['C25', 'Three sets', 'from C07: fewer, bigger cells', 1, '<rect class="fo" x="111" y="176" width="80" height="160" rx="18"/><rect class="fo" x="216" y="176" width="80" height="160" rx="18"/>' +
+    partial(330, 185, 62, 142, 12, 8)],
+  ['C26', 'Set grid', 'from C07: the 2×2 of C06', 1, '<rect class="fo" x="131" y="131" width="110" height="110" rx="22"/><rect class="fo" x="271" y="131" width="110" height="110" rx="22"/><rect class="fo" x="131" y="271" width="110" height="110" rx="22"/>' +
+    partial(280, 280, 92, 92, 16, 8)],
+  ['C27', 'Reps over the bar', 'C16 + C07: the arc as logged reps', 1, S(32, 'M120 300H392') +
+    '<circle class="fo" cx="172" cy="350" r="24"/><circle class="fo" cx="196" cy="268" r="24"/><circle class="fo" cx="250" cy="222" r="24"/><circle class="s" stroke-width="14" cx="320" cy="182" r="22"/>'],
+  ['C28', 'Loop', 'from C16: around the bar', 1, S(36, 'M112 256H400') + O(30, 'M186 327A100 100 0 1 1 326 327M369 319L326 327L334 284')],
+  ['C29', 'Sets row, round', 'from C07: pill cells', 1, '<rect class="fo" x="111" y="181" width="56" height="150" rx="28"/><rect class="fo" x="189" y="181" width="56" height="150" rx="28"/>' +
+    '<rect class="o" stroke-width="16" x="275" y="189" width="40" height="134" rx="20"/><rect class="fo" x="275" y="256" width="40" height="67" rx="20"/>' +
+    '<rect class="s" stroke-width="16" x="353" y="189" width="40" height="134" rx="20"/>'],
+  ['C30', 'Set ring', 'C07 as a ring: 4 sets, one short', 1, O(36, 'M272.7 137.2A120 120 0 0 1 374.8 239.3M374.8 272.7A120 120 0 0 1 272.7 374.8M239.3 374.8A120 120 0 0 1 171.1 340.9') +
+    T(36, 'M171.1 340.9A120 120 0 0 1 137.2 272.7M137.2 239.3A120 120 0 0 1 239.3 137.2')],
+];
+
+const pantry = [
+  ['P11', 'Barcode', 'round 1', 1, S(24, CORN) + BARS + O(18, 'M164 256H348')],
+  ['P15', 'Plate, kcal left', 'round 1', 1, '<circle class="s" stroke-width="24" cx="256" cy="256" r="140"/>' + O(28, 'M256 166A90 90 0 1 1 166 256')],
+  ['P21', 'Scan', 'from P11: corners and the line only', 1, S(26, CORN) + O(26, 'M164 256H348')],
+  ['P22', 'Scan the jar', 'P11 + the old jar', 1, S(24, CORN) + scaled(`<rect class="s" stroke-width="42" x="186" y="122" width="140" height="44" rx="12"/>` + S(42, JAR), .52, 258) + O(20, 'M164 272H348')],
+  ['P23', 'Barcode, big', 'from P11: no corners', 1, S(16, 'M150 160V352M184 160V352M300 160V352M362 160V352') + S(32, 'M220 160V352M262 160V352M332 160V352') + O(24, 'M116 256H396')],
+  ['P24', 'Scan the ring', 'P11 + P15', 1, S(24, CORN) + T(24, 'M256 184A72 72 0 1 1 255.9 184') + O(24, 'M256 184A72 72 0 1 1 184 256')],
+  ['P25', 'Plate and cutlery', 'from P15', 1, '<circle class="s" stroke-width="22" cx="256" cy="256" r="104"/>' + O(24, 'M256 190A66 66 0 1 1 190 256') +
+    S(18, 'M98 164V202a14 14 0 0 0 28 0V164M112 164V352M406 352V164c-20 10-24 60-24 100h24')],
+  ['P26', 'Kcal donut', 'from P15: track and arc', 1, T(44, 'M256 136A120 120 0 1 1 255.9 136') + O(44, 'M256 136A120 120 0 1 1 141.9 293.1')],
+  ['P27', 'Plate and fork', 'from P15: fork inside', 1, '<circle class="s" stroke-width="24" cx="256" cy="256" r="140"/>' + O(28, 'M256 166A90 90 0 1 1 166 256') +
+    S(16, 'M240 214V246a16 16 0 0 0 32 0V214M256 214V300')],
+  ['P28', 'Kcal, end dot', 'from P15: arc with a knob', 1, T(28, 'M256 136A120 120 0 1 1 255.9 136') + O(28, 'M256 136A120 120 0 1 1 136 256') + '<circle class="fo" cx="136" cy="256" r="30"/>'],
+  ['P29', 'Scan the plate', 'P15 + P11', 1, '<circle class="s" stroke-width="24" cx="256" cy="256" r="140"/>' + BARS + O(18, 'M164 256H348')],
+  ['P30', 'Scan the apple', 'from P11: food inside', 1, S(24, CORN) + scaled(S(44, APPLE), .52, 250) + O(20, 'M164 276H348')],
+];
+
+const svg = (inner, cls) => `<svg class="${cls}" viewBox="0 0 512 512" aria-hidden="true"><rect class="bg" width="512" height="512"/>${inner}</svg>`;
+const picks = { C: '', P: '' };
+function render(id, list) {
+  document.getElementById(id).innerHTML = list.map(([code, name, hint, orange, inner]) =>
+    `<button class="tile" data-code="${code}" aria-pressed="false">${svg(inner, 'big')}
+      <div class="row">${svg(inner, 'small')}<div><b>${code} ${name}</b><span>${hint}</span></div></div></button>`).join('');
+}
+render('cali', cali);
+render('pantry', pantry);
+document.querySelectorAll('.tile').forEach(t => t.addEventListener('click', () => {
+  const code = t.dataset.code, key = code[0];
+  picks[key] = picks[key] === code ? '' : code;
+  document.querySelectorAll(`.tile[data-code^="${key}"]`).forEach(o => o.setAttribute('aria-pressed', o.dataset.code === picks[key]));
+  document.getElementById('pick').textContent = `name? · ${picks.C || 'C?'} · ${picks.P || 'P?'}`;
+}));
+function seg(attr, apply) {
+  document.querySelectorAll(`[${attr}]`).forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll(`[${attr}]`).forEach(o => o.setAttribute('aria-pressed', o === b));
+    apply(b.getAttribute(attr));
+  }));
+}
+seg('data-theme-btn', v => document.documentElement.setAttribute('data-theme', v));
+seg('data-icon-btn', v => document.documentElement.setAttribute('data-icon', v));
+</script>
+</body>
+</html>
