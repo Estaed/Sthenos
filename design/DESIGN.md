@@ -22,3 +22,8 @@ below. None yet.
   share one foundation (pure grey ground, grey cells, Manrope, one orange) and differ only in layout, so the block is
   likely in what they share. Round 5 (`design/r5/`) holds a 06+04 control fixed and changes one foundation axis per
   screen (colour, type, imagery, ground, density) to find it.
+- 2026-10-24, round 5 pick: 02 result colour, with hit sets orange instead of green and the short set shown
+  as partial rather than amber ("yeşil yerine turuncu olur, sarı yerine de yarım olduğunu belli eden bir renk").
+  Read (hypothesis): the block was the all-grey sheet that hid how the workout is going, and a second hue is
+  still unwanted. Round 6 (`design/r6/proto.html`) is the clickable prototype: short sets fill up to reps/target,
+  the current set moves to a neutral ink ring, plus settings and an independent timer.
