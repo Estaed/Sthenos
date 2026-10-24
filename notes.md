@@ -62,6 +62,9 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 - Sync pushes when a day or week is finished, not after every change (already live in the old app,
   `b47cf0c`); Pantry keeps its own policy (Tarık: "pantry kalsın aynen").
 - Deadline: gym reopens Monday 2026-10-26; the app should be ready for that day.
+- Look: round 6 (`design/r6/screens.html`) approved 2026-10-24 ("güzel bence"). One way to change a set's reps, not
+  two ("1 özellik 2 farklı şekilde yapılmasın"): the sheet's number strip; tapping a cell only selects that set.
+- Body weight is logged here, not in Pantry (Tarık 2026-10-24); Pantry's notes left it an open idea.
 
 ## Ideas
 - Set-by-set logging (P4) with a focus view for the current exercise (P3).
