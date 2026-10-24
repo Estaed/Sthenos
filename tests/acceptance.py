@@ -1,88 +1,153 @@
-"""Acceptance test for sync + 3/4/5-day plans.
+"""Calisthenics acceptance gate. Run from the repo root:  python tests/acceptance.py
 
-Run: python tests/acceptance.py
-Serves the app over a local HTTP server, mocks the GitHub Contents API in-memory,
-and drives two isolated browser contexts ("phone" and "pc").
+Serves THIS repo (the folder holding tests/) under /Calisthenics-App/, the GitHub Pages path, on a free local port,
+mocks the GitHub API, and drives Chromium as Tarik's phone: 360 x 740, touch, Australia/Darwin. Then runs every
+tests/test_*.py as `python <file>` from the repo root; a file's exit code is its verdict. Prints PASS or FAIL per
+check and exits 1 on any FAIL. Nothing is written to the repo (a test that needs files writes under .tmp/).
+
+Time: every phone context installs Playwright's clock at NOW, so Cali.now() (Date.now) and setTimeout follow the
+test, never the wall clock: a gesture or a timer moves only when a test runs the clock.
+
+Hooks the gate relies on (keep them when a screen is redrawn): window.Cali (app/core.js); the 'day' route shows
+the day's sets as elements with data-set="<dayId>:<exId>:<i>"; a tap is one touch on a set cell (touchStart and
+touchEnd at one point with no clock movement), a hold keeps the touch down while the clock runs 800 ms; gestures
+are 1 s of clock time apart.
 """
 import base64
+import datetime
 import functools
 import hashlib
 import http.server
 import json
+import mimetypes
+import os
 import pathlib
+import re
 import socketserver
+import struct
+import subprocess
 import sys
 import threading
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+BASE = "/Calisthenics-App/"
+DARWIN = datetime.timezone(datetime.timedelta(hours=9, minutes=30))
+NOW = datetime.datetime(2026, 10, 26, 7, 0, tzinfo=DARWIN)        # Monday, the first gym day
+PHONE = dict(viewport={"width": 360, "height": 740}, device_scale_factor=3, is_mobile=True, has_touch=True,
+             timezone_id="Australia/Darwin", locale="en-AU")
 TOKEN = "TESTTOKEN"
-REPO_PATH = "/repos/Estaed/Calisthenics-Data"
-API_PATH = REPO_PATH + "/contents/calisthenics-data.json"
 FAILS = []
 
 
-def check(name, cond, detail=""):
-    print(("PASS " if cond else "FAIL ") + name + ("" if cond else f"  -> {detail}"))
-    if not cond:
+def check(name, ok, detail=""):
+    print(("PASS " if ok else "FAIL ") + name + ("" if ok else f"  -> {detail}"), flush=True)
+    if not ok:
         FAILS.append(name)
+    return ok
 
 
-# ── local static server ────────────────────────────────────────────
-class QuietHandler(http.server.SimpleHTTPRequestHandler):
-    def log_message(self, *a):
+# ── a GitHub Pages stand-in: this repo under /Calisthenics-App/, with overlays and a switch that cuts the network ──
+class Site:
+    def __init__(self):
+        self.overlay = {}        # path -> bytes served instead of the file
+        self.down = False        # True: every request is dropped unanswered, like a phone with no network
+        self.paths = []          # every path asked for while up
+
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    site = None
+
+    def log_message(self, *args):
         pass
 
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-cache")
+        super().end_headers()
 
-def start_server():
-    handler = functools.partial(QuietHandler, directory=str(ROOT))
-    srv = socketserver.ThreadingTCPServer(("127.0.0.1", 0), handler)
+    def do_GET(self):
+        site = self.site
+        path = urllib.parse.urlsplit(self.path).path
+        if site.down:
+            self.close_connection = True
+            return
+        site.paths.append(path)
+        if path == BASE.rstrip("/"):
+            self.send_response(301)
+            self.send_header("Location", BASE)
+            self.end_headers()
+            return
+        if path in site.overlay:
+            body = site.overlay[path]
+            self.send_response(200)
+            self.send_header("Content-Type", mimetypes.guess_type(path)[0] or "application/octet-stream")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if not path.startswith(BASE):
+            self.send_error(404, "outside " + BASE)
+            return
+        self.path = "/" + self.path[len(BASE):]
+        super().do_GET()
+
+
+class Server(socketserver.ThreadingTCPServer):
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        if not isinstance(sys.exc_info()[1], ConnectionError):
+            super().handle_error(request, client_address)
+
+
+def start_site():
+    site = Site()
+    handler = type("SiteHandler", (Handler,), {"site": site})
+    srv = Server(("127.0.0.1", 0), functools.partial(handler, directory=str(ROOT)))
     threading.Thread(target=srv.serve_forever, daemon=True).start()
-    return srv, f"http://127.0.0.1:{srv.server_address[1]}/index.html"
+    return srv, site, f"http://127.0.0.1:{srv.server_address[1]}{BASE}"
 
 
-# ── mock GitHub ────────────────────────────────────────────────────
+# ── mock GitHub (Contents API of Estaed/Calisthenics-Data) ──
 class MockGitHub:
-    def __init__(self, repo_visible=True):
-        self.text = None
-        self.sha = None
-        self.puts = 0
-        self.repo_visible = repo_visible
+    CORS = {"access-control-allow-origin": "*", "access-control-allow-headers": "*",
+            "access-control-allow-methods": "GET,PUT,OPTIONS"}
+    REPO = "/repos/Estaed/Calisthenics-Data"
+    FILE = REPO + "/contents/calisthenics-data.json"
 
-    CORS = {
-        "access-control-allow-origin": "*",
-        "access-control-allow-headers": "*",
-        "access-control-allow-methods": "GET,PUT,OPTIONS",
-    }
+    def __init__(self, text=None, sha=None):
+        self.text, self.sha = text, sha
+        self.puts = 0
+        self.requests = []
 
     def handle(self, route):
         req = route.request
+        self.requests.append(f"{req.method} {req.url}")
         if req.method == "OPTIONS":
             return route.fulfill(status=204, headers=self.CORS)
         if req.headers.get("authorization") != f"Bearer {TOKEN}":
             return route.fulfill(status=401, headers=self.CORS, body='{"message":"Bad credentials"}')
-        if req.url.split("?")[0].endswith(REPO_PATH):
-            # GitHub answers 404 for a private repo the token cannot see
-            return route.fulfill(status=200 if self.repo_visible else 404, headers=self.CORS,
-                                 content_type="application/json", body="{}")
-        if API_PATH not in req.url or not self.repo_visible:
+        path = urllib.parse.urlsplit(req.url).path
+        if path == self.REPO:
+            return route.fulfill(status=200, headers=self.CORS, content_type="application/json", body="{}")
+        if path != self.FILE:
             return route.fulfill(status=404, headers=self.CORS, body='{"message":"Not Found"}')
         if req.method == "GET":
             if self.text is None:
                 return route.fulfill(status=404, headers=self.CORS, body='{"message":"Not Found"}')
             raw = base64.b64encode(self.text.encode("utf-8")).decode()
-            wrapped = "\n".join(raw[i:i + 60] for i in range(0, len(raw), 60))
-            body = {"sha": self.sha, "content": wrapped, "encoding": "base64",
-                    "size": len(self.text.encode("utf-8"))}
-            return route.fulfill(status=200, headers=self.CORS, content_type="application/json",
-                                 body=json.dumps(body))
+            body = {"sha": self.sha, "content": "\n".join(raw[i:i + 60] for i in range(0, len(raw), 60)),
+                    "encoding": "base64", "size": len(self.text.encode("utf-8"))}
+            return route.fulfill(status=200, headers=self.CORS, content_type="application/json", body=json.dumps(body))
         if req.method == "PUT":
             body = json.loads(req.post_data or "{}")
             if self.sha is not None and body.get("sha") != self.sha:
                 return route.fulfill(status=409, headers=self.CORS, body='{"message":"sha mismatch"}')
-            if self.sha is None and body.get("sha"):
-                return route.fulfill(status=422, headers=self.CORS, body='{"message":"no file"}')
             self.text = base64.b64decode(body["content"]).decode("utf-8")
             self.sha = hashlib.sha1(self.text.encode("utf-8")).hexdigest()
             self.puts += 1
@@ -91,397 +156,364 @@ class MockGitHub:
         return route.fulfill(status=405, headers=self.CORS)
 
 
-# ── v2 seed (shape of the live phone data) ─────────────────────────
-def ex(name, weight="", reps="8", unit="kg", amount=2.5, status="none", green=0):
-    return {"id": name[:4] + "_x", "name": name, "sets": 2, "reps": reps, "weight": weight,
-            "status": status, "incrementAmount": amount, "incrementUnit": unit,
-            "requiredWeeks": 1, "consecutiveGreen": green}
-
-
-def v2_seed():
-    def days(status):
-        return [
-            {"name": "Push", "exercises": [ex("Weighted Dip", "+10 kg", status=status),
-                                           ex("Wall Handstand Hold", reps="30s", unit="s", amount=2, status=status)]},
-            {"name": "Pull", "exercises": [ex("Weighted Pull-up", "+5 kg", status=status)]},
-            {"name": "Leg", "exercises": [ex("Leg Press Orta Ayak", "100 kg", amount=5, status=status)]},
-            {"name": "Upper", "exercises": [ex("Machine Row", "40 kg", status=status, green=0)]},
-            {"name": "Lower", "exercises": [ex("Leg Press Yüksek Ayak ğşı", "90 kg", amount=5, status=status)]},
-        ]
-    return {"_version": 2, "programName": "Calisthenic Program",
-            "weeks": [{"weekNumber": 1, "completed": True, "days": days("done")},
-                      {"weekNumber": 2, "completed": False, "days": days("none")}]}
-
-
-def new_page(browser, url, gh, errors, tag):
-    ctx = browser.new_context(service_workers="block")
-    ctx.route("https://api.github.com/**", gh.handle)
-    page = ctx.new_page()
+# ── browser helpers ───────────────────────────────────────────────
+def watch(page, errors, tag):
     page.on("pageerror", lambda e: errors.append(f"[{tag}] pageerror: {e}"))
-    page.on("console", lambda m: m.type == "error" and "Failed to load resource" not in m.text
-            and errors.append(f"[{tag}] console: {m.text}"))
+    page.on("console", lambda m: m.type == "error" and errors.append(f"[{tag}] console: {m.text}"))
     page.on("dialog", lambda d: d.accept())
+
+
+def phone(browser, errors, tag, gh=None, clock=True, **extra):
+    """A phone context with the mocked GitHub API and, by default, Playwright's clock installed at NOW (running)."""
+    ctx = browser.new_context(**PHONE, **extra)
+    ctx.route("https://api.github.com/**", (gh or MockGitHub()).handle)
+    if clock:
+        ctx.clock.install(time=NOW)
+    page = ctx.new_page()
+    watch(page, errors, tag)
+    return ctx, page
+
+
+def open_day(page, url):
     page.goto(url)
-    return page
+    page.wait_for_selector('[data-screen="day"] [data-set]')
 
 
-def configure_sync(page):
-    page.evaluate("""() => localStorage.setItem('cali_sync_config', JSON.stringify({
-        owner: 'Estaed', repo: 'Calisthenics-Data', branch: 'main',
-        path: 'calisthenics-data.json', token: 'TESTTOKEN', deviceName: 'test'}))""")
+def stored(page):
+    return page.evaluate("() => JSON.parse(localStorage.getItem('cali.v5'))")
+
+
+def poll(page, js, timeout=15.0):
+    """Evaluates js (an async function is awaited) until it is truthy; the wall clock bounds the wait only."""
+    end = time.monotonic() + timeout
+    while True:
+        value = page.evaluate(js)
+        if value or time.monotonic() > end:
+            return value
+        page.wait_for_timeout(100)
+
+
+def wait_controlled(page):
+    return poll(page, "async () => { await navigator.serviceWorker.ready; return navigator.serviceWorker.controller !== null; }")
+
+
+def go_offline(ctx, site):
+    ctx.set_offline(True)
+    site.down = True
+
+
+def go_online(ctx, site):
+    ctx.set_offline(False)
+    site.down = False
+
+
+def center(page, selector):
+    box = page.locator(selector).bounding_box()
+    return box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+
+
+def touch_tap(page, selector):
+    page.locator(selector).scroll_into_view_if_needed()
+    x, y = center(page, selector)
+    page.touchscreen.tap(x, y)
+
+
+def touch_hold(page, ctx, selector, ms=800):
+    page.locator(selector).scroll_into_view_if_needed()
+    x, y = center(page, selector)
+    cdp = ctx.new_cdp_session(page)
+    cdp.send("Input.dispatchTouchEvent", {"type": "touchStart", "touchPoints": [{"x": x, "y": y}]})
+    ctx.clock.run_for(ms)
+    cdp.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
+    cdp.detach()
+
+
+def default_program():
+    text = (ROOT / "app" / "default-program.js").read_text(encoding="utf-8")
+    body = text.split("self.CALI_DEFAULT_PROGRAM = ", 1)[1].rstrip().rstrip(";")
+    return json.loads(body)
+
+
+DEFAULTS = {"restPair": 90, "restExercise": 120, "restAfterLog": True, "headsUp": 10, "vibrate": True, "sound": True,
+            "keepAwake": True, "loadStep": 2.5, "theme": "system"}
+
+
+# ── checks ────────────────────────────────────────────────────────
+def check_files():
+    app = ROOT / "app"
+    leaks = [p.name for p in sorted(app.glob("*")) if p.is_file() and p.name != "core.js"
+             and "localStorage" in p.read_text(encoding="utf-8", errors="replace")]
+    check("only app/core.js touches localStorage", not leaks, leaks)
+    core = (app / "core.js").read_text(encoding="utf-8")
+    writes = re.findall(r"localStorage\.(?:setItem|removeItem|clear)\(([^,)]*)", core)
+    check("app/core.js writes only cali.v5, cali.sync and cali.timers",
+          writes and set(writes) <= {"KEY", "SYNC_KEY", "TIMERS_KEY"}
+          and "const KEY = 'cali.v5'" in core and "const SYNC_KEY = 'cali.sync'" in core and "const TIMERS_KEY = 'cali.timers'" in core,
+          writes)
+    check("app/core.js opens with a header comment", core.startswith("/*") and "*/" in core, core[:60])
+
+    registry = (app / "registry.js").read_text(encoding="utf-8")
+    listed = re.findall(r"^CALI_FEATURES\.push\('([^']+)'\);$", registry, re.M)
+    code_lines = [ln for ln in re.sub(r"/\*.*?\*/", "", registry, flags=re.S).splitlines() if ln.strip()]
+    missing = [f for f in listed if not (ROOT / f).is_file()]
+    check("app/registry.js lists one existing script or stylesheet per line",
+          listed and not missing and len(code_lines) == len(listed) + 1 and all(re.fullmatch(r"app/[\w-]+\.(js|css)", f) for f in listed),
+          (listed, missing))
+    index = (ROOT / "index.html").read_text(encoding="utf-8")
+    order = [index.find(s) for s in ('href="tokens.css"', 'href="app/base.css"', 'src="app/registry.js"',
+                                      'src="app/default-program.js"', 'src="app/core.js"')]
+    check("index.html loads tokens, base.css, the registry, the default program and core, in that order",
+          all(i >= 0 for i in order) and order == sorted(order), order)
+    sw = (ROOT / "sw.js").read_text(encoding="utf-8")
+    check("sw.js names a versioned cache, reads the registry and lists no feature by hand",
+          re.search(r"const CACHE = 'cali-app-v\d+';", sw) is not None and "importScripts('app/registry.js')" in sw
+          and not any(f in sw for f in listed), listed)
+
+    design = ROOT / "design"
+    pairs = [(ROOT / "tokens.css", design / "tokens.css")] + [
+        (ROOT / "fonts" / n, design / "fonts" / n)
+        for n in ("archivo.css", "Archivo-latin.woff2", "Archivo-latin-ext.woff2", "Manrope.woff2")]
+    differ = [str(a.relative_to(ROOT)) for a, b in pairs
+              if not a.is_file() or hashlib.sha256(a.read_bytes()).digest() != hashlib.sha256(b.read_bytes()).digest()]
+    check("tokens.css and fonts/ are unchanged copies of Tarik Base v6 (design/)", not differ, differ)
+
+    prog = default_program()
+    days = prog["days"]
+    kinds = {e["kind"] for d in days for e in d["exercises"]}
+    paired = all(sum(1 for e in d["exercises"] if e.get("pair") == p) == 2
+                 for d in days for p in {e["pair"] for e in d["exercises"] if "pair" in e})
+    check("app/default-program.js: three days A/B/C with reps, time and check rows, pairs of two, no logs",
+          [d["name"][0] for d in days] == ["A", "B", "C"] and kinds == {"reps", "time", "check"} and paired
+          and "sets\": [" not in json.dumps(prog) and all(isinstance(e["sets"], int) for d in days for e in d["exercises"]),
+          [d["name"] for d in days])
+
+    legacy = (ROOT / "legacy" / "index.html").read_text(encoding="utf-8")
+    check("legacy/index.html no longer unregisters workers or deletes caches",
+          "getRegistrations" not in legacy and "caches.delete" not in legacy and "caches.keys" not in legacy)
+    check("legacy/index.html registers its own worker inside legacy/",
+          re.search(r"serviceWorker\.register\('sw\.js[^']*'", legacy) is not None and (ROOT / "legacy" / "sw.js").is_file())
+    lsw = (ROOT / "legacy" / "sw.js").read_text(encoding="utf-8")
+    check("legacy/sw.js deletes only its own older caches", "key.startsWith('cali-legacy-')" in lsw)
+
+
+def png_size(data):
+    return struct.unpack(">II", data[16:24]) if data[:8] == b"\x89PNG\r\n\x1a\n" else None
+
+
+def check_manifest(url):
+    murl = urllib.parse.urljoin(url, "manifest.json")
+    m = json.loads(urllib.request.urlopen(murl).read())
+
+    def get(u):
+        try:
+            with urllib.request.urlopen(u) as r:
+                return r.status, r.read()
+        except urllib.error.HTTPError as e:
+            return e.code, b""
+
+    for key in ("start_url", "scope"):
+        raw = m.get(key, "")
+        u = urllib.parse.urljoin(murl, raw)
+        status, _ = get(u)
+        check(f"manifest {key} is relative and resolves under {BASE} with 200",
+              raw and not raw.startswith("/") and "://" not in raw and urllib.parse.urlsplit(u).path.startswith(BASE)
+              and status == 200, (raw, u, status))
+    check("manifest is installable (standalone, name, English)", m.get("display") == "standalone" and m.get("name")
+          and m.get("lang") == "en", m)
+    for size in (192, 512):
+        icons = [i for i in m.get("icons", []) if i.get("sizes") == f"{size}x{size}"]
+        purposes = {p for i in icons for p in i.get("purpose", "any").split()}
+        ok = bool(icons)
+        for icon in icons:
+            status, data = get(urllib.parse.urljoin(murl, icon["src"]))
+            ok = ok and status == 200 and png_size(data) == (size, size)
+        check(f"manifest {size} px icon resolves with 200, is {size}x{size}, any and maskable", ok and {"any", "maskable"} <= purposes, icons)
+
+
+def check_phone(browser, url, site, errors):
+    gh = MockGitHub()
+    ctx, page = phone(browser, errors, "phone", gh=gh)
+    open_day(page, url)
+    ctx.clock.pause_at(NOW + datetime.timedelta(seconds=30))
+
+    # first open builds week 1 from the active program
+    doc = stored(page)
+    prog = default_program()
+    check("first open stores the v5 document under cali.v5",
+          doc and doc.get("_version") == 5 and set(doc) == {"_version", "updatedAt", "programs", "activeProgram",
+                                                            "nextProgram", "weeks", "body", "settings"}, doc and list(doc))
+    check("the built-in program is Tarik's A/B/C (app/default-program.js) and is active and next",
+          doc["programs"] == [prog] and doc["activeProgram"] == doc["nextProgram"] == prog["id"])
+    w = doc["weeks"]
+    built = len(w) == 1 and w[0]["n"] == 1 and w[0]["program"] == prog["id"] and "startedAt" in w[0] and all(
+        w[0]["days"][d["id"]]["exercises"][e["id"]] == {**{k: v for k, v in e.items() if k not in ("id", "sets")},
+                                                         "sets": [None] * e["sets"]}
+        for d in prog["days"] for e in d["exercises"]) and len(w[0]["days"]) == len(prog["days"])
+    check("first open builds week 1 from activeProgram: every exercise's rules, load and target copied, no logs", built, w and w[0].get("n"))
+    check("every setting has its default, body is empty", doc["settings"] == DEFAULTS and doc["body"] == [], doc["settings"])
+    keys = page.evaluate("() => Object.keys(localStorage)")
+    check("localStorage holds only cali.* keys", keys and all(k.startswith("cali.") for k in keys), keys)
+
+    day = prog["days"][0]
+    want = {f"{day['id']}:{e['id']}:{i}" for e in day["exercises"] for i in range(e["sets"])}
+    shown = set(page.evaluate("() => [...document.querySelectorAll('[data-screen=\"day\"] [data-set]')].map(el => el.dataset.set)"))
+    check("the day opens on day A with a data-set cell for every set", shown == want, sorted(shown ^ want)[:6])
+
+    pull = next(e for e in day["exercises"] if e["name"] == "Weighted Pull-up")
+    sel = f'[data-set="{day["id"]}:{pull["id"]}:0"]'
+    set0 = f"() => {{ const s = Cali.week().days['{day['id']}'].exercises['{pull['id']}'].sets[0]; return s && s.r; }}"
+    stored0 = lambda: (stored(page)["weeks"][-1]["days"][day["id"]]["exercises"][pull["id"]]["sets"][0] or {}).get("r")
+
+    touch_tap(page, sel)
+    check("touch-tap Pull-up set 1 stores 6 (the target)", stored0() == 6, stored0())
+    ctx.clock.run_for(1000)
     page.reload()
-    page.evaluate("() => syncNow({manual: true})")
-    page.wait_for_timeout(300)
+    page.wait_for_selector(f'[data-screen="day"] {sel}')
+    check("after a reload set 1 is still 6", stored0() == 6 and page.evaluate(set0) == 6, (stored0(), page.evaluate(set0)))
+    ctx.clock.run_for(1000)
+    touch_tap(page, sel)
+    check("tap again stores 5 (one less)", stored0() == 5, stored0())
+    ctx.clock.run_for(1000)
+    touch_hold(page, ctx, sel)
+    check("hold stores 6 (one more)", stored0() == 6, stored0())
+    ctx.clock.run_for(1000)
+    at = (stored(page)["weeks"][-1]["days"][day["id"]]["exercises"][pull["id"]]["sets"][0] or {}).get("at")
+    check("a set's time comes from Cali.now() (the test clock), not the wall clock",
+          at and datetime.datetime.fromisoformat(at.replace("Z", "+00:00")) - NOW < datetime.timedelta(minutes=1), at)
+
+    members = page.evaluate("""() => [...Object.keys(Cali).map(k => 'Cali.' + k),
+        ...Object.keys(Cali.settings).map(k => 'Cali.settings.' + k), ...Object.keys(Cali.alert).map(k => 'Cali.alert.' + k),
+        ...Object.keys(Cali.timers).map(k => '.' + k + '(')]""")
+    header = (ROOT / "app" / "core.js").read_text(encoding="utf-8").split("*/", 1)[0]
+    undocumented = [k for k in members if k not in header]
+    check("the core.js header documents every Cali member", members and not undocumented, undocumented)
+    check("no request reached GitHub (no sync in Task-00)", not gh.requests, gh.requests[:3])
+
+    # offline after one online load
+    ctx.clock.resume()
+    check("the service worker controls the app after the first load", wait_controlled(page))
+    go_offline(ctx, site)
+    page.reload()
+    page.wait_for_selector(f'[data-screen="day"] {sel}', timeout=10000)
+    fonts = page.evaluate("""async () => { await document.fonts.ready;
+        return document.fonts.check('16px Manrope') && document.fonts.check('700 40px Archivo'); }""")
+    check("offline, a reload shows the day with the logged set and the fonts", page.evaluate(set0) == 6 and fonts, fonts)
+    go_online(ctx, site)
+
+    # a release: the worker deletes its own older caches and 'cali-v4' (the old app's at this scope), no other
+    page.evaluate("""async () => { for (const n of ['pantry-v9', 'cali-legacy-v1', 'cali-app-v0', 'cali-v4', 'other'])
+        await (await caches.open(n)).put('probe-' + n, new Response('x')); }""")
+    sw = (ROOT / "sw.js").read_bytes()
+    site.overlay[BASE + "sw.js"] = re.sub(rb"const CACHE = 'cali-app-v\d+';", b"const CACHE = 'cali-app-v999';", sw)
+    page.evaluate("async () => { const reg = await navigator.serviceWorker.getRegistration(); await reg.update(); }")
+    keys = poll(page, """async () => { const k = await caches.keys();
+        return k.includes('cali-app-v999') && !k.includes('cali-app-v0') && !k.includes('cali-v4') && k; }""")
+    keys = keys or page.evaluate("() => caches.keys()")
+    check("a new release keeps every other cache (Pantry's, legacy's, any other)",
+          all(k in keys for k in ("pantry-v9", "cali-legacy-v1", "other")), keys)
+    check("a new release deletes this app's older caches and the old app's cali-v4",
+          "cali-app-v999" in keys and not any(k in keys for k in ("cali-app-v0", "cali-app-v1", "cali-v4")), keys)
+    site.overlay.clear()
+    ctx.close()
 
 
-ACTIVE_NAMES = "() => getActiveDays(getCurrentWeek()).map(d => d.name)"
-SYNC_STATE = "() => JSON.parse(localStorage.getItem('cali_sync_state') || '{}')"
+def check_legacy(browser, url, site, errors):
+    legacy_errors = []
+    # 1) the new app is installed; opening legacy/ leaves its worker and caches alone; the new app then loads offline
+    ctx, page = phone(browser, legacy_errors, "legacy-then-app", clock=False)   # legacy's own console is not the app's
+    open_day(page, url)
+    check("the new app's worker controls it before legacy/ is opened", wait_controlled(page))
+    page.goto(url + "legacy/")
+    page.wait_for_selector("#dayTabs button")
+    origin = url.split(BASE)[0]
+    regs = poll(page, f"""async () => {{ const r = await navigator.serviceWorker.getRegistrations();
+        const s = r.filter(x => x.active).map(x => x.scope);
+        return s.includes('{origin}{BASE}legacy/') && s; }}""")
+    regs = regs or page.evaluate("async () => (await navigator.serviceWorker.getRegistrations()).map(x => x.scope)")
+    check("legacy/ registers its own worker with scope legacy/, and the app's worker stays",
+          f"{origin}{BASE}legacy/" in regs and f"{origin}{BASE}" in regs, regs)
+    keys = page.evaluate("() => caches.keys()")
+    check("opening legacy/ deletes no cache of the new app", "cali-app-v1" in keys, keys)
+    app_urls = page.evaluate("async () => (await (await caches.open('cali-app-v1')).keys()).map(r => r.url)")
+    check("the app's worker caches nothing under legacy/", app_urls and not any("/legacy/" in u for u in app_urls),
+          [u for u in app_urls if "/legacy/" in u][:3])
+    go_offline(ctx, site)
+    page.goto(url)
+    page.wait_for_selector('[data-screen="day"] [data-set]', timeout=10000)
+    check("after legacy/ was opened, the new app still loads offline", page.locator("[data-set]").count() > 0)
+    go_online(ctx, site)
+    ctx.close()
+
+    # 2) legacy refuses a v5 document from the data repo: no adoption, no write
+    fixture = (ROOT / "tests" / "fixtures" / "v5-document.json").read_text(encoding="utf-8")
+    gh = MockGitHub(text=fixture, sha="v5sha")
+    ctx, page = phone(browser, legacy_errors, "legacy-v5", gh=gh, clock=False, service_workers="block")
+    page.goto(url + "legacy/")
+    page.wait_for_selector("#dayTabs button")
+    page.evaluate("""() => localStorage.setItem('cali_sync_config', JSON.stringify({ owner: 'Estaed',
+        repo: 'Calisthenics-Data', branch: 'main', path: 'calisthenics-data.json', token: 'TESTTOKEN', deviceName: 'test' }))""")
+    page.reload()
+    page.wait_for_selector("#dayTabs button")
+    err = poll(page, "() => (JSON.parse(localStorage.getItem('cali_sync_state') || '{}').lastError || '')")
+    local = page.evaluate("() => ({ mem: programData._version, saved: JSON.parse(localStorage.getItem('cali4_program_data'))._version })")
+    check("legacy refuses a v5 document (tests/fixtures/v5-document.json): it says a newer version holds the data",
+          "daha yeni" in (err or ""), err)
+    check("legacy neither adopts nor overwrites the v5 document", gh.puts == 0 and gh.text == fixture
+          and local == {"mem": 4, "saved": 4}, (gh.puts, local))
+    real = [e for e in legacy_errors if "pageerror" in e]
+    check("legacy opens without page errors", not real, real[:3])
+    ctx.close()
+
+
+def run_file(path):
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"}
+    try:
+        r = subprocess.run([sys.executable, str(path)], cwd=ROOT, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=900, env=env)
+        return r.returncode, (r.stdout + r.stderr)
+    except subprocess.TimeoutExpired:
+        return "timeout", ""
+
+
+def check_suite():
+    code, _ = run_file(ROOT / "tests" / "fixtures" / "exits_1.py")
+    check("the runner turns a test file that exits 1 red (tests/fixtures/exits_1.py, not in the suite)", code == 1, code)
+    files = sorted((ROOT / "tests").glob("test_*.py"))
+    check("tests/test_*.py exist", bool(files))
+    for f in files:
+        code, out = run_file(f)
+        if not check(f"tests/{f.name} exits 0", code == 0, f"exit {code}"):
+            print("\n".join("    " + line for line in out.strip().splitlines()[-30:]))
+
+
+def guarded(name, fn, *args):
+    """A scenario that crashes is one FAIL with its error, and the other scenarios still run."""
+    try:
+        fn(*args)
+    except Exception as e:      # noqa: BLE001 - the gate reports every crash as a failure
+        check(f"{name} ran to the end", False, f"{type(e).__name__}: {str(e).splitlines()[0] if str(e) else ''}")
 
 
 def main():
-    srv, url = start_server()
+    sys.dont_write_bytecode = True
+    srv, site, url = start_site()
     errors = []
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-
-        # T1 fresh install
-        gh0 = MockGitHub()
-        page = new_page(browser, url, gh0, errors, "fresh")
-        d = page.evaluate("() => programData")
-        lib = [x["name"] for x in d["weeks"][-1]["days"]]
-        check("T1 version 4", d.get("_version") == 4, d.get("_version"))
-        check("T1 library has 9 days", lib == ["Push", "Pull", "Leg", "Upper", "Lower", "Lower Quad", "Lower Posterior", "Ev A", "Ev B"], lib)
-        check("T1 plan sizes", [len(d["plans"][k]) for k in ("3", "4", "5", "ev")] == [3, 4, 5, 2], d.get("plans"))
-        check("T1 no mobility data", "mobility" not in d, list(d))
-        check("T1 week plan 5 and 5 tabs", d["weeks"][0]["plan"] == 5 and page.locator("#dayTabs button").count() == 5,
-              page.locator("#dayTabs button").count())
-
-        # T2 plan switching
-        page.evaluate("() => selectPlan(4)")
-        check("T2 4-day tabs", page.evaluate(ACTIVE_NAMES) == ["Push", "Lower Quad", "Pull", "Lower Posterior"], page.evaluate(ACTIVE_NAMES))
-        tabs = [t.strip() for t in page.locator("#dayTabs button").all_inner_texts()]
-        check("T2 DOM tabs follow plan", tabs == ["Push", "Lower Quad", "Pull", "Lower Posterior"], tabs)
-        page.evaluate("() => selectPlan(3)")
-        check("T2 3-day tabs", page.evaluate(ACTIVE_NAMES) == ["Push", "Pull", "Leg"], page.evaluate(ACTIVE_NAMES))
-        check("T1/T2 no sync without config", gh0.puts == 0, gh0.puts)
-
-        # T12 plan editor: add Upper, move it above Leg, drop Leg, save
-        page.evaluate("""() => {
-            const ids = Object.fromEntries(getCurrentWeek().days.map(d => [d.name, d.id]));
-            openPlanEditor();
-            togglePlanDay(ids.Upper, true);
-            movePlanDay(ids.Upper, -1);
-            togglePlanDay(ids.Leg, false);
-            savePlanEditor();
-        }""")
-        check("T12 plan editor updates active days", page.evaluate(ACTIVE_NAMES) == ["Push", "Pull", "Upper"], page.evaluate(ACTIVE_NAMES))
-        plan3 = page.evaluate("() => programData.plans['3'].map(id => getCurrentWeek().days.find(d => d.id === id).name)")
-        check("T12 plan editor updates plan", plan3 == ["Push", "Pull", "Upper"], plan3)
-
-        # T13 JSON backup upload replaces data and migrates it
-        page.set_input_files("#backupInput", files=[{"name": "b.json", "mimeType": "application/json",
-                                                     "buffer": json.dumps(v2_seed()).encode("utf-8")}])
-        page.wait_for_timeout(500)
-        d = page.evaluate("() => programData")
-        check("T13 backup upload migrated", len(d["weeks"]) == 2 and d["_version"] == 4, (len(d["weeks"]), d.get("_version")))
-        page.context.close()
-
-        # T3 v2 migration (phone)
-        gh = MockGitHub()
-        phone = new_page(browser, url, gh, errors, "phone")
-        seed = json.dumps(v2_seed())
-        phone.evaluate("s => localStorage.setItem('cali4_program_data', s)", seed)
-        phone.reload()
-        d = phone.evaluate("() => programData")
-        backup = phone.evaluate("() => localStorage.getItem('cali4_program_data_backup_v2')")
-        check("T3 backup of raw v2 kept", backup is not None and json.loads(backup) == json.loads(seed), (backup or "")[:80])
-        w1, w2 = d["weeks"]
-        check("T3 day ids stable across weeks", [x["id"] for x in w1["days"]] == [x["id"] for x in w2["days"][:5]])
-        check("T3 last week gets Lower Quad/Posterior", [x["name"] for x in w2["days"]][5:] == ["Lower Quad", "Lower Posterior", "Ev A", "Ev B"],
-              [x["name"] for x in w2["days"]])
-        check("T3 active days = original 5", phone.evaluate(ACTIVE_NAMES) == ["Push", "Pull", "Leg", "Upper", "Lower"], phone.evaluate(ACTIVE_NAMES))
-        byid = {x["id"]: x["name"] for x in w2["days"]}
-        check("T3 plan 4 order", [byid[i] for i in d["plans"]["4"]] == ["Push", "Lower Quad", "Pull", "Lower Posterior"], d["plans"]["4"])
-        check("T3 plan 3", [byid[i] for i in d["plans"]["3"]] == ["Push", "Pull", "Leg"], d["plans"]["3"])
-        check("T3 v4 adds ev plan", [byid[i] for i in d["plans"]["ev"]] == ["Ev A", "Ev B"], d.get("plans"))
-        check("T3 weights intact", w2["days"][0]["exercises"][0]["weight"] == "+10 kg")
-
-        # T4 phone pushes to empty cloud
-        configure_sync(phone)
-        check("T4 phone created cloud file", gh.text is not None and gh.puts >= 1, gh.puts)
-        st = phone.evaluate(SYNC_STATE)
-        check("T4 phone clean after push", st.get("dirty") is False and st.get("lastSha") == gh.sha, st)
-
-        # T5 render alone does not dirty / push
-        puts = gh.puts
-        phone.evaluate("() => { render(); render(); render(); }")
-        phone.wait_for_timeout(5000)
-        check("T5 render does not mark dirty", phone.evaluate(SYNC_STATE).get("dirty") is False and gh.puts == puts,
-              (phone.evaluate(SYNC_STATE), gh.puts, puts))
-
-        # T6 pc (pristine) adopts cloud, Turkish round-trip
-        pc = new_page(browser, url, gh, errors, "pc")
-        configure_sync(pc)
-        d_pc = pc.evaluate("() => programData")
-        check("T6 pc adopted cloud weeks", len(d_pc["weeks"]) == 2, len(d_pc["weeks"]))
-        check("T6 pc jumps to current week after first adopt", pc.evaluate("() => currentWeekIdx") == 1,
-              pc.evaluate("() => currentWeekIdx"))
-        check("T6 turkish name round-trip", d_pc["weeks"][1]["days"][4]["exercises"][0]["name"] == "Leg Press Yüksek Ayak ğşı",
-              d_pc["weeks"][1]["days"][4]["exercises"][0]["name"])
-
-        # T7 an edit waits on the device (no push until the day is finished or a manual sync), then phone pulls
-        puts = gh.puts
-        pc.evaluate("() => { switchDay(0); updateField(0, 'weight', '+12.5 kg'); }")
-        pc.wait_for_timeout(6000)
-        check("T7 edit alone does not push", gh.puts == puts and '+12.5 kg' not in (gh.text or ""), gh.puts)
-        check("T7 indicator says it waits for the day", pc.evaluate("() => syncText()") == 'Gün bitince gönderilecek',
-              pc.evaluate("() => syncText()"))
-        pc.evaluate("() => syncNow({manual: true})")
-        check("T7 manual sync pushes the edit", '+12.5 kg' in (gh.text or ""), gh.puts)
-        phone.evaluate("() => syncNow({manual: true})")
-        w = phone.evaluate("() => programData.weeks[1].days[0].exercises[0].weight")
-        check("T7 phone adopted pc edit", w == "+12.5 kg", w)
-
-        # T8 completeWeek on 3-day plan: inactive days carried unchanged
-        phone.evaluate("() => { currentWeekIdx = 1; selectPlan(3); }")
-        puts8 = gh.puts
-        phone.evaluate("""() => {
-            const act = getActiveDays(getCurrentWeek());
-            act.forEach((day, j) => { switchDay(j); day.exercises.forEach((_, i) => setStatus(i, 'done')); });
-            completeWeek();
-        }""")
-        d = phone.evaluate("() => programData")
-        nw = d["weeks"][-1]
-        byname = {x["name"]: x for x in nw["days"]}
-        check("T8 new week created with plan 3", len(d["weeks"]) == 3 and nw["plan"] == 3, (len(d["weeks"]), nw.get("plan")))
-        check("T8 active day progressed", byname["Push"]["exercises"][0]["weight"] == "+15.0 kg", byname["Push"]["exercises"][0]["weight"])
-        check("T8 inactive day unchanged", byname["Upper"]["exercises"][0]["weight"] == "40 kg"
-              and byname["Upper"]["exercises"][0]["status"] == "none", byname["Upper"]["exercises"][0])
-        check("T8 day ids preserved", [x["id"] for x in nw["days"]] == [x["id"] for x in d["weeks"][1]["days"]])
-        phone.wait_for_timeout(2500)
-        check("T8 finished days and week pushed without a manual sync", gh.puts > puts8 and '"completed": true' in (gh.text or ""),
-              (gh.puts, puts8))
-        check("T8 history shows active days only",
-              phone.evaluate("() => { renderHistory(); return document.getElementById('historyBody').innerText; }").count("Machine Row") == 1)
-        phone.wait_for_timeout(6000)
-
-        # T9 conflict: both devices change offline-ish, pc sees conflict and takes cloud
-        pc.evaluate("() => { programData.programName = 'pc-local-change'; saveData(); }")
-        phone.evaluate("() => syncNow({manual: true})")
-        pc.evaluate("() => syncNow({manual: true})")
-        pc.wait_for_timeout(300)
-        btn = pc.get_by_role("button", name="Buluttakini al")
-        check("T9 conflict modal shown", btn.count() > 0 and btn.first.is_visible(), btn.count())
-        if btn.count():
-            btn.first.click()
-            pc.wait_for_timeout(300)
-        d_pc = pc.evaluate("() => programData")
-        check("T9 pc took cloud", len(d_pc["weeks"]) == 3 and d_pc["programName"] != "pc-local-change",
-              (len(d_pc["weeks"]), d_pc["programName"]))
-
-        # T10 newer-version cloud is refused
-        good_text, good_sha = gh.text, gh.sha
-        newer = json.loads(gh.text)
-        newer["_version"] = 99
-        gh.text = json.dumps(newer)
-        gh.sha = "newer"
-        puts = gh.puts
-        phone.evaluate("() => syncNow({manual: true})")
-        check("T10 newer cloud not overwritten", gh.puts == puts and phone.evaluate("() => programData._version") == 4)
-        gh.text, gh.sha = good_text, good_sha
-
-        # T11 sw.js only handles same-origin GET
-        sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-        check("T11 sw guards method/origin", "'GET'" in sw or '"GET"' in sw, "no GET guard")
-        check("T11 sw cache bumped", "cali-v4" in sw)
-
-        # T14 real phone flow: token typed into the modal, one button saves + syncs, result stays visible
-        gh14 = MockGitHub()
-        ui = new_page(browser, url, gh14, errors, "ui")
-        ui.evaluate("s => localStorage.setItem('cali4_program_data', s)", json.dumps(v2_seed()))
-        ui.reload()
-        ui.evaluate("() => openSyncModal()")
-        ui.fill("#syncToken", TOKEN)
-        ui.fill("#syncDeviceName", "phone")
-        ui.get_by_role("button", name="Kaydet ve senkronla").click()
-        ui.wait_for_timeout(1500)
-        status = ui.locator("#syncStatus").inner_text()
-        check("T14 save button pushes to cloud", gh14.puts >= 1, gh14.puts)
-        check("T14 modal stays open with success", ui.locator("#syncModal.open").count() == 1 and "Senkronize" in status, status)
-        check("T14 no separate 'Şimdi senkronla' button", ui.get_by_role("button", name="Şimdi senkronla").count() == 0)
-        ui.context.close()
-
-        # T15 failures are shown inside the open modal, nothing is written
-        cases = [
-            ("repo not visible", MockGitHub(repo_visible=False), TOKEN, "Repo bulunamadı"),
-            ("bad token", MockGitHub(), "WRONG", "Token geçersiz"),
-            ("empty token", MockGitHub(), "", "Token boş"),
-        ]
-        for name, gh_bad, token, expect in cases:
-            pg = new_page(browser, url, gh_bad, errors, f"t15-{name}")
-            pg.evaluate("() => openSyncModal()")
-            pg.fill("#syncToken", token)
-            pg.get_by_role("button", name="Kaydet ve senkronla").click()
-            pg.wait_for_timeout(1500)
-            status = pg.locator("#syncStatus").inner_text()
-            check(f"T15 {name}: message visible", pg.locator("#syncModal.open").count() == 1 and expect in status, status)
-            check(f"T15 {name}: nothing written", gh_bad.puts == 0, gh_bad.puts)
-            pg.context.close()
-
-
-        # T16 automatic double progression
-        dp = new_page(browser, url, MockGitHub(), errors, "dp")
-        dp.evaluate("""() => {
-            const w = getCurrentWeek();
-            const day = getActiveDays(w)[0];
-            const base = day.exercises[0];
-            const mk = (id, name, reps, weight, lo, hi) => Object.assign({}, base, {
-                id, name, reps, weight, status: 'none', incrementAmount: 1, incrementUnit: 'reps',
-                requiredWeeks: 1, consecutiveGreen: 0, repMin: lo, repMax: hi, loadStep: 2.5 });
-            day.exercises = [mk('dp1', 'DP top', '10', '+10 kg', 6, 10), mk('dp2', 'DP mid', '7', 'BW', 6, 10),
-                             mk('dp3', 'DP bw top', '8', 'BW', 4, 8), mk('dp4', 'DP abs top', '12', '50 kg', 8, 12)];
-            saveData();
-            getActiveDays(w).forEach((d, j) => { switchDay(j); d.exercises.forEach((_, i) => setStatus(i, 'done')); });
-            completeWeek();
-        }""")
-        byn = {e["name"]: e for e in dp.evaluate("() => getActiveDays(getCurrentWeek())[0].exercises")}
-        check("T16 top of range: +load, reps to min", byn["DP top"]["reps"] == "6" and byn["DP top"]["weight"] == "+12.5 kg", byn.get("DP top"))
-        check("T16 inside range: +1 rep only", byn["DP mid"]["reps"] == "8" and byn["DP mid"]["weight"] == "BW", byn.get("DP mid"))
-        check("T16 bodyweight top becomes +2.5 kg", byn["DP bw top"]["reps"] == "4" and byn["DP bw top"]["weight"] == "+2.5 kg", byn.get("DP bw top"))
-        check("T16 absolute load top", byn["DP abs top"]["reps"] == "8" and byn["DP abs top"]["weight"] == "52.5 kg", byn.get("DP abs top"))
-        check("T16 range fields carried", byn["DP top"].get("repMax") == 10 and byn["DP top"].get("loadStep") == 2.5, byn.get("DP top"))
-
-        # T19 last-week reference
-        dp.evaluate("() => switchDay(0)")
-        body = dp.locator("#exb").inner_text()
-        check("T19 last-week reference shown", "geçen: +10 kg × 10" in body, body[:300])
-        check("T19 range label shown", "6–10" in body, body[:300])
-
-        # T18 Ev plan
-        dp.evaluate("() => selectPlan('ev')")
-        check("T18 ev plan tabs", dp.evaluate(ACTIVE_NAMES) == ["Ev A", "Ev B"], dp.evaluate(ACTIVE_NAMES))
-        check("T18 Ev button present", dp.get_by_role("button", name="Ev", exact=True).count() >= 1)
-        dp.evaluate("""() => {
-            getActiveDays(getCurrentWeek()).forEach((d, j) => { switchDay(j); d.exercises.forEach((_, i) => setStatus(i, 'done')); });
-            completeWeek();
-        }""")
-        check("T18 ev plan carried to next week", dp.evaluate("() => getCurrentWeek().plan") == "ev", dp.evaluate("() => getCurrentWeek().plan"))
-        dp.context.close()
-
-        # T20 real v3 program (2026-09-15 reset) upgrades to v4 without touching the program
-        fx = (ROOT / "tests" / "fixtures" / "v3-program.json").read_text(encoding="utf-8")
-        src = json.loads(fx)
-        v3 = new_page(browser, url, MockGitHub(), errors, "v3")
-        v3.evaluate("s => localStorage.setItem('cali4_program_data', s)", fx)
-        v3.reload()
-        d = v3.evaluate("() => programData")
-        names = [x["name"] for x in d["weeks"][0]["days"]]
-        check("T20 keeps days, appends Ev A/B", names == [x["name"] for x in src["weeks"][0]["days"]] + ["Ev A", "Ev B"], names)
-        bk = v3.evaluate("() => localStorage.getItem('cali4_program_data_backup_v3')")
-        check("T20 backup_v3 is the raw v3 data", bk is not None and json.loads(bk) == src)
-        check("T20 active days and 3/4/5 plans unchanged", d["weeks"][0]["activeDayIds"] == src["weeks"][0]["activeDayIds"]
-              and all(d["plans"][k] == src["plans"][k] for k in ("3", "4", "5")))
-        check("T20 exercises unchanged", d["weeks"][0]["days"][:5] == src["weeks"][0]["days"])
-        check("T20 no mobility data", "mobility" not in d, list(d))
-        v3.context.close()
-
-        # T21 single-user UI cleanup (phone viewport)
-        ctx = browser.new_context(service_workers="block", viewport={"width": 390, "height": 844},
-                                  is_mobile=True, has_touch=True)
-        ctx.route("https://api.github.com/**", MockGitHub().handle)
-        ui = ctx.new_page()
-        ui.on("pageerror", lambda e: errors.append(f"[t21] pageerror: {e}"))
-        ui.on("dialog", lambda dlg: dlg.accept())
-        ui.goto(url)
-        ui.evaluate("() => selectPlan(3)")
-        text = ui.locator("body").inner_text()
-        check("T21 tips box removed", "Antrenman İpuçları" not in text)
-        check("T21 week shown once", text.count("Hafta 1") == 1, text.count("Hafta 1"))
-        check("T21 header title has plan", "Hafta 1 · 3 Gün" in ui.locator("#stages").inner_text(), ui.locator("#stages").inner_text())
-        pills = [t.strip() for t in ui.locator("#weekNav button").all_inner_texts()]
-        check("T21 week pill shows plan", pills and pills[0].startswith("H1 (3)"), pills)
-        check("T21 no reset button in header", ui.get_by_role("button", name="Sıfırla").count() == 0
-              and "Sıfırla" not in ui.locator("#stages").locator("xpath=..").inner_text())
-        ui.evaluate("() => openSyncModal()")
-        check("T21 reset lives in settings modal", ui.locator("#syncModal").get_by_role("button", name="Programı sıfırla").count() == 1)
-        ui.evaluate("() => closeSyncModal()")
-        check("T21 no per-row delete", ui.locator("#exb .del-btn").count() == 0)
-        check("T21 incomplete week shows no hint", ui.locator("#weekCompleteArea").inner_text().strip() == "",
-              ui.locator("#weekCompleteArea").inner_text())
-        check("T21 dinfo is the progress line", "yapıldı" in ui.locator("#dinfo").inner_text(), ui.locator("#dinfo").inner_text())
-        ui.evaluate("() => updateField(0, 'weight', '112.5 kg')")
-        clip = ui.evaluate("""() => { const i = [...document.querySelectorAll('#exb input')].find(x => x.value === '112.5 kg');
-                                      return i ? i.scrollWidth - i.clientWidth : 999; }""")
-        check("T21 weight input fits 112.5 kg", clip <= 1, clip)
-        check("T21 no horizontal page scroll", not ui.evaluate("() => document.documentElement.scrollWidth > window.innerWidth"))
-        before = ui.evaluate("() => getCurrentDay().exercises.length")
-        ui.evaluate("() => openEditModal(getCurrentDay().exercises[0].id)")
-        ui.get_by_role("button", name="Egzersizi sil").click()
-        check("T21 delete from edit modal", ui.evaluate("() => getCurrentDay().exercises.length") == before - 1)
-        ctx.close()
-
-        # T22 desktop width is capped
-        wide = new_page(browser, url, MockGitHub(), errors, "wide")
-        wide.set_viewport_size({"width": 1280, "height": 900})
-        width = wide.evaluate("() => document.getElementById('exTable').getBoundingClientRect().width")
-        check("T22 table capped on desktop", width <= 720, width)
-        wide.context.close()
-
-        # T23 last-week reference skips weeks where the day was not trained
-        lw = new_page(browser, url, MockGitHub(), errors, "lastweek")
-        lw.evaluate("""() => {
-            const doneAll = () => getActiveDays(getCurrentWeek()).forEach((d, j) => {
-                switchDay(j); d.exercises.forEach((_, i) => setStatus(i, 'done')); });
-            const push = getCurrentWeek().days.find(d => d.name === 'Push');
-            push.exercises[0].weight = '+10 kg';
-            push.exercises[0].reps = '8';
-            saveData();
-            doneAll(); completeWeek();          // H1: 5-day, Push trained → H2 Push +12.5 kg
-            selectPlan('ev'); doneAll(); completeWeek();   // H2: Ev, Push not trained → H3 Push carried
-            selectPlan(5);
-            switchDay(getActiveDays(getCurrentWeek()).findIndex(d => d.name === 'Push'));
-        }""")
-        body = lw.locator("#exb").inner_text()
-        check("T23 reference comes from last trained week", "geçen: +10 kg × 8" in body, body[:200])
-        lw.context.close()
-
-        # T24 narrow phones: nothing overflows sideways, rows stay compact (real Samsung bug)
-        fx_real = (ROOT / "tests" / "fixtures" / "v3-program.json").read_text(encoding="utf-8")
-        for width in (320, 360):
-            nctx = browser.new_context(service_workers="block", viewport={"width": width, "height": 780},
-                                       is_mobile=True, has_touch=True, device_scale_factor=3)
-            nctx.route("https://api.github.com/**", MockGitHub().handle)
-            npg = nctx.new_page()
-            npg.on("pageerror", lambda e: errors.append(f"[t24] pageerror: {e}"))
-            npg.goto(url)
-            npg.evaluate("s => localStorage.setItem('cali4_program_data', s)", fx_real)
-            npg.reload()
-            npg.evaluate("() => selectPlan(3)")
-            for day_idx in range(3):
-                npg.evaluate(f"() => switchDay({day_idx})")
-                over = npg.evaluate("""() => {
-                    const w = window.innerWidth;
-                    // the real-phone bug overflowed the exercise card, not the viewport: measure against the card too
-                    const table = document.getElementById('exTable');
-                    const card = table.parentElement;
-                    const cardRight = Math.min(card.getBoundingClientRect().right, w);
-                    const outOfCard = [...document.querySelectorAll('#exTable, #exb *')]
-                        .filter(el => el.offsetParent !== null && el.getBoundingClientRect().right > cardRight + 0.5)
-                        .map(el => (el.className || el.tagName) + ':' + Math.round(el.getBoundingClientRect().right));
-                    const outOfView = [...document.querySelectorAll('#weekNav, #planSelector, #dayTabs, #stages, .content')]
-                        .filter(el => el.getBoundingClientRect().right > w + 0.5)
-                        .map(el => (el.id || el.className) + ':' + Math.round(el.getBoundingClientRect().right));
-                    return { page: document.documentElement.scrollWidth - w, cardRight: Math.round(cardRight),
-                             bad: outOfCard.concat(outOfView).slice(0, 6) };
-                }""")
-                check(f"T24 {width}px day {day_idx}: no sideways overflow", over["page"] <= 0 and not over["bad"], over)
-            rows = npg.evaluate("""() => [...document.querySelectorAll('#exb tr')].map(tr => Math.round(tr.getBoundingClientRect().height))""")
-            check(f"T24 {width}px rows compact (<= 110px)", rows and max(rows) <= 110, rows)
-            nctx.close()
-
-        browser.close()
-    srv.shutdown()
-    check("no page/console errors", not errors, "\n".join(errors[:10]))
+    try:
+        guarded("file checks", check_files)
+        guarded("manifest checks", check_manifest, url)
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            guarded("phone scenario", check_phone, browser, url, site, errors)
+            site.overlay.clear()
+            site.down = False
+            guarded("legacy scenario", check_legacy, browser, url, site, errors)
+            browser.close()
+        outside = sorted({p for p in site.paths if not p.startswith(BASE) and p != BASE.rstrip("/")})
+        check(f"every request stays under {BASE} (relative paths only)", not outside, outside)
+        check("no console errors or page errors in the app", not errors, "\n".join(errors[:10]))
+    finally:
+        srv.shutdown()
+    guarded("tests/test_*.py suite", check_suite)
     print(f"\n{'ALL PASS' if not FAILS else str(len(FAILS)) + ' FAIL'}")
     sys.exit(1 if FAILS else 0)
 

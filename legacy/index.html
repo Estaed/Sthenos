@@ -1,0 +1,4088 @@
+<!DOCTYPE html>
+<html lang="tr" translate="no">
+<head>
+    <meta name="google" content="notranslate" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f0f0f" />
+    <title>Calisthenic Program</title>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Calisthenics" />
+
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --card: #1a1a1a;
+            --card2: #222;
+            --text: #e8eaed;
+            --text2: #9aa0a6;
+            --border: #2a2a2a;
+            --green: #34a853;
+            --green-bg: #152b1c;
+            --orange: #f9ab00;
+            --orange-bg: #2d2010;
+            --red: #ea4335;
+            --red-bg: #2a1515;
+            --radius: 12px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: calc(130px + var(--safe-bottom));
+        }
+        .scroll-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 12px 12px 8px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            background: var(--bg);
+        }
+        .scroll-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stage-bar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .stage-bar .scroll-row {
+            padding: 0;
+            background: transparent;
+            flex: 1;
+        }
+        .stage-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .stage-actions button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+        .stage-actions button:hover {
+            border-color: #555;
+            color: var(--text);
+        }
+        .reset-btn:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .week-nav-wrap {
+            position: sticky;
+            top: 49px;
+            z-index: 30;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px 0 4px;
+            gap: 4px;
+        }
+        .week-nav-wrap .scroll-row {
+            padding: 8px 4px;
+            flex: 1;
+        }
+        .week-nav-wrap .week-actions {
+            flex-shrink: 0;
+            display: flex;
+            gap: 4px;
+            margin-left: 4px;
+        }
+        .week-nav-wrap .week-actions button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: .15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .week-nav-wrap .week-actions button:hover {
+            border-color: #555;
+            color: var(--text);
+        }
+        .week-nav-wrap .week-actions button.manage-on {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-bg);
+        }
+
+        .pill {
+            flex-shrink: 0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text2);
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            user-select: none;
+        }
+        .pill.on {
+            background: #2a2a2a;
+            border-color: #555;
+            color: var(--text);
+            font-weight: 700;
+        }
+        .pill.done {
+            background: var(--green-bg);
+            border-color: #2e7d32;
+            color: var(--green);
+        }
+        .pill.partial {
+            background: var(--orange-bg);
+            border-color: #b45309;
+            color: var(--orange);
+        }
+        .pill.completed-true {
+            background: var(--green-bg);
+            border-color: #2e7d32;
+            color: var(--green);
+        }
+        /* Management mode – red */
+        .pill.manage-mode {
+            border-color: var(--red) !important;
+            background: var(--red-bg) !important;
+            color: var(--red) !important;
+        }
+        .pill.manage-mode.on {
+            border-color: var(--red) !important;
+            background: #3d1a1a !important;
+            color: #ff6b5e !important;
+        }
+
+        .dpill {
+            flex-shrink: 0;
+            padding: 7px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text2);
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .dpill.on {
+            background: #2a2a2a;
+            border-color: #555;
+            color: var(--text);
+            font-weight: 700;
+        }
+        .dpill.done {
+            background: var(--green-bg);
+            border-color: #2e7d32;
+            color: var(--green);
+        }
+        .dpill.partial {
+            background: var(--orange-bg);
+            border-color: #b45309;
+            color: var(--orange);
+        }
+        /* Management mode – red */
+        .dpill.manage-mode {
+            border-color: var(--red) !important;
+            background: var(--red-bg) !important;
+            color: var(--red) !important;
+        }
+        .dpill.manage-mode.on {
+            border-color: var(--red) !important;
+            background: #3d1a1a !important;
+            color: #ff6b5e !important;
+        }
+        .dpill.add-day-btn {
+            border: 1px dashed var(--green);
+            color: var(--green);
+            background: var(--green-bg);
+        }
+        .dpill.add-day-btn:hover {
+            background: #1e3a28;
+        }
+
+        .content {
+            padding: 0 12px;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card);
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
+
+        .week-hdr {
+            margin-bottom: 12px;
+        }
+        .wfocus {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .wnote {
+            font-size: 13px;
+            color: var(--text2);
+            line-height: 1.7;
+        }
+
+        .day-info {
+            font-size: 13px;
+            color: var(--text2);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .day-done-badge {
+            display: inline-block;
+            background: var(--green-bg);
+            color: var(--green);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .ex-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+        .ex-table th {
+            font-size: 11px;
+            color: var(--text2);
+            text-align: left;
+            padding: 8px 6px 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+        .ex-table th:first-child {
+            width: 66px;
+        }
+        .ex-table th:nth-child(2) {
+            width: 99%;
+        }
+        .ex-table th:nth-child(3) {
+            width: 40px;
+        }
+        .ex-table th:nth-child(4) {
+            width: 44px;
+        }
+        .ex-table th:nth-child(5) {
+            width: 92px;
+        }
+        .ex-table th:last-child {
+            width: 34px;
+        }
+
+        .ex-table td {
+            padding: 9px 4px 9px 0;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .ex-table td:first-child {
+            padding-left: 0;
+        }
+
+        .status-group {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .status-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            color: var(--text2);
+            flex-shrink: 0;
+        }
+        .status-btn.green-on {
+            border-color: #2e7d32;
+            background: var(--green-bg);
+            color: var(--green);
+            box-shadow: 0 0 8px rgba(52, 168, 83, 0.3);
+        }
+        .status-btn.orange-on {
+            border-color: #b45309;
+            background: var(--orange-bg);
+            color: var(--orange);
+            box-shadow: 0 0 8px rgba(249, 171, 0, 0.3);
+        }
+        .status-btn:hover {
+            opacity: .8;
+        }
+
+        .ex-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .ex-range {
+            color: var(--text2);
+            font-size: 11px;
+            margin-left: 4px;
+            white-space: nowrap;
+        }
+        .ex-prev {
+            color: var(--text2);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .ex-input {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 4px 6px;
+            width: 100%;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            min-width: 36px;
+            transition: border .15s;
+        }
+        .ex-input:focus {
+            outline: none;
+            border-color: #555;
+        }
+        .ex-input-sm {
+            max-width: 40px;
+        }
+        .ex-input-med {
+            max-width: 84px;
+            min-width: 84px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #5a5a5a;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 3px;
+            transition: color .15s;
+            line-height: 1;
+            border-radius: 4px;
+        }
+        .action-btn:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .del-btn {
+            color: #6a6a6a;
+            font-size: 17px;
+        }
+        .del-btn:hover {
+            color: var(--red);
+            background: rgba(234, 67, 53, 0.12);
+        }
+        .mode-btn.on {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .add-ex-btn {
+            background: var(--card2);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            color: var(--text2);
+            padding: 10px 0;
+            width: 100%;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all .15s;
+            margin-top: 12px;
+        }
+        .add-ex-btn:hover {
+            border-color: #555;
+            color: var(--text);
+        }
+
+        .week-complete-area {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .complete-btn {
+            background: var(--green-bg);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 10px 28px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+        }
+        .complete-btn:hover {
+            background: #1e3a28;
+        }
+        .complete-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .week-done-badge {
+            display: inline-block;
+            background: var(--green-bg);
+            color: var(--green);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .sp {
+            height: 8px;
+        }
+
+        /* Drag & Drop */
+        .ex-table tr.dragging {
+            opacity: 0.5;
+            background: #2a2a2a;
+        }
+        .ex-table tr.drag-over {
+            border-bottom: 2px solid var(--green);
+        }
+        .ex-table tr.shake {
+            animation: shake 0.3s ease-in-out infinite alternate;
+        }
+        @keyframes shake {
+            0% {
+                transform: translateX(-2px);
+            }
+            100% {
+                transform: translateX(2px);
+            }
+        }
+        .drag-handle {
+            cursor: grab;
+            color: var(--text2);
+            font-size: 16px;
+            padding: 0 4px;
+            user-select: none;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .drag-mode-on .drag-handle {
+            color: var(--text);
+        }
+        .drag-mode-on tr {
+            cursor: grab;
+        }
+        .drag-mode-on tr:active {
+            cursor: grabbing;
+        }
+
+        /* ─── TIMER ─── */
+        #timerContainer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 6px 12px calc(6px + var(--safe-bottom));
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            backdrop-filter: blur(10px);
+            background: rgba(20, 20, 20, 0.95);
+        }
+        #timerContainer .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        #timerContainer .timer-row input {
+            width: 50px;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            padding: 3px 4px;
+            font-size: 13px;
+            text-align: center;
+            outline: none;
+        }
+        #timerContainer .timer-row input:focus {
+            border-color: #555;
+        }
+        #timerContainer .timer-row .timer-label {
+            font-size: 11px;
+            color: var(--text2);
+            margin-right: 2px;
+        }
+        #timerContainer .timer-row button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: .15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        #timerContainer .timer-row button:hover {
+            border-color: #555;
+        }
+        #timerContainer .timer-row button.start {
+            background: var(--green-bg);
+            border-color: var(--green);
+            color: var(--green);
+        }
+        #timerContainer .timer-row button.stop {
+            background: var(--red-bg);
+            border-color: #c5221f;
+            color: var(--red);
+        }
+        #timerContainer .timer-row button.reset {
+            color: var(--text2);
+        }
+        .timer-time {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            min-width: 52px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+        }
+        .timer-progress {
+            width: 100%;
+            height: 3px;
+            background: var(--card2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .timer-progress .bar {
+            height: 100%;
+            width: 0%;
+            background: var(--green);
+            border-radius: 2px;
+            transition: width 0.2s linear;
+        }
+
+        /* ─── HISTORY ─── */
+        #historyContainer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        #historyContainer.open {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .history-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .history-box h2 {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-box h2 button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 20px;
+            padding: 4px 14px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .history-box h2 button:hover {
+            border-color: #555;
+        }
+        .history-table-wrap {
+            overflow-x: auto;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history-table th {
+            text-align: left;
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text2);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .history-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        .history-table .status-badge {
+            display: inline-block;
+            padding: 0 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .history-table .status-badge.done {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .history-table .status-badge.partial {
+            background: var(--orange-bg);
+            color: var(--orange);
+        }
+        .history-table .status-badge.none {
+            background: var(--card2);
+            color: var(--text2);
+        }
+        .history-export-btn {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+        .history-export-btn:hover {
+            border-color: #555;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 420px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .modal-box label {
+            font-size: 13px;
+            color: var(--text2);
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+        .modal-box input,
+        .modal-box select {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--card2);
+            color: var(--text);
+            font-size: 14px;
+        }
+        .modal-box input:focus,
+        .modal-box select:focus {
+            outline: none;
+            border-color: #555;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .modal-actions button {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-actions .btn-cancel {
+            background: var(--card2);
+            color: var(--text2);
+        }
+        .modal-actions .btn-add {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
+        .modal-actions .btn-danger {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid #c5221f;
+        }
+
+        .empty-msg {
+            color: var(--text2);
+            font-size: 14px;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* Day action modal */
+        .day-action-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .day-action-options button {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--card2);
+            color: var(--text);
+            flex: 1;
+            min-width: 120px;
+            transition: all .15s;
+        }
+        .day-action-options button:hover {
+            border-color: #555;
+        }
+        .day-action-options .del-day-action {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-bg);
+        }
+        .day-action-options .del-day-action:hover {
+            background: #3d1a1a;
+        }
+        .day-action-options .rename-day-action {
+            border-color: var(--orange);
+            color: var(--orange);
+            background: var(--orange-bg);
+        }
+        .day-action-options .rename-day-action:hover {
+            background: #3d2a10;
+        }
+
+        .plan-selector {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+        .plan-selector button {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 18px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .plan-selector button.on {
+            border-color: var(--green);
+            color: var(--green);
+            background: var(--green-bg);
+        }
+        .plan-selector button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+        .plan-selector .plan-edit {
+            margin-left: auto;
+        }
+        .sync-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-left: 4px;
+            background: #777;
+        }
+        .sync-dot.synced {
+            background: var(--green);
+        }
+        .sync-dot.pending {
+            background: var(--orange);
+        }
+        .sync-dot.error {
+            background: var(--red);
+        }
+        .plan-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .plan-row input[type="checkbox"] {
+            width: auto;
+            flex: 0 0 auto;
+            margin: 0;
+        }
+        .plan-row span {
+            flex: 1;
+            text-align: left;
+        }
+        .plan-row button {
+            padding: 3px 8px;
+        }
+        .sync-status {
+            margin-top: 12px;
+            padding: 10px;
+            background: var(--card2);
+            border-radius: 8px;
+            color: var(--text2);
+            font-size: 13px;
+        }
+        .sync-error {
+            color: var(--red);
+        }
+        .sync-help {
+            color: var(--text2);
+            font-size: 12px;
+            line-height: 1.55;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .ex-table th:first-child,
+            .ex-table td:first-child {
+                width: 76px;
+            }
+            .ex-table th:nth-child(3),
+            .ex-table td:nth-child(3) {
+                width: 34px;
+            }
+            .ex-table th:nth-child(4),
+            .ex-table td:nth-child(4) {
+                width: 38px;
+            }
+            .ex-table th:nth-child(5),
+            .ex-table td:nth-child(5) {
+                width: 88px;
+            }
+            .ex-table td {
+                padding: 8px 3px 8px 0;
+            }
+            .status-group {
+                gap: 3px;
+            }
+            .status-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 13px;
+            }
+            .ex-input-sm {
+                max-width: 32px;
+                font-size: 12px;
+                padding: 3px 3px;
+            }
+            .ex-input-med {
+                min-width: 76px;
+                max-width: 76px;
+                font-size: 12px;
+                padding: 3px 4px;
+            }
+            .ex-name {
+                font-size: 13px;
+            }
+            .pill {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            .stage-actions button {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+            #timerContainer .timer-row {
+                gap: 3px;
+            }
+            #timerContainer .timer-row input {
+                width: 44px;
+                font-size: 12px;
+                padding: 2px 3px;
+            }
+            .timer-time {
+                font-size: 16px;
+                min-width: 44px;
+            }
+            #timerContainer .timer-row button {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+            .week-nav-wrap .week-actions button {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+            .dpill {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            .day-action-options button {
+                padding: 8px 16px;
+                font-size: 13px;
+                min-width: 80px;
+            }
+        }
+
+        /* Phones: slightly smaller UI, and the exercise table becomes a 2-line card-row grid
+           instead of the fixed 6-column table (real-device overflow fix). */
+        @media (max-width: 560px) {
+            body {
+                font-size: 14px;
+            }
+            .pill,
+            .dpill {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            .stage-actions button {
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+            .week-nav-wrap .week-actions button {
+                width: 34px;
+                height: 34px;
+            }
+
+            #exTable thead {
+                display: none;
+            }
+            #exTable {
+                display: block;
+                width: 100%;
+            }
+            #exTable tbody {
+                display: block;
+                width: 100%;
+            }
+            #exb tr {
+                display: grid;
+                grid-template-columns: auto 44px 46px 1fr 30px;
+                column-gap: 6px;
+                row-gap: 4px;
+                align-items: center;
+                width: 100%;
+                padding: 10px 0;
+                border-bottom: 1px solid var(--border);
+            }
+            #exb tr td {
+                padding: 0;
+                border-bottom: none;
+                min-width: 0;
+            }
+            #exb tr td:nth-child(1) {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            #exb tr td:nth-child(2) {
+                grid-column: 1 / 5;
+                grid-row: 1;
+                min-width: 0;
+            }
+            #exb tr td:nth-child(3) {
+                grid-column: 2;
+                grid-row: 2;
+            }
+            #exb tr td:nth-child(4) {
+                grid-column: 3;
+                grid-row: 2;
+            }
+            #exb tr td:nth-child(5) {
+                grid-column: 4 / 6;
+                grid-row: 2;
+            }
+            #exb tr td:nth-child(6) {
+                grid-column: 5;
+                grid-row: 1;
+                justify-self: end;
+            }
+            #exb tr td:nth-child(3),
+            #exb tr td:nth-child(4),
+            #exb tr td:nth-child(5) {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                min-width: 0;
+            }
+            #exb tr td:nth-child(3)::before,
+            #exb tr td:nth-child(4)::before,
+            #exb tr td:nth-child(5)::before {
+                font-size: 9px;
+                color: var(--text2);
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                line-height: 1;
+            }
+            #exb tr td:nth-child(3)::before {
+                content: 'set';
+            }
+            #exb tr td:nth-child(4)::before {
+                content: 'rep';
+            }
+            #exb tr td:nth-child(5)::before {
+                content: 'kg';
+            }
+            #exb .ex-input-sm,
+            #exb .ex-input-med {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+            }
+            #exb .status-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            #exb .ex-name {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content">
+
+        <div class="stage-bar">
+            <div class="scroll-row" id="stages"></div>
+            <div class="stage-actions">
+                <button onclick="toggleTimer()" title="Timer">⏱️</button>
+                <button onclick="toggleHistory()" title="Geçmiş">📊</button>
+                <button id="syncButton" onclick="openSyncModal()" title="Bulut ve ayarlar">
+                    ☁<span id="syncDot" class="sync-dot"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="week-nav-wrap">
+            <div class="scroll-row" id="weekNav"></div>
+            <div class="week-actions">
+                <button id="weekManageToggle" onclick="toggleManagementMode()" title="Yönetim modu">⚙</button>
+            </div>
+        </div>
+
+        <div class="plan-selector" id="planSelector"></div>
+
+        <div class="week-hdr" id="weekHdr"></div>
+
+        <div class="scroll-row" style="padding:0 0 10px" id="dayTabs"></div>
+        <div class="day-info" id="dinfo"></div>
+
+        <div class="card" style="margin-top:6px">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:13px;color:var(--text2);">Egzersizler</span>
+                <button class="action-btn mode-btn" id="dragToggle" onclick="toggleDragMode()" title="Sürükle-Bırak modu">⇅ Sırala</button>
+            </div>
+            <table class="ex-table" id="exTable">
+                <thead>
+                    <tr>
+                        <th>Durum</th>
+                        <th>Egzersiz</th>
+                        <th>Set</th>
+                        <th>Rep</th>
+                        <th>Ağırlık</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="exb"></tbody>
+            </table>
+            <button class="add-ex-btn" onclick="openAddModal()">+ Egzersiz Ekle</button>
+
+            <div class="week-complete-area" id="weekCompleteArea"></div>
+        </div>
+
+        <div class="sp"></div>
+    </div>
+
+    <!-- Add Exercise Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-box">
+            <h3>Yeni Egzersiz</h3>
+            <label>Egzersiz Adı</label>
+            <input id="modalName" placeholder="Örn: Weighted Dip" value="" />
+            <label>Set</label>
+            <input id="modalSets" type="number" value="2" min="1" />
+            <label>Rep</label>
+            <input id="modalReps" placeholder="8 / 15s / 60s" value="8" />
+            <label>Ağırlık</label>
+            <input id="modalWeight" placeholder="+10 kg / BW / 45 kg" value="" />
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeAddModal()">İptal</button>
+                <button class="btn-add" onclick="confirmAddExercise()">Ekle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Exercise Config Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h3>Egzersiz İlerleme Ayarları</h3>
+            <label>Egzersiz Adı</label>
+            <input id="editName" placeholder="Egzersiz adı" value="" />
+            <label>Haftalık Artış Miktarı</label>
+            <input id="editIncrement" type="number" step="0.1" min="0" value="2.5" />
+            <label>Artış Birimi</label>
+            <select id="editUnit" onchange="updateEditRangeVisibility()">
+                <option value="kg">kg (ağırlık)</option>
+                <option value="reps">rep (tekrar)</option>
+                <option value="s">saniye (süre)</option>
+                <option value="yok">— Artış Yok —</option>
+            </select>
+            <div id="editRangeFields" style="display:none;">
+                <label>Tekrar min</label>
+                <input id="editRepMin" type="number" min="1" step="1" placeholder="Boş = kapalı" value="" />
+                <label>Tekrar max</label>
+                <input id="editRepMax" type="number" min="1" step="1" placeholder="Boş = kapalı" value="" />
+                <label>Kilo adımı (kg)</label>
+                <input id="editLoadStep" type="number" min="0" step="0.5" placeholder="2.5" value="" />
+            </div>
+            <label>Kaç Hafta Üst Üste Yeşil Olmalı</label>
+            <input id="editRequiredWeeks" type="number" min="1" value="1" />
+            <div style="font-size:12px;color:var(--text2);margin-top:8px;">
+                Mevcut yeşil hafta sayısı: <span id="editCurrentGreen">0</span>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="deleteEditingExercise()">Egzersizi sil</button>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeEditModal()">İptal</button>
+                <button class="btn-add" onclick="confirmEditExercise()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day Action Modal -->
+    <div class="modal-overlay" id="dayActionModal">
+        <div class="modal-box">
+            <h3 id="dayActionTitle">Gün İşlemi</h3>
+            <p style="color:var(--text2);font-size:14px;margin:8px 0;" id="dayActionDesc">Bu gün için ne yapmak istersiniz?</p>
+            <div class="day-action-options">
+                <button class="del-day-action" onclick="confirmDayDelete()">🗑️ Gün Sil</button>
+                <button class="rename-day-action" onclick="confirmDayRename()">✏️ İsim Değiştir</button>
+            </div>
+            <div class="modal-actions" style="margin-top:12px;">
+                <button class="btn-cancel" onclick="closeDayActionModal()">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Confirm Modal -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal-box">
+            <h3>⚠️ Tüm Verileri Sıfırla</h3>
+            <p style="color:var(--text2);font-size:14px;margin:10px 0;">
+                Bu işlem tüm antrenman verilerini, ilerlemeleri ve ayarları kalıcı olarak silecektir.
+                Geri alınamaz. Senkron açıksa buluttaki kopya da sıfırlanır.
+                Devam etmek istediğinize emin misiniz?
+            </p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeResetModal()">İptal</button>
+                <button class="btn-danger" onclick="confirmReset()">Evet, Sıfırla</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="planEditorModal">
+        <div class="modal-box">
+            <h3 id="planEditorTitle">Plan Düzenle</h3>
+            <div id="planEditorRows"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closePlanEditor()">İptal</button>
+                <button class="btn-add" onclick="savePlanEditor()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="syncModal">
+        <div class="modal-box">
+            <h3>Bulut ve Ayarlar</h3>
+            <label>Owner</label>
+            <input id="syncOwner" />
+            <label>Repo</label>
+            <input id="syncRepo" />
+            <label>Branch</label>
+            <input id="syncBranch" />
+            <label>Dosya yolu</label>
+            <input id="syncPath" />
+            <label>Token</label>
+            <input id="syncToken" type="password" />
+            <label>Cihaz adı</label>
+            <input id="syncDeviceName" />
+            <div class="sync-status" id="syncStatus"></div>
+            <p class="sync-help">
+                Özel bir <strong>Calisthenics-Data</strong> deposu (README ile) oluşturun.
+                Bu depoya sınırlı, <strong>Contents: Read and write</strong> izinli fine-grained
+                kişisel erişim anahtarı oluşturun. Anahtarı her cihaza yapıştırın; yalnızca bu cihazda saklanır.
+            </p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="downloadBackup()">JSON indir</button>
+                <button class="btn-cancel" onclick="document.getElementById('backupInput').click()">JSON yükle</button>
+            </div>
+            <input id="backupInput" type="file" accept="application/json" style="display:none"
+                onchange="uploadBackup(event)" />
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="resetAll()">Programı sıfırla</button>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="disconnectSync()">Bağlantıyı kes</button>
+                <button class="btn-cancel" onclick="closeSyncModal()">Kapat</button>
+                <button class="btn-add" id="syncSaveButton" onclick="saveSyncConfig()">Kaydet ve senkronla</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="conflictModal">
+        <div class="modal-box">
+            <h3>Senkron Çakışması</h3>
+            <div id="conflictInfo"
+                style="display:grid;grid-template-columns:1fr 1fr;gap:12px;color:var(--text2);font-size:13px;"></div>
+            <div class="modal-actions" style="flex-wrap:wrap;">
+                <button class="btn-add" onclick="useLocalConflict()">Bu cihazdakini kullan</button>
+                <button class="btn-cancel" onclick="useRemoteConflict()">Buluttakini al</button>
+                <button class="btn-danger" onclick="cancelConflict()">Şimdilik iptal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Container -->
+    <div id="timerContainer" style="display:none;">
+        <div class="timer-row">
+            <input type="text" inputmode="numeric" id="timerInput" value="30" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+            <span class="timer-label">sn</span>
+            <span class="timer-time" id="timerDisplay">00:30</span>
+            <button id="timerToggleBtn" class="start" onclick="toggleTimerStart()" title="Başlat/Durdur">▶</button>
+            <button onclick="resetTimer()" class="reset" title="Sıfırla">⟳</button>
+        </div>
+        <div class="timer-progress">
+            <div class="bar" id="timerProgressBar"></div>
+        </div>
+    </div>
+
+    <!-- History Container -->
+    <div id="historyContainer">
+        <div class="history-box">
+            <h2>
+                📊 Antrenman Geçmişi
+                <button onclick="toggleHistory()">✕ Kapat</button>
+            </h2>
+            <div class="history-table-wrap">
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Hafta</th>
+                            <th>Gün</th>
+                            <th>Egzersiz</th>
+                            <th>Set</th>
+                            <th>Rep</th>
+                            <th>Ağırlık</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+            <button class="history-export-btn" onclick="exportCSV()">📥 CSV Olarak Dışa Aktar</button>
+        </div>
+    </div>
+
+    <script>
+        // ───────────────────────────────────────────────────────────────
+        // DATA VERSIONING
+        // ───────────────────────────────────────────────────────────────
+
+        const DATA_VERSION = 4;
+        const STORAGE_KEY = 'cali4_program_data';
+
+        // Default day order per plan; mapped to day ids in this order by orderedPlanIds()
+        const PLAN_DAY_NAMES = {
+            '3': ['Push', 'Pull', 'Leg'],
+            '4': ['Push', 'Lower Quad', 'Pull', 'Lower Posterior'],
+            '5': ['Push', 'Pull', 'Leg', 'Upper', 'Lower'],
+            'ev': ['Ev A', 'Ev B']
+        };
+
+        function getStorageKey() { return STORAGE_KEY; }
+
+        function genId() {
+            return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+        }
+
+        // Optional numeric field: null when unset or not a finite number
+        function optionalNumber(value) {
+            if (value === undefined || value === null || value === '') {
+                return null;
+            }
+            const num = Number(value);
+            return Number.isFinite(num) ? num : null;
+        }
+
+        function isValidPlanValue(plan) {
+            return plan === 'ev' || [3, 4, 5].includes(plan);
+        }
+
+        function planLabel(plan) {
+            return plan === 'ev' ? 'Ev' : `${plan} Gün`;
+        }
+
+        // Short form used in the week pills, e.g. "3" or "Ev"
+        function planShortLabel(plan) {
+            return plan === 'ev' ? 'Ev' : `${plan}`;
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // BUILD INITIAL DATA
+        // ───────────────────────────────────────────────────────────────
+
+        function buildInitialWeek() {
+            const week = {
+                weekNumber: 1,
+                completed: false,
+                days: [{
+                    name: "Push",
+                    exercises: [
+                        { id: genId(), name: "Weighted Dip", sets: 2, reps: "8", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Incline Barbell Bench Press", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Pike Push-up", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 0,
+                            incrementUnit: "yok", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Side Lateral Raise", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 1, incrementUnit: "kg",
+                            requiredWeeks: 3, consecutiveGreen: 0 },
+                        { id: genId(), name: "Wall Handstand Hold", sets: 3, reps: "30s", weight: "",
+                            status: "none", incrementAmount: 2, incrementUnit: "s",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "L-sit Progresyonu", sets: 3, reps: "15s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }, {
+                    name: "Pull",
+                    exercises: [
+                        { id: genId(), name: "Weighted Pull-up", sets: 2, reps: "8", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Lat Pulldown", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Inverted Row", sets: 2, reps: "12",
+                            weight: "", status: "none", incrementAmount: 0,
+                            incrementUnit: "yok", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Reverse Pec Deck Fly", sets: 2, reps: "12",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Scapular Pull-up", sets: 2, reps: "10", weight: "",
+                            status: "none", incrementAmount: 0, incrementUnit: "yok",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Tuck Front Lever Tutuş", sets: 3, reps: "15s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }, {
+                    name: "Leg",
+                    exercises: [
+                        { id: genId(), name: "Leg Press Orta Ayak", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Leg Extension", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Lying Leg Curl", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Standing Calf Raise", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Hip Abduction", sets: 2, reps: "15",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Hanging Knee Raise", sets: 2, reps: "12",
+                            weight: "", status: "none", incrementAmount: 1,
+                            incrementUnit: "reps", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Plank", sets: 2, reps: "60s", weight: "",
+                            status: "none", incrementAmount: 2, incrementUnit: "s",
+                            requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }, {
+                    name: "Upper",
+                    exercises: [
+                        { id: genId(), name: "Weighted Pull-up", sets: 2, reps: "8", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Weighted Dips", sets: 2, reps: "10", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Machine Row", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Shoulder Press", sets: 2, reps: "10", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Dumbbell Lateral Raise", sets: 2, reps: "15", weight: "",
+                            status: "none", incrementAmount: 1, incrementUnit: "kg",
+                            requiredWeeks: 2, consecutiveGreen: 0 },
+                        { id: genId(), name: "Dumbbell Biceps Curl", sets: 2, reps: "15", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }, {
+                    name: "Lower",
+                    exercises: [
+                        { id: genId(), name: "Leg Press Yüksek Ayak", sets: 2, reps: "8",
+                            weight: "", status: "none", incrementAmount: 5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Leg Extension", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Lying Leg Curl", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Seated Calf Raise", sets: 2, reps: "12", weight: "",
+                            status: "none", incrementAmount: 2.5, incrementUnit: "kg",
+                            requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Hip Abduction", sets: 2, reps: "15",
+                            weight: "", status: "none", incrementAmount: 2.5,
+                            incrementUnit: "kg", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "L-sit Pratiği", sets: 3, reps: "15s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 },
+                        { id: genId(), name: "Side Plank", sets: 2, reps: "30s",
+                            weight: "", status: "none", incrementAmount: 2,
+                            incrementUnit: "s", requiredWeeks: 1, consecutiveGreen: 0 }
+                    ]
+                }]
+            };
+            week.days.forEach(day => {
+                day.id = genId();
+            });
+            week.days.push(...buildFourDayExtraDays());
+            week.days.push(...buildHomeDays());
+            week.plan = 5;
+            week.activeDayIds = orderedPlanIds(week.days, PLAN_DAY_NAMES['5']);
+            return week;
+        }
+
+        function buildFourDayExtraDays() {
+            function exercise(name, sets, reps, incrementAmount, incrementUnit) {
+                return {
+                    id: genId(),
+                    name: name,
+                    sets: sets,
+                    reps: reps,
+                    weight: '',
+                    status: 'none',
+                    incrementAmount: incrementAmount,
+                    incrementUnit: incrementUnit,
+                    requiredWeeks: 1,
+                    consecutiveGreen: 0
+                };
+            }
+
+            return [
+                {
+                    id: genId(),
+                    name: 'Lower Quad',
+                    exercises: [
+                        exercise('Leg Press Orta Ayak', 2, '8', 5, 'kg'),
+                        exercise('Leg Extension', 2, '12', 2.5, 'kg'),
+                        exercise('Lying Leg Curl', 2, '12', 2.5, 'kg'),
+                        exercise('Standing Calf Raise', 2, '12', 2.5, 'kg'),
+                        exercise('Hip Abduction', 2, '15', 2.5, 'kg'),
+                        exercise('Hanging Knee Raise', 2, '12', 1, 'reps'),
+                        exercise('Plank', 2, '60s', 2, 's')
+                    ]
+                },
+                {
+                    id: genId(),
+                    name: 'Lower Posterior',
+                    exercises: [
+                        exercise('Leg Press Yüksek Ayak', 2, '8', 5, 'kg'),
+                        exercise('Leg Extension', 2, '12', 2.5, 'kg'),
+                        exercise('Lying Leg Curl', 2, '12', 2.5, 'kg'),
+                        exercise('Seated Calf Raise', 2, '12', 2.5, 'kg'),
+                        exercise('Hip Abduction', 2, '15', 2.5, 'kg'),
+                        exercise('L-sit Pratiği (parallette)', 3, '15s', 2, 's'),
+                        exercise('Side Plank (her taraf)', 2, '30s', 2, 's')
+                    ]
+                }
+            ];
+        }
+
+        // Bodyweight home days. Weight is 'BW' (isPristine treats it like empty) so a fresh install stays pristine for sync.
+        function buildHomeDays() {
+            const homeExercise = (name, reps, incrementAmount, incrementUnit) => ({
+                id: genId(),
+                name: name,
+                sets: 2,
+                reps: reps,
+                weight: 'BW',
+                status: 'none',
+                incrementAmount: incrementAmount,
+                incrementUnit: incrementUnit,
+                requiredWeeks: 1,
+                consecutiveGreen: 0
+            });
+
+            return [
+                {
+                    id: genId(),
+                    name: 'Ev A',
+                    exercises: [
+                        homeExercise('Pull-up', '8', 1, 'reps'),
+                        homeExercise('Push-up (ayak yükseltili)', '12', 1, 'reps'),
+                        homeExercise('Bodyweight Squat (3 sn iniş)', '20', 1, 'reps'),
+                        homeExercise('Bulgarian Split Squat (her bacak)', '10', 1, 'reps'),
+                        homeExercise('Single-leg Calf Raise', '15', 1, 'reps'),
+                        homeExercise('Dead Bug', '8', 1, 'reps')
+                    ]
+                },
+                {
+                    id: genId(),
+                    name: 'Ev B',
+                    exercises: [
+                        homeExercise('Pull-up', '8', 1, 'reps'),
+                        homeExercise('Pike Push-up (ayak yükseltili)', '8', 1, 'reps'),
+                        homeExercise('Reverse Lunge (her bacak)', '10', 1, 'reps'),
+                        homeExercise('Sliding Leg Curl (havlu)', '8', 1, 'reps'),
+                        homeExercise('Plank', '50s', 2, 's'),
+                        homeExercise('Side Plank', '34s', 2, 's')
+                    ]
+                }
+            ];
+        }
+
+        function normalizeDayName(name) {
+            return String(name || '').trim().toLocaleLowerCase('tr-TR');
+        }
+
+        // Shared name -> id helper: returns ids in the order of `names` (not library order)
+        function orderedPlanIds(days, names) {
+            return names.map(name => {
+                const match = days.find(day => {
+                    return normalizeDayName(day.name) === normalizeDayName(name);
+                });
+                return match ? match.id : null;
+            }).filter(Boolean);
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // MIGRATIONS
+        // ───────────────────────────────────────────────────────────────
+
+        function migrationFlag(data, key, value) {
+            Object.defineProperty(data, key, {
+                value: value,
+                configurable: true,
+                writable: true,
+                enumerable: false
+            });
+        }
+
+        function migrateData(data) {
+            if (!data || typeof data !== 'object') {
+                return data;
+            }
+
+            const originalVersion = Number(data._version || 0);
+            if (originalVersion > DATA_VERSION) {
+                migrationFlag(data, '__migrationRefused', true);
+                return data;
+            }
+
+            let changed = false;
+            if (!Array.isArray(data.weeks)) {
+                data.weeks = [];
+                changed = true;
+            }
+
+            if (originalVersion < 3 && !localStorage.getItem('cali4_program_data_backup_v2')) {
+                localStorage.setItem('cali4_program_data_backup_v2', migrationRaw || JSON.stringify(data));
+            }
+            if (originalVersion < 4 && !localStorage.getItem('cali4_program_data_backup_v3')) {
+                localStorage.setItem('cali4_program_data_backup_v3', migrationRaw || JSON.stringify(data));
+            }
+
+            const idsByName = new Map();
+            data.weeks.forEach(week => {
+                if (!Array.isArray(week.days)) {
+                    week.days = [];
+                    changed = true;
+                }
+
+                week.days.forEach(day => {
+                    const name = normalizeDayName(day.name);
+                    if (!day.id) {
+                        day.id = idsByName.get(name) || genId();
+                        changed = true;
+                    }
+                    if (name && !idsByName.has(name)) {
+                        idsByName.set(name, day.id);
+                    }
+                    if (!Array.isArray(day.exercises)) {
+                        day.exercises = [];
+                        changed = true;
+                    }
+
+                    day.exercises.forEach(exercise => {
+                        if (!exercise.id) {
+                            exercise.id = genId();
+                            changed = true;
+                        }
+                        if (!exercise.status) {
+                            exercise.status = 'none';
+                            changed = true;
+                        }
+                        if (exercise.incrementAmount === undefined) {
+                            exercise.incrementAmount = 2.5;
+                            changed = true;
+                        }
+                        if (!exercise.incrementUnit) {
+                            exercise.incrementUnit = 'kg';
+                            changed = true;
+                        }
+                        if (exercise.requiredWeeks === undefined) {
+                            exercise.requiredWeeks = 1;
+                            changed = true;
+                        }
+                        if (exercise.consecutiveGreen === undefined) {
+                            exercise.consecutiveGreen = 0;
+                            changed = true;
+                        }
+                    });
+                });
+            });
+
+            data.weeks.forEach(week => {
+                const validIds = new Set(week.days.map(day => day.id));
+                if (originalVersion < 3 || !Array.isArray(week.activeDayIds)) {
+                    week.activeDayIds = week.days.map(day => day.id);
+                    changed = true;
+                } else {
+                    const activeDayIds = week.activeDayIds.filter(id => validIds.has(id));
+                    if (activeDayIds.length !== week.activeDayIds.length) {
+                        week.activeDayIds = activeDayIds;
+                        changed = true;
+                    }
+                }
+
+                if (originalVersion < 3) {
+                    week.plan = [3, 4, 5].includes(week.days.length) ? week.days.length : 5;
+                    changed = true;
+                } else if ([3, 4, 5].includes(Number(week.plan)) && typeof week.plan !== 'number') {
+                    // Numeric strings would miss the strict plan comparisons in the UI
+                    week.plan = Number(week.plan);
+                    changed = true;
+                } else if (!isValidPlanValue(week.plan)) {
+                    week.plan = [3, 4, 5].includes(week.activeDayIds.length) ?
+                        week.activeDayIds.length : 5;
+                    changed = true;
+                }
+            });
+
+            const lastWeek = data.weeks[data.weeks.length - 1];
+            const plansBefore = JSON.stringify(data.plans === undefined ? null : data.plans);
+            if (lastWeek) {
+                const upgrading = originalVersion < 3;
+                let defaultFive = lastWeek.days.map(day => day.id);
+                if (!upgrading) {
+                    const namedFive = orderedPlanIds(lastWeek.days, PLAN_DAY_NAMES['5']);
+                    defaultFive = namedFive.length ? namedFive : defaultFive;
+                }
+
+                // Library completion belongs to the v2 -> v3 upgrade only; on v3 data the user may
+                // have deleted these days on purpose.
+                if (upgrading) {
+                    buildFourDayExtraDays().forEach(template => {
+                        if (!orderedPlanIds(lastWeek.days, [template.name]).length) {
+                            lastWeek.days.push(template);
+                            changed = true;
+                        }
+                    });
+                }
+
+                // Home days belong to the v3 -> v4 upgrade only, for the same reason
+                if (originalVersion < 4) {
+                    buildHomeDays().forEach(template => {
+                        if (!orderedPlanIds(lastWeek.days, [template.name]).length) {
+                            lastWeek.days.push(template);
+                            changed = true;
+                        }
+                    });
+                }
+
+                const validIds = new Set(lastWeek.days.map(day => day.id));
+                const existingPlans = !upgrading && data.plans && typeof data.plans === 'object' ? data.plans : {};
+                const plans = {};
+                ['5', '4', '3'].forEach(key => {
+                    let ids;
+                    if (Array.isArray(existingPlans[key])) {
+                        ids = existingPlans[key].filter(id => validIds.has(id));
+                    } else if (key === '5') {
+                        ids = defaultFive.slice();
+                    } else {
+                        ids = orderedPlanIds(lastWeek.days, PLAN_DAY_NAMES[key]);
+                    }
+                    if (!ids.length) {
+                        ids = key === '5' ? defaultFive.slice() : plans['5'].slice();
+                    }
+                    plans[key] = ids;
+                });
+
+                // Ev plan: set from names on upgrade; afterwards keep the stored order, rebuilt only when emptied
+                const namedHome = orderedPlanIds(lastWeek.days, PLAN_DAY_NAMES.ev);
+                let homeIds = Array.isArray(existingPlans.ev) ? existingPlans.ev.filter(id => validIds.has(id)) : [];
+                if (originalVersion < 4 || (!homeIds.length && namedHome.length === PLAN_DAY_NAMES.ev.length)) {
+                    homeIds = namedHome;
+                }
+                plans.ev = homeIds;
+                data.plans = plans;
+            } else {
+                data.plans = { '3': [], '4': [], '5': [], 'ev': [] };
+            }
+            if (JSON.stringify(data.plans) !== plansBefore) {
+                changed = true;
+            }
+
+            data._version = DATA_VERSION;
+            migrationFlag(data, '__migrationChanged', changed || originalVersion !== DATA_VERSION);
+            return data;
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // LOAD / INIT
+        // ───────────────────────────────────────────────────────────────
+
+        let programData = null;
+        let currentWeekIdx = 0;
+        let currentDayIdx = 0;
+        let editingExerciseId = null;
+        let migrationRaw = null;
+
+        // Save dedupe: last written content (without updatedAt) and a counter of real local changes
+        let lastSavedContent = null;
+        let localChangeCounter = 0;
+
+        // Management mode
+        let managementMode = false;
+        let dragMode = false;
+        let dragSrcIndex = null;
+        let touchDragData = null;
+
+        // Timer state
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let timerTotal = 0;
+        let timerRunning = false;
+
+        // Day action modal state
+        let pendingDayIdx = null;
+
+        function contentString(data) {
+            const copy = Object.assign({}, data);
+            delete copy.updatedAt;
+            return JSON.stringify(copy);
+        }
+
+        function saveLocalOnly(data) {
+            programData = data || programData;
+            if (!programData) {
+                return;
+            }
+            programData._version = DATA_VERSION;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(programData));
+            lastSavedContent = contentString(programData);
+        }
+
+        function saveData() {
+            if (!programData || programData.__migrationRefused) {
+                return;
+            }
+
+            programData._version = DATA_VERSION;
+            const content = contentString(programData);
+            if (content === lastSavedContent) {
+                return;
+            }
+
+            programData.updatedAt = new Date().toISOString();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(programData));
+            lastSavedContent = contentString(programData);
+            localChangeCounter++;
+
+            const state = getSyncState();
+            state.dirty = true;
+            if (!state.dirtySince) {
+                state.dirtySince = new Date().toISOString();
+            }
+            const pushed = new Set(state.pushedComplete || []);
+            const finishedNow = completedKeys().some(key => !pushed.has(key));
+            if (finishedNow) {
+                state.pushDue = true;
+            }
+            setSyncState(state);
+            if (finishedNow) {
+                scheduleSync(1500);
+            } else {
+                updateSyncIndicator();
+            }
+        }
+
+        // Push policy (Tarık, 2026-10-24: "hep atmasın, program tamamlanınca atsın"): a change waits on this
+        // phone until a day's workout or the week is finished, the cloud button is pressed, or it is older than
+        // PUSH_AFTER_MS (so a day left half-done is still backed up). Pulls are unchanged.
+        const PUSH_AFTER_MS = 12 * 60 * 60 * 1000;
+
+        // A finished day: every exercise marked done or partial; a finished week: completed
+        function completedKeys() {
+            const keys = [];
+            (programData.weeks || []).forEach((week, wi) => {
+                if (week.completed) {
+                    keys.push(`w${wi}`);
+                }
+                (week.days || []).forEach(day => {
+                    const list = day.exercises || [];
+                    if (list.length && list.every(ex => ex.status !== 'none')) {
+                        keys.push(`${wi}:${day.id}`);
+                    }
+                });
+            });
+            return keys;
+        }
+
+        function pushAllowed(state) {
+            if (state.pushDue) {
+                return true;
+            }
+            return !!state.dirtySince && Date.now() - Date.parse(state.dirtySince) > PUSH_AFTER_MS;
+        }
+
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+                return false;
+            }
+
+            try {
+                const parsed = JSON.parse(raw);
+                if (!parsed || !Array.isArray(parsed.weeks) || !parsed.weeks.length) {
+                    return false;
+                }
+                migrationRaw = raw;
+                programData = migrateData(parsed);
+                migrationRaw = null;
+                return true;
+            } catch (_) {
+                migrationRaw = null;
+                return false;
+            }
+        }
+
+        function clampIndexes() {
+            if (!programData || !programData.weeks.length) {
+                return;
+            }
+
+            currentWeekIdx = Math.max(0, Math.min(currentWeekIdx, programData.weeks.length - 1));
+            const activeDays = getActiveDays(programData.weeks[currentWeekIdx]);
+            currentDayIdx = activeDays.length ?
+                Math.max(0, Math.min(currentDayIdx, activeDays.length - 1)) : 0;
+        }
+
+        function selectLastIncompleteWeek() {
+            let selectedIndex = programData.weeks.length - 1;
+            for (let index = programData.weeks.length - 1; index >= 0; index--) {
+                if (!programData.weeks[index].completed) {
+                    selectedIndex = index;
+                    break;
+                }
+            }
+            currentWeekIdx = Math.max(0, selectedIndex);
+            currentDayIdx = 0;
+        }
+
+        function initProgram() {
+            if (!loadData()) {
+                const week = buildInitialWeek();
+                programData = {
+                    _version: DATA_VERSION,
+                    programName: 'Calisthenic Program',
+                    updatedAt: new Date().toISOString(),
+                    plans: {
+                        '3': orderedPlanIds(week.days, PLAN_DAY_NAMES['3']),
+                        '4': orderedPlanIds(week.days, PLAN_DAY_NAMES['4']),
+                        '5': week.activeDayIds.slice(),
+                        'ev': orderedPlanIds(week.days, PLAN_DAY_NAMES.ev)
+                    },
+                    weeks: [week]
+                };
+                saveData();
+            } else if (programData.__migrationRefused) {
+                alert('Daha yeni bir uygulama sürümünün verisi var, lütfen sayfayı yenileyin.');
+                return;
+            } else if (programData.__migrationChanged) {
+                saveData();
+            } else {
+                saveLocalOnly(programData);
+            }
+
+            selectLastIncompleteWeek();
+            clampIndexes();
+        }
+
+        function getActiveDays(week) {
+            if (!week || !Array.isArray(week.days)) {
+                return [];
+            }
+            const ids = Array.isArray(week.activeDayIds) ?
+                week.activeDayIds : week.days.map(day => day.id);
+            return ids.map(id => week.days.find(day => day.id === id)).filter(Boolean);
+        }
+
+        function getCurrentWeek() {
+            if (!programData || !programData.weeks.length) {
+                return null;
+            }
+            clampIndexes();
+            return programData.weeks[currentWeekIdx];
+        }
+
+        function getCurrentDay() {
+            const week = getCurrentWeek();
+            if (!week) {
+                return null;
+            }
+            const activeDays = getActiveDays(week);
+            if (!activeDays.length) {
+                return null;
+            }
+            currentDayIdx = Math.min(currentDayIdx, activeDays.length - 1);
+            return activeDays[currentDayIdx];
+        }
+
+        function isWeekFullyDone(week) {
+            const activeDays = getActiveDays(week);
+            return activeDays.length > 0 && activeDays.every(day => {
+                return day.exercises.every(exercise => exercise.status !== 'none');
+            });
+        }
+
+        function getWeekStatus(week) {
+            const exercises = getActiveDays(week).flatMap(day => day.exercises);
+            if (!exercises.length) {
+                return 'none';
+            }
+            const hasProgress = exercises.some(exercise => exercise.status !== 'none');
+            if (!hasProgress) {
+                return 'none';
+            }
+            return exercises.every(exercise => exercise.status !== 'none') ? 'done' : 'partial';
+        }
+
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // Muted reference to the same exercise on the same day, taken from the most recent earlier
+        // week where that day was active (weeks where the day was inactive are skipped).
+        function lastWeekReference(dayId, exerciseName) {
+            let previous = null;
+            for (let i = currentWeekIdx - 1; i >= 0; i--) {
+                const week = programData.weeks[i];
+                if (!week || !Array.isArray(week.activeDayIds) || !week.activeDayIds.includes(dayId)) {
+                    continue;
+                }
+                const day = Array.isArray(week.days) ? week.days.find(item => item.id === dayId) : null;
+                previous = day && Array.isArray(day.exercises) ?
+                    day.exercises.find(ex => ex.name === exerciseName) : null;
+                break;
+            }
+            if (!previous) {
+                return '';
+            }
+            const marks = { done: '✓', partial: '◐' };
+            const mark = marks[previous.status] || '–';
+            return `<div class="ex-prev">geçen: ${escHtml(previous.weight || 'BW')} × ${escHtml(previous.reps)} ${mark}</div>`;
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // RENDER
+        // ───────────────────────────────────────────────────────────────
+
+        function render() {
+            const w = getCurrentWeek();
+            if (w) {
+                if (w.completed && !isWeekFullyDone(w)) {
+                    w.completed = false;
+                    if (programData.weeks.length > currentWeekIdx + 1) {
+                        programData.weeks.splice(currentWeekIdx + 1, 1);
+                    }
+                    saveData();
+                }
+                if (programData.weeks.length > currentWeekIdx + 1) {
+                    const nextW = programData.weeks[currentWeekIdx + 1];
+                    if (nextW && !isWeekFullyDone(w)) {
+                        programData.weeks.splice(currentWeekIdx + 1, 1);
+                        saveData();
+                    }
+                }
+            }
+
+            const wk = getCurrentWeek();
+            if (!wk) {
+                document.getElementById('weekHdr').innerHTML = '<div class="wfocus">Program boş</div>';
+                document.getElementById('exb').innerHTML = '';
+                document.getElementById('weekNav').innerHTML = '';
+                document.getElementById('dayTabs').innerHTML = '';
+                document.getElementById('planSelector').innerHTML = '';
+                document.getElementById('dinfo').textContent = '';
+                document.getElementById('weekCompleteArea').innerHTML = '';
+                document.getElementById('stages').innerHTML = '';
+                return;
+            }
+
+            const d = getCurrentDay();
+            const exercises = d ? d.exercises : [];
+            const activeDays = getActiveDays(wk);
+
+            // ── Week navigation ──
+            const weekNav = document.getElementById('weekNav');
+            weekNav.innerHTML = programData.weeks.map((wkItem, i) => {
+                let cls = 'pill';
+                if (i === currentWeekIdx) cls += ' on';
+                if (wkItem.completed) cls += ' completed-true';
+                const wStatus = getWeekStatus(wkItem);
+                if (wStatus === 'done') cls += ' done';
+                else if (wStatus === 'partial') cls += ' partial';
+
+                // Management mode: red for all weeks except first
+                if (managementMode && i > 0) cls += ' manage-mode';
+
+                let label = `H${wkItem.weekNumber} (${planShortLabel(wkItem.plan)})`;
+                if (wkItem.completed) label += ' ✓';
+
+                let clickHandler = `switchWeek(${i})`;
+                if (managementMode && i > 0) {
+                    clickHandler = `deleteWeekPrompt(${i})`;
+                }
+
+                return `<button class="${cls}" onclick="${clickHandler}">${label}</button>`;
+            }).join('');
+
+            document.getElementById('weekManageToggle').classList.toggle('manage-on', managementMode);
+
+            const planButtons = [3, 4, 5, 'ev'].map(plan => {
+                const current = wk.plan === plan ? ' on' : '';
+                const disabled = wk.completed ? ' disabled' : '';
+                const planArg = plan === 'ev' ? `'ev'` : plan;
+                return `<button class="${current.trim()}"${disabled} onclick="selectPlan(${planArg})">${planLabel(plan)}</button>`;
+            }).join('');
+            const planSelector = document.getElementById('planSelector');
+            planSelector.innerHTML = `${planButtons}
+                <button class="plan-edit" onclick="openPlanEditor()" title="Planı düzenle">✎</button>`;
+            // A single program (every plan holds the same days) needs no plan choice
+            const distinctPlans = new Set(Object.values(programData.plans || {})
+                .filter(ids => Array.isArray(ids) && ids.length).map(ids => ids.join()));
+            planSelector.style.display = distinctPlans.size > 1 ? '' : 'none';
+
+            // ── Day tabs ──
+            const dayTabs = document.getElementById('dayTabs');
+            let dayHTML = '';
+            activeDays.forEach((day, j) => {
+                let cls = 'dpill';
+                if (j === currentDayIdx) cls += ' on';
+                let allDone = true;
+                let anyDone = false;
+                for (const ex of day.exercises) {
+                    if (ex.status === 'done' || ex.status === 'partial') anyDone = true;
+                    else if (ex.status === 'none') { allDone = false; break; }
+                }
+                if (allDone && anyDone) cls += ' done';
+                else if (anyDone) cls += ' partial';
+
+                // Management mode: red for all days
+                if (managementMode) cls += ' manage-mode';
+
+                let clickHandler = `switchDay(${j})`;
+                if (managementMode) {
+                    clickHandler = `openDayActionModal(${j})`;
+                }
+
+                dayHTML +=
+                    `<button class="${cls}" onclick="${clickHandler}">${escHtml(day.name)}</button>`;
+            });
+
+            // Add day button (management mode)
+            if (managementMode) {
+                dayHTML +=
+                    `<button class="dpill add-day-btn" onclick="addDay()">+ Gün Ekle</button>`;
+            }
+
+            dayTabs.innerHTML = dayHTML;
+
+            // ── Day info ──
+            const dayName = d ? d.name : '';
+            let allDoneDay = true;
+            let anyDoneDay = false;
+            if (d) {
+                for (const ex of d.exercises) {
+                    if (ex.status === 'done' || ex.status === 'partial') anyDoneDay = true;
+                    else if (ex.status === 'none') { allDoneDay = false; break; }
+                }
+            }
+            const doneBadge = (allDoneDay && anyDoneDay) ? '<span class="day-done-badge">✅ Gün Tamamlandı</span>' : '';
+
+            // ── Progress line (day name + status, the single place this shows) ──
+            const totalEx = d ? d.exercises.length : 0;
+            const doneEx = d ? d.exercises.filter(e => e.status === 'done' || e.status === 'partial').length : 0;
+            const greenEx = d ? d.exercises.filter(e => e.status === 'done').length : 0;
+            const progText = d ? `${escHtml(dayName)} · ${doneEx}/${totalEx} yapıldı (${greenEx} yeşil)` : 'Bu plan için etkin gün yok';
+            document.getElementById('dinfo').innerHTML = d ? progText + ' ' + doneBadge : progText;
+
+            // ── Week header: title already shown once in #stages, nothing to render here ──
+            document.getElementById('weekHdr').innerHTML = '';
+
+            // ── Exercise table ──
+            if (d) {
+                const rows = d.exercises.map((ex, idx) => {
+                    const isDone = ex.status === 'done';
+                    const isPartial = ex.status === 'partial';
+                    const weightVal = ex.weight || '';
+                    const repMin = optionalNumber(ex.repMin);
+                    const repMax = optionalNumber(ex.repMax);
+                    const rangeLabel = repMin !== null && repMax !== null ?
+                        `<span class="ex-range">${repMin}–${repMax}</span>` : '';
+                    return `<tr data-ex-idx="${idx}" draggable="${dragMode}">
+                        <td>
+                            <div class="status-group">
+                                <button class="status-btn ${isDone ? 'green-on' : ''}" 
+                                    onclick="setStatus(${idx}, 'done')" title="Tamamlandı">✓</button>
+                                <button class="status-btn ${isPartial ? 'orange-on' : ''}" 
+                                    onclick="setStatus(${idx}, 'partial')" title="Yarım kaldı (ilerleme uygulanmaz)">◐</button>
+                            </div>
+                        </td>
+                        <td>
+                            ${dragMode ? `<span class="drag-handle" title="Sürükle">⠿</span>` : ''}
+                            <span class="ex-name">${escHtml(ex.name)}</span>${rangeLabel}
+                            ${lastWeekReference(d.id, ex.name)}
+                        </td>
+                        <td><input class="ex-input ex-input-sm" type="number" min="1" value="${ex.sets}" 
+                                onchange="updateField(${idx}, 'sets', this.value)" /></td>
+                        <td><input class="ex-input ex-input-sm" type="text" value="${escHtml(ex.reps)}" 
+                                onchange="updateField(${idx}, 'reps', this.value)" /></td>
+                        <td><input class="ex-input ex-input-med" type="text" value="${escHtml(weightVal)}" 
+                                placeholder="Boş" onchange="updateField(${idx}, 'weight', this.value)" /></td>
+                        <td>
+                            <button class="action-btn" onclick="openEditModal('${ex.id}')" title="İlerleme ayarları">⚙</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+                document.getElementById('exb').innerHTML = rows;
+
+                if (dragMode) {
+                    const trs = document.querySelectorAll('#exb tr');
+                    trs.forEach(tr => {
+                        tr.addEventListener('dragstart', handleDragStart);
+                        tr.addEventListener('dragover', handleDragOver);
+                        tr.addEventListener('dragenter', handleDragEnter);
+                        tr.addEventListener('dragleave', handleDragLeave);
+                        tr.addEventListener('drop', handleDrop);
+                        tr.addEventListener('dragend', handleDragEnd);
+                        tr.addEventListener('touchstart', handleTouchStart, { passive: true });
+                        tr.addEventListener('touchmove', handleTouchMove, { passive: false });
+                        tr.addEventListener('touchend', handleTouchEnd, { passive: true });
+                    });
+                }
+            } else {
+                document.getElementById('exb').innerHTML = '<tr><td colspan="6" class="empty-msg">Bu gün için egzersiz yok</td></tr>';
+            }
+
+            // ── Week complete area ──
+            const area = document.getElementById('weekCompleteArea');
+            if (wk.completed) {
+                area.innerHTML = `<div class="week-done-badge">✅ Tamamlandı</div>`;
+            } else {
+                const fullyDone = isWeekFullyDone(wk);
+                if (fullyDone && d && d.exercises.length > 0) {
+                    area.innerHTML = `
+                        <button class="complete-btn" onclick="completeWeek()">✅ Bu Haftayı Tamamla → Hafta ${wk.weekNumber + 1}</button>
+                        <div style="font-size:12px;color:var(--text2);margin-top:6px;">Tüm egzersizler yapıldı! Yeni hafta oluştur.</div>
+                    `;
+                } else {
+                    area.innerHTML = '';
+                }
+            }
+
+            document.getElementById('stages').innerHTML = `
+                <span style="color:var(--text);font-size:14px;font-weight:600;padding:8px 0;">Hafta ${wk.weekNumber} · ${planLabel(wk.plan)}</span>
+            `;
+
+            document.getElementById('dragToggle').classList.toggle('on', dragMode);
+            document.getElementById('exTable').classList.toggle('drag-mode-on', dragMode);
+
+            updateSyncIndicator();
+            saveData();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // WEEK & DAY NAVIGATION
+        // ───────────────────────────────────────────────────────────────
+
+        function switchWeek(idx) {
+            if (idx >= 0 && idx < programData.weeks.length) {
+                currentWeekIdx = idx;
+                currentDayIdx = 0;
+                render();
+            }
+        }
+
+        function switchDay(idx) {
+            const activeDays = getActiveDays(getCurrentWeek());
+            if (idx >= 0 && idx < activeDays.length) {
+                currentDayIdx = idx;
+                render();
+            }
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // PLAN SELECTOR & EDITOR
+        // ───────────────────────────────────────────────────────────────
+
+        // Plan editor state: day ids in display order, included ids, and the plan being edited
+        let planEditorIds = [];
+        let planEditorSelected = new Set();
+        let planEditorPlan = null;
+
+        function selectPlan(n) {
+            const week = getCurrentWeek();
+            if (!week || week.completed || week.plan === n) {
+                return;
+            }
+
+            const nextIds = (programData.plans[String(n)] || []).filter(id => {
+                return week.days.some(day => day.id === id);
+            });
+            if (!nextIds.length) {
+                alert('Bu plan için kullanılabilir gün yok.');
+                return;
+            }
+
+            const nextSet = new Set(nextIds);
+            const dropsMarkedDay = getActiveDays(week)
+                .filter(day => !nextSet.has(day.id))
+                .some(day => day.exercises.some(ex => ex.status !== 'none'));
+            const message = 'Bu haftada işaretlenmiş ama yeni planda olmayan günler var. İşaretleri yok sayılacak. Devam?';
+            if (dropsMarkedDay && !confirm(message)) {
+                return;
+            }
+
+            week.plan = n;
+            week.activeDayIds = nextIds;
+            currentDayIdx = 0;
+            saveData();
+            render();
+        }
+
+        function openPlanEditor() {
+            const week = getCurrentWeek();
+            if (!week) {
+                return;
+            }
+
+            planEditorPlan = week.plan;
+            const planIds = (programData.plans[String(week.plan)] || []).filter(id => {
+                return week.days.some(day => day.id === id);
+            });
+            planEditorSelected = new Set(planIds);
+            const restIds = week.days.map(day => day.id).filter(id => !planEditorSelected.has(id));
+            planEditorIds = planIds.concat(restIds);
+
+            document.getElementById('planEditorTitle').textContent = `Plan Düzenle — ${planLabel(week.plan)}`;
+            renderPlanEditorRows();
+            document.getElementById('planEditorModal').classList.add('open');
+        }
+
+        function renderPlanEditorRows() {
+            const week = getCurrentWeek();
+            if (!week) {
+                return;
+            }
+
+            const included = planEditorIds.filter(id => planEditorSelected.has(id));
+            const excluded = planEditorIds.filter(id => !planEditorSelected.has(id));
+            document.getElementById('planEditorRows').innerHTML = included.concat(excluded).map(id => {
+                const day = week.days.find(item => item.id === id);
+                if (!day) {
+                    return '';
+                }
+                const on = planEditorSelected.has(id);
+                const upAttr = on ? `onclick="movePlanDay('${id}', -1)"` : 'disabled';
+                const downAttr = on ? `onclick="movePlanDay('${id}', 1)"` : 'disabled';
+                return `<div class="plan-row">
+                    <input type="checkbox" data-plan-id="${id}" ${on ? 'checked' : ''}
+                        onchange="togglePlanDay('${id}', this.checked)">
+                    <span>${escHtml(day.name)}</span>
+                    <button ${upAttr}>↑</button>
+                    <button ${downAttr}>↓</button>
+                </div>`;
+            }).join('');
+        }
+
+        function togglePlanDay(id, checked) {
+            if (checked) {
+                planEditorSelected.add(id);
+            } else {
+                planEditorSelected.delete(id);
+            }
+            renderPlanEditorRows();
+        }
+
+        function movePlanDay(id, delta) {
+            const included = planEditorIds.filter(value => planEditorSelected.has(value));
+            const index = included.indexOf(id);
+            const target = index + delta;
+            if (index < 0 || target < 0 || target >= included.length) {
+                return;
+            }
+            [included[index], included[target]] = [included[target], included[index]];
+            const excluded = planEditorIds.filter(value => !planEditorSelected.has(value));
+            planEditorIds = included.concat(excluded);
+            renderPlanEditorRows();
+        }
+
+        function closePlanEditor() {
+            document.getElementById('planEditorModal').classList.remove('open');
+        }
+
+        function savePlanEditor() {
+            const week = getCurrentWeek();
+            if (!week || planEditorPlan === null) {
+                return;
+            }
+
+            const ids = planEditorIds.filter(id => {
+                return planEditorSelected.has(id) && week.days.some(day => day.id === id);
+            });
+            if (!ids.length) {
+                alert('En az 1 gün gerekli.');
+                return;
+            }
+
+            programData.plans[String(planEditorPlan)] = ids;
+            if (!week.completed && week.plan === planEditorPlan) {
+                week.activeDayIds = ids.slice();
+            }
+            clampIndexes();
+            closePlanEditor();
+            saveData();
+            render();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // MANAGEMENT MODE
+        // ───────────────────────────────────────────────────────────────
+
+        function toggleManagementMode() {
+            managementMode = !managementMode;
+            if (managementMode && dragMode) {
+                dragMode = false;
+            }
+            render();
+        }
+
+        // ── Week delete ──
+        function deleteWeekPrompt(idx) {
+            if (idx === 0) {
+                alert('İlk hafta silinemez.');
+                return;
+            }
+            if (confirm(`Hafta ${programData.weeks[idx].weekNumber} silinecek. Devam et?`)) {
+                programData.weeks.splice(idx, 1);
+                if (currentWeekIdx >= programData.weeks.length) {
+                    currentWeekIdx = programData.weeks.length - 1;
+                }
+                currentDayIdx = 0;
+                saveData();
+                render();
+            }
+        }
+
+        // ── Day actions ──
+        function openDayActionModal(idx) {
+            const w = getCurrentWeek();
+            if (!w) return;
+            const activeDays = getActiveDays(w);
+            if (idx < 0 || idx >= activeDays.length) return;
+            pendingDayIdx = idx;
+            const dayName = activeDays[idx].name;
+            document.getElementById('dayActionTitle').textContent = `"${dayName}"`;
+            document.getElementById('dayActionDesc').textContent = 'Bu gün için ne yapmak istersiniz?';
+            document.getElementById('dayActionModal').classList.add('open');
+        }
+
+        function closeDayActionModal() {
+            document.getElementById('dayActionModal').classList.remove('open');
+            pendingDayIdx = null;
+        }
+
+        function confirmDayDelete() {
+            const idx = pendingDayIdx;
+            closeDayActionModal();
+            if (idx === null) return;
+            const w = getCurrentWeek();
+            if (!w) return;
+            const activeDays = getActiveDays(w);
+            const day = activeDays[idx];
+            if (!day) return;
+            if (activeDays.length <= 1) {
+                alert('En az bir etkin gün olmalı.');
+                return;
+            }
+            if (!confirm(`"${day.name}" gününü silmek istediğinize emin misiniz?`)) return;
+
+            w.days.splice(w.days.indexOf(day), 1);
+            w.activeDayIds = activeDays.map(item => item.id).filter(id => id !== day.id);
+            ['3', '4', '5', 'ev'].forEach(key => {
+                const remaining = (programData.plans[key] || []).filter(id => id !== day.id);
+                programData.plans[key] = remaining.length || key === 'ev' ? remaining : w.activeDayIds.slice();
+            });
+            if (currentDayIdx >= w.activeDayIds.length) {
+                currentDayIdx = w.activeDayIds.length - 1;
+            }
+            saveData();
+            render();
+        }
+
+        function confirmDayRename() {
+            const idx = pendingDayIdx;
+            closeDayActionModal();
+            if (idx === null) return;
+            const w = getCurrentWeek();
+            if (!w) return;
+            const day = getActiveDays(w)[idx];
+            if (!day) return;
+            const oldName = day.name;
+            const newName = prompt('Günün yeni adı:', oldName);
+            if (newName === null || newName.trim() === '') return;
+            day.name = newName.trim();
+            saveData();
+            render();
+        }
+
+        // ── Add day ──
+        function addDay() {
+            const w = getCurrentWeek();
+            if (!w) return;
+            const name = prompt('Yeni gün adı:', 'Gün ' + (w.days.length + 1));
+            if (name === null || name.trim() === '') return;
+            const newDay = {
+                id: genId(),
+                name: name.trim(),
+                exercises: []
+            };
+            w.days.push(newDay);
+            if (!w.completed) {
+                const planKey = String(w.plan);
+                if (!Array.isArray(programData.plans[planKey])) {
+                    programData.plans[planKey] = [];
+                }
+                w.activeDayIds.push(newDay.id);
+                programData.plans[planKey].push(newDay.id);
+                currentDayIdx = getActiveDays(w).length - 1;
+            }
+            saveData();
+            render();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // EXERCISE ACTIONS
+        // ───────────────────────────────────────────────────────────────
+
+        function setStatus(exIdx, status) {
+            const d = getCurrentDay();
+            if (!d) return;
+            const ex = d.exercises[exIdx];
+            if (!ex) return;
+            if (ex.status === status) {
+                ex.status = "none";
+            } else {
+                ex.status = status;
+            }
+            const w = getCurrentWeek();
+            if (w && w.completed && !isWeekFullyDone(w)) {
+                w.completed = false;
+                if (programData.weeks.length > currentWeekIdx + 1) {
+                    programData.weeks.splice(currentWeekIdx + 1, 1);
+                }
+            }
+            render();
+        }
+
+        function updateField(exIdx, field, value) {
+            const d = getCurrentDay();
+            if (!d) return;
+            const ex = d.exercises[exIdx];
+            if (!ex) return;
+            if (field === 'sets') {
+                const num = parseInt(value);
+                if (!isNaN(num) && num > 0) ex.sets = num;
+            } else if (field === 'reps') {
+                ex.reps = value.trim() || '0';
+            } else if (field === 'weight') {
+                ex.weight = value.trim() || '';
+            }
+            saveData();
+            render();
+        }
+
+        function deleteExercise(exIdx) {
+            const d = getCurrentDay();
+            if (!d) return;
+            if (d.exercises.length <= 1) {
+                alert('En az bir egzersiz olmalı.');
+                return;
+            }
+            if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
+            d.exercises.splice(exIdx, 1);
+            saveData();
+            render();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // COMPLETE WEEK
+        // ───────────────────────────────────────────────────────────────
+
+        // Optional double-progression fields travel with the exercise only when set
+        function withRangeFields(target, source) {
+            ['repMin', 'repMax', 'loadStep'].forEach(key => {
+                if (optionalNumber(source[key]) !== null) {
+                    target[key] = source[key];
+                }
+            });
+            return target;
+        }
+
+        // Adds one load step in the kg progression format; null when the weight cannot be parsed
+        function increaseLoad(weight, step) {
+            const amount = step !== null && step > 0 ? step : 2.5;
+            const weightStr = String(weight || '');
+            if (!weightStr.trim() || /^bw$/i.test(weightStr.trim())) {
+                return '+' + amount.toFixed(1) + ' kg';
+            }
+            let match = weightStr.match(/([\+\-]?\d+\.?\d*)\s*kg/);
+            if (!match) {
+                match = weightStr.match(/([\+\-]?\d+\.?\d*)/);
+            }
+            const val = match ? parseFloat(match[1]) : NaN;
+            if (isNaN(val)) {
+                return null;
+            }
+            const prefix = weightStr.startsWith('+') ? '+' : '';
+            return prefix + (val + amount).toFixed(1) + ' kg';
+        }
+
+        function completeWeek() {
+            const w = getCurrentWeek();
+            if (!w) return;
+            if (w.completed) {
+                alert('Bu hafta zaten tamamlanmış.');
+                return;
+            }
+            if (!isWeekFullyDone(w)) {
+                alert('Tüm egzersizleri yapmadan (yeşil veya turuncu) haftayı bitiremezsiniz!');
+                return;
+            }
+
+            // Progression applies to active days only; library order is preserved
+            const activeIds = new Set(getActiveDays(w).map(day => day.id));
+            const newDays = w.days.map(day => {
+                if (!activeIds.has(day.id)) {
+                    // Inactive this week: carry the day over unchanged, only reset the marks
+                    return {
+                        id: day.id,
+                        name: day.name,
+                        exercises: day.exercises.map(ex => withRangeFields({
+                            id: genId(),
+                            name: ex.name,
+                            sets: ex.sets,
+                            reps: ex.reps,
+                            weight: ex.weight,
+                            status: "none",
+                            incrementAmount: ex.incrementAmount,
+                            incrementUnit: ex.incrementUnit,
+                            requiredWeeks: ex.requiredWeeks,
+                            consecutiveGreen: ex.consecutiveGreen
+                        }, ex))
+                    };
+                }
+
+                const newExercises = day.exercises.map(ex => {
+                    let newConsecutive = ex.consecutiveGreen;
+                    let newWeight = ex.weight || '';
+                    let newReps = ex.reps || '0';
+                    let applied = false;
+
+                    if (ex.status === 'done') {
+                        newConsecutive = ex.consecutiveGreen + 1;
+                    } else {
+                        newConsecutive = 0;
+                    }
+
+                    if (ex.status === 'done' && newConsecutive >= ex.requiredWeeks) {
+                        const unit = ex.incrementUnit;
+                        const amount = ex.incrementAmount || 0;
+
+                        if (unit === 'kg') {
+                            const weightStr = ex.weight || '';
+                            let match = weightStr.match(/([\+\-]?\d+\.?\d*)\s*kg/);
+                            if (!match && !/^bw$/i.test(weightStr.trim())) {
+                                match = weightStr.match(/([\+\-]?\d+\.?\d*)/);
+                            }
+                            if (match && !/^bw$/i.test(weightStr.trim())) {
+                                const val = parseFloat(match[1]);
+                                if (!isNaN(val)) {
+                                    const newVal = val + amount;
+                                    const prefix = weightStr.startsWith('+') ? '+' : '';
+                                    newWeight = prefix + newVal.toFixed(1) + ' kg';
+                                    applied = true;
+                                }
+                            } else if (/^bw$/i.test(weightStr.trim())) {
+                                newWeight = 'BW';
+                            }
+                        } else if (unit === 'reps') {
+                            const repsStr = ex.reps || '0';
+                            let match = repsStr.match(/(\d+)/);
+                            if (match) {
+                                const val = parseInt(match[1]);
+                                if (!isNaN(val)) {
+                                    const newVal = val + amount;
+                                    const repMax = optionalNumber(ex.repMax);
+                                    const loadedWeight = repMax !== null && newVal > repMax ?
+                                        increaseLoad(ex.weight, optionalNumber(ex.loadStep)) : null;
+                                    if (loadedWeight !== null) {
+                                        // Double progression: top of the range reached, add load and restart at repMin
+                                        const repMin = optionalNumber(ex.repMin);
+                                        newReps = (repMin !== null ? repMin : val) + '';
+                                        newWeight = loadedWeight;
+                                    } else {
+                                        newReps = newVal + '';
+                                    }
+                                    applied = true;
+                                }
+                            }
+                        } else if (unit === 's') {
+                            const repsStr = ex.reps || '0s';
+                            let match = repsStr.match(/(\d+)s/);
+                            if (!match) {
+                                match = repsStr.match(/(\d+)/);
+                            }
+                            if (match) {
+                                const val = parseInt(match[1]);
+                                if (!isNaN(val)) {
+                                    const newVal = val + amount;
+                                    newReps = newVal + 's';
+                                    applied = true;
+                                }
+                            }
+                        }
+                        if (applied) {
+                            newConsecutive = 0;
+                        }
+                    }
+
+                    return withRangeFields({
+                        id: genId(),
+                        name: ex.name,
+                        sets: ex.sets,
+                        reps: newReps,
+                        weight: newWeight,
+                        status: "none",
+                        incrementAmount: ex.incrementAmount,
+                        incrementUnit: ex.incrementUnit,
+                        requiredWeeks: ex.requiredWeeks,
+                        consecutiveGreen: newConsecutive
+                    }, ex);
+                });
+                return {
+                    id: day.id,
+                    name: day.name,
+                    exercises: newExercises
+                };
+            });
+
+            const planIds = (programData.plans[String(w.plan)] || []).filter(id => {
+                return newDays.some(day => day.id === id);
+            });
+            const newWeek = {
+                weekNumber: w.weekNumber + 1,
+                completed: false,
+                plan: w.plan,
+                activeDayIds: planIds.length ? planIds : Array.from(activeIds),
+                days: newDays
+            };
+
+            w.completed = true;
+            programData.weeks.push(newWeek);
+            saveData();
+
+            currentWeekIdx = programData.weeks.length - 1;
+            currentDayIdx = 0;
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // DRAG & DROP
+        // ───────────────────────────────────────────────────────────────
+
+        function toggleDragMode() {
+            dragMode = !dragMode;
+            if (dragMode && managementMode) {
+                managementMode = false;
+            }
+            if (dragMode) {
+                document.querySelectorAll('#exb tr').forEach(tr => tr.classList.add('shake'));
+            } else {
+                document.querySelectorAll('#exb tr').forEach(tr => {
+                    tr.classList.remove('shake', 'dragging', 'drag-over');
+                    tr.draggable = false;
+                });
+                const trs = document.querySelectorAll('#exb tr');
+                trs.forEach(tr => {
+                    tr.removeEventListener('dragstart', handleDragStart);
+                    tr.removeEventListener('dragover', handleDragOver);
+                    tr.removeEventListener('dragenter', handleDragEnter);
+                    tr.removeEventListener('dragleave', handleDragLeave);
+                    tr.removeEventListener('drop', handleDrop);
+                    tr.removeEventListener('dragend', handleDragEnd);
+                    tr.removeEventListener('touchstart', handleTouchStart);
+                    tr.removeEventListener('touchmove', handleTouchMove);
+                    tr.removeEventListener('touchend', handleTouchEnd);
+                });
+                dragSrcIndex = null;
+            }
+            render();
+        }
+
+        function handleDragStart(e) {
+            if (!dragMode) return;
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const idx = parseInt(tr.dataset.exIdx);
+            dragSrcIndex = idx;
+            tr.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', idx);
+            touchDragData = { idx, startY: 0 };
+        }
+
+        function handleDragOver(e) {
+            if (!dragMode) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            if (!dragMode) return;
+            e.preventDefault();
+            const tr = e.target.closest('tr');
+            if (tr && dragSrcIndex !== null && parseInt(tr.dataset.exIdx) !== dragSrcIndex) {
+                tr.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            if (!dragMode) return;
+            const tr = e.target.closest('tr');
+            if (tr) tr.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (!dragMode) return;
+            e.preventDefault();
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const targetIdx = parseInt(tr.dataset.exIdx);
+            if (dragSrcIndex === null || targetIdx === dragSrcIndex) {
+                tr.classList.remove('drag-over');
+                return;
+            }
+            const d = getCurrentDay();
+            if (!d) return;
+            const exs = d.exercises;
+            const [removed] = exs.splice(dragSrcIndex, 1);
+            exs.splice(targetIdx, 0, removed);
+            saveData();
+            dragSrcIndex = null;
+            tr.classList.remove('drag-over');
+            render();
+        }
+
+        function handleDragEnd(e) {
+            if (!dragMode) return;
+            document.querySelectorAll('#exb tr').forEach(tr => tr.classList.remove('dragging', 'drag-over'));
+            dragSrcIndex = null;
+        }
+
+        function handleTouchStart(e) {
+            if (!dragMode) return;
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const idx = parseInt(tr.dataset.exIdx);
+            touchDragData = { idx, startY: e.touches[0].clientY, tr };
+        }
+
+        function handleTouchMove(e) {
+            if (!dragMode || !touchDragData) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const trs = document.querySelectorAll('#exb tr');
+            let targetTr = null;
+            trs.forEach(tr => {
+                const rect = tr.getBoundingClientRect();
+                if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                    targetTr = tr;
+                }
+            });
+            if (targetTr && targetTr.dataset.exIdx != touchDragData.idx) {
+                trs.forEach(tr => tr.classList.remove('drag-over'));
+                targetTr.classList.add('drag-over');
+            } else {
+                trs.forEach(tr => tr.classList.remove('drag-over'));
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!dragMode || !touchDragData) return;
+            const trs = document.querySelectorAll('#exb tr');
+            let targetTr = null;
+            trs.forEach(tr => {
+                if (tr.classList.contains('drag-over')) targetTr = tr;
+                tr.classList.remove('drag-over');
+            });
+            if (targetTr) {
+                const targetIdx = parseInt(targetTr.dataset.exIdx);
+                if (targetIdx !== touchDragData.idx) {
+                    const d = getCurrentDay();
+                    if (d) {
+                        const exs = d.exercises;
+                        const [removed] = exs.splice(touchDragData.idx, 1);
+                        exs.splice(targetIdx, 0, removed);
+                        saveData();
+                        render();
+                    }
+                }
+            }
+            touchDragData = null;
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // EDIT EXERCISE CONFIG
+        // ───────────────────────────────────────────────────────────────
+
+        function openEditModal(exId) {
+            const d = getCurrentDay();
+            if (!d) return;
+            const ex = d.exercises.find(e => e.id === exId);
+            if (!ex) return;
+            editingExerciseId = exId;
+            document.getElementById('editName').value = ex.name || '';
+            document.getElementById('editIncrement').value = ex.incrementAmount || 0;
+            document.getElementById('editUnit').value = ex.incrementUnit || 'kg';
+            document.getElementById('editRequiredWeeks').value = ex.requiredWeeks || 1;
+            document.getElementById('editCurrentGreen').textContent = ex.consecutiveGreen || 0;
+            document.getElementById('editRepMin').value = optionalNumber(ex.repMin) !== null ? ex.repMin : '';
+            document.getElementById('editRepMax').value = optionalNumber(ex.repMax) !== null ? ex.repMax : '';
+            document.getElementById('editLoadStep').value = optionalNumber(ex.loadStep) !== null ? ex.loadStep : '';
+            updateEditRangeVisibility();
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        // Rep range inputs only apply to rep progression
+        function updateEditRangeVisibility() {
+            const isReps = document.getElementById('editUnit').value === 'reps';
+            document.getElementById('editRangeFields').style.display = isReps ? 'block' : 'none';
+        }
+
+        // Reads the optional double-progression inputs; alerts and returns null when invalid
+        function readEditRangeFields() {
+            const repMin = optionalNumber(document.getElementById('editRepMin').value.trim());
+            const repMax = optionalNumber(document.getElementById('editRepMax').value.trim());
+            const loadStep = optionalNumber(document.getElementById('editLoadStep').value.trim());
+            const badRep = [repMin, repMax].some(value => value !== null && (!Number.isInteger(value) || value < 1));
+            if (badRep) {
+                alert('Tekrar min ve max pozitif tam sayı olmalı.');
+                return null;
+            }
+            if (loadStep !== null && loadStep <= 0) {
+                alert('Kilo adımı sıfırdan büyük olmalı.');
+                return null;
+            }
+            if (repMin !== null && repMax !== null && repMin > repMax) {
+                alert('Tekrar min, tekrar max değerinden büyük olamaz.');
+                return null;
+            }
+            return { repMin: repMin, repMax: repMax, loadStep: loadStep };
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('open');
+            editingExerciseId = null;
+        }
+
+        // Deletes the exercise currently open in the edit modal (danger button inside the modal)
+        function deleteEditingExercise() {
+            const d = getCurrentDay();
+            if (!d) return;
+            const idx = d.exercises.findIndex(e => e.id === editingExerciseId);
+            if (idx === -1) return;
+            if (d.exercises.length <= 1) {
+                alert('En az bir egzersiz olmalı.');
+                return;
+            }
+            if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
+            d.exercises.splice(idx, 1);
+            closeEditModal();
+            saveData();
+            render();
+        }
+
+        function confirmEditExercise() {
+            const d = getCurrentDay();
+            if (!d) return;
+            const ex = d.exercises.find(e => e.id === editingExerciseId);
+            if (!ex) return;
+
+            let range = null;
+            if (document.getElementById('editUnit').value === 'reps') {
+                range = readEditRangeFields();
+                if (!range) {
+                    return;
+                }
+            }
+
+            const newName = document.getElementById('editName').value.trim();
+            if (newName) ex.name = newName;
+
+            const inc = parseFloat(document.getElementById('editIncrement').value);
+            if (isNaN(inc) || inc < 0) {
+                alert('Geçerli bir artış miktarı girin.');
+                return;
+            }
+            ex.incrementAmount = inc;
+            ex.incrementUnit = document.getElementById('editUnit').value;
+            const req = parseInt(document.getElementById('editRequiredWeeks').value);
+            if (isNaN(req) || req < 1) {
+                alert('En az 1 hafta olmalı.');
+                return;
+            }
+            ex.requiredWeeks = req;
+            if (range) {
+                ['repMin', 'repMax', 'loadStep'].forEach(key => {
+                    if (range[key] === null) {
+                        delete ex[key];
+                    } else {
+                        ex[key] = range[key];
+                    }
+                });
+            }
+            saveData();
+            closeEditModal();
+            render();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // ADD EXERCISE MODAL
+        // ───────────────────────────────────────────────────────────────
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('open');
+            document.getElementById('modalName').value = '';
+            document.getElementById('modalSets').value = '2';
+            document.getElementById('modalReps').value = '8';
+            document.getElementById('modalWeight').value = '';
+            document.getElementById('modalName').focus();
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('open');
+        }
+
+        function confirmAddExercise() {
+            const name = document.getElementById('modalName').value.trim();
+            const sets = parseInt(document.getElementById('modalSets').value) || 2;
+            const reps = document.getElementById('modalReps').value.trim() || '8';
+            const weight = document.getElementById('modalWeight').value.trim() || '';
+
+            if (!name) {
+                alert('Egzersiz adı giriniz.');
+                return;
+            }
+
+            const d = getCurrentDay();
+            if (!d) {
+                alert('Gün bulunamadı.');
+                return;
+            }
+
+            d.exercises.push({
+                id: genId(),
+                name: name,
+                sets: sets,
+                reps: reps,
+                weight: weight,
+                status: "none",
+                incrementAmount: 2.5,
+                incrementUnit: "kg",
+                requiredWeeks: 1,
+                consecutiveGreen: 0
+            });
+
+            closeAddModal();
+            saveData();
+            render();
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // TIMER (only vibration, no sound)
+        // ───────────────────────────────────────────────────────────────
+
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        function toggleTimer() {
+            const container = document.getElementById('timerContainer');
+            if (container.style.display === 'none') {
+                container.style.display = 'flex';
+                const input = document.getElementById('timerInput');
+                timerTotal = parseInt(input.value) || 30;
+                timerSeconds = timerTotal;
+                updateTimerDisplay();
+                updateProgress();
+                requestNotificationPermission();
+            } else {
+                container.style.display = 'none';
+                stopTimer();
+            }
+        }
+
+        function toggleTimerStart() {
+            if (timerRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            if (timerRunning) return;
+            const input = document.getElementById('timerInput');
+            timerTotal = parseInt(input.value) || 30;
+            if (timerSeconds <= 0) {
+                timerSeconds = timerTotal;
+            }
+            timerRunning = true;
+            const btn = document.getElementById('timerToggleBtn');
+            btn.classList.remove('start');
+            btn.classList.add('stop');
+            btn.textContent = '⏹';
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+                updateProgress();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerRunning = false;
+                    btn.textContent = '▶';
+                    btn.classList.remove('stop');
+                    btn.classList.add('start');
+                    onTimerEnd();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            const btn = document.getElementById('timerToggleBtn');
+            btn.textContent = '▶';
+            btn.classList.remove('stop');
+            btn.classList.add('start');
+        }
+
+        function resetTimer() {
+            stopTimer();
+            const input = document.getElementById('timerInput');
+            timerTotal = parseInt(input.value) || 30;
+            timerSeconds = timerTotal;
+            updateTimerDisplay();
+            updateProgress();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        }
+
+        function updateProgress() {
+            const pct = timerTotal > 0 ? ((timerTotal - timerSeconds) / timerTotal * 100) : 0;
+            document.getElementById('timerProgressBar').style.width = Math.min(100, pct) + '%';
+        }
+
+        // ─── TIMER END: only vibration, no sound ────────────────────
+        function onTimerEnd() {
+            // 1) Direct vibration (foreground)
+            if (navigator.vibrate) {
+                navigator.vibrate(3000);
+            }
+
+            // 2) Notification vibration (background, silent)
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    new Notification('⏱️ Süre Doldu!', {
+                        body: 'Antrenman dinlenme süresi tamamlandı.',
+                        icon: 'favicon-32x32.png',
+                        silent: true,
+                        requireInteraction: true,
+                        vibrate: [3000]
+                    });
+                } catch (_) { /* safe ignore */ }
+            }
+
+            // 3) Service worker ping
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'TIMER_END',
+                    message: 'Antrenman dinlenme süresi tamamlandı!'
+                });
+            }
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // HISTORY
+        // ───────────────────────────────────────────────────────────────
+
+        function toggleHistory() {
+            const container = document.getElementById('historyContainer');
+            container.classList.toggle('open');
+            if (container.classList.contains('open')) {
+                renderHistory();
+            }
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('historyBody');
+            if (!programData || !programData.weeks) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Veri yok</td></tr>';
+                return;
+            }
+            let html = '';
+            programData.weeks.forEach(w => {
+                getActiveDays(w).forEach(day => {
+                    day.exercises.forEach(ex => {
+                        const statusCls = ex.status === 'done' ? 'done' : (ex.status === 'partial' ?
+                            'partial' : 'none');
+                        const statusText = ex.status === 'done' ? '✅ Tam' : (ex.status === 'partial' ?
+                            '◐ Eksik' : '⬜ Boş');
+                        html += `<tr>
+                            <td>${w.weekNumber}</td>
+                            <td>${escHtml(day.name)}</td>
+                            <td>${escHtml(ex.name)}</td>
+                            <td>${ex.sets}</td>
+                            <td>${escHtml(ex.reps)}</td>
+                            <td>${escHtml(ex.weight)}</td>
+                            <td><span class="status-badge ${statusCls}">${statusText}</span></td>
+                        </tr>`;
+                    });
+                });
+            });
+            if (!html) {
+                html = '<tr><td colspan="7" class="empty-msg">Henüz kayıt yok</td></tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function exportCSV() {
+            if (!programData || !programData.weeks) {
+                alert('Veri yok.');
+                return;
+            }
+            let csv = 'Hafta,Gün,Egzersiz,Set,Rep,Ağırlık,Durum\n';
+            programData.weeks.forEach(w => {
+                getActiveDays(w).forEach(day => {
+                    day.exercises.forEach(ex => {
+                        const statusText = ex.status === 'done' ? 'Tam' : (ex.status === 'partial' ?
+                            'Eksik' : 'Boş');
+                        const row = [
+                            w.weekNumber,
+                            `"${day.name}"`,
+                            `"${ex.name}"`,
+                            ex.sets,
+                            `"${ex.reps}"`,
+                            `"${ex.weight}"`,
+                            statusText
+                        ];
+                        csv += row.join(',') + '\n';
+                    });
+                });
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute('download', 'calisthenics_history.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // RESET
+        // ───────────────────────────────────────────────────────────────
+
+        function resetAll() {
+            document.getElementById('resetModal').classList.add('open');
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.remove('open');
+        }
+
+        function confirmReset() {
+            localStorage.removeItem(STORAGE_KEY);
+            programData = null;
+            currentWeekIdx = 0;
+            currentDayIdx = 0;
+            managementMode = false;
+            dragMode = false;
+            closeResetModal();
+            initProgram();
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // CLOSE MODALS ON OVERLAY CLICK
+        // ───────────────────────────────────────────────────────────────
+
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddModal();
+        });
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+        document.getElementById('resetModal').addEventListener('click', function(e) {
+            if (e.target === this) closeResetModal();
+        });
+        document.getElementById('historyContainer').addEventListener('click', function(e) {
+            if (e.target === this) toggleHistory();
+        });
+        document.getElementById('dayActionModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDayActionModal();
+        });
+        document.getElementById('planEditorModal').addEventListener('click', function(e) {
+            if (e.target === this) closePlanEditor();
+        });
+        document.getElementById('syncModal').addEventListener('click', function(e) {
+            if (e.target === this) closeSyncModal();
+        });
+        // conflictModal intentionally has no overlay close: the user must pick an option
+
+        // ───────────────────────────────────────────────────────────────
+        // SYNC (GitHub Contents API)
+        // ───────────────────────────────────────────────────────────────
+
+        const SYNC_CONFIG_KEY = 'cali_sync_config';
+        const SYNC_STATE_KEY = 'cali_sync_state';
+        const REPO_NOT_FOUND_MESSAGE = 'Repo bulunamadı veya token bu repoya erişemiyor. Token ayarında Repository access altında Calisthenics-Data seçili mi?';
+
+        let syncTimer = null;
+        let syncPromise = null;   // promise of the running sync incl. queued reruns; never rejects
+        let syncRerun = false;
+        let syncPaused = false;
+        let pendingConflict = null;
+
+        // ── Config & state ──
+        function getSyncConfig() {
+            const fallback = {
+                owner: 'Estaed',
+                repo: 'Calisthenics-Data',
+                branch: 'main',
+                path: 'calisthenics-data.json',
+                token: '',
+                deviceName: ''
+            };
+            try {
+                return Object.assign(fallback, JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || '{}'));
+            } catch (_) {
+                return fallback;
+            }
+        }
+
+        function getSyncState() {
+            const fallback = {
+                lastSha: null,
+                lastSyncedAt: null,
+                dirty: false,
+                lastError: null
+            };
+            try {
+                return Object.assign(fallback, JSON.parse(localStorage.getItem(SYNC_STATE_KEY) || '{}'));
+            } catch (_) {
+                return fallback;
+            }
+        }
+
+        function setSyncState(next) {
+            localStorage.setItem(SYNC_STATE_KEY, JSON.stringify(next));
+            updateSyncIndicator();
+        }
+
+        function syncConfigured() {
+            const config = getSyncConfig();
+            return !!(config.owner && config.repo && config.token);
+        }
+
+        // ── GitHub API helpers ──
+        function encodePath(path) {
+            return String(path || '').split('/').filter(Boolean).map(encodeURIComponent).join('/');
+        }
+
+        function syncUrl(config) {
+            return `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${encodePath(config.path)}`;
+        }
+
+        function githubHeaders(config, extra) {
+            return Object.assign({
+                Authorization: `Bearer ${config.token}`,
+                Accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            }, extra || {});
+        }
+
+        function decodeBase64Utf8(value) {
+            const binary = atob(String(value).replace(/\s/g, ''));
+            const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+            return new TextDecoder('utf-8').decode(bytes);
+        }
+
+        function encodeBase64Utf8(value) {
+            const bytes = new TextEncoder().encode(value);
+            let binary = '';
+            // Chunked so large payloads do not overflow the argument list
+            for (let i = 0; i < bytes.length; i += 0x8000) {
+                binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+            }
+            return btoa(binary);
+        }
+
+        // A thrown TypeError from fetch (offline, DNS, CORS) becomes a readable message
+        async function safeFetch(url, options) {
+            try {
+                return await fetch(url, options);
+            } catch (_) {
+                throw new Error('GitHub\'a ulaşılamadı (ağ hatası).');
+            }
+        }
+
+        // 401/403 mean the same thing on every GitHub Contents API call
+        function authStatusError(status) {
+            if (status === 401) {
+                return new Error('Token geçersiz veya süresi dolmuş.');
+            }
+            if (status === 403) {
+                return new Error('Token\'ın yazma/okuma izni yok: Permissions → Contents → Read and write olmalı.');
+            }
+            return null;
+        }
+
+        async function remoteGet() {
+            const config = getSyncConfig();
+            const url = `${syncUrl(config)}?ref=${encodeURIComponent(config.branch)}`;
+            const response = await safeFetch(url, {
+                headers: githubHeaders(config),
+                cache: 'no-store'
+            });
+            if (response.status === 404) {
+                // A 404 here is ambiguous: missing file, missing repo, or a token that cannot see the repo
+                const repoResponse = await safeFetch(`https://api.github.com/repos/${config.owner}/${config.repo}`, {
+                    headers: githubHeaders(config),
+                    cache: 'no-store'
+                });
+                if (repoResponse.status === 200) {
+                    return { exists: false };
+                }
+                if (repoResponse.status === 404) {
+                    throw new Error(REPO_NOT_FOUND_MESSAGE);
+                }
+                if (repoResponse.status === 401) {
+                    throw new Error('Token geçersiz veya süresi dolmuş.');
+                }
+                throw new Error(`Bulut verisi alınamadı (${repoResponse.status}).`);
+            }
+            const authError = authStatusError(response.status);
+            if (authError) {
+                throw authError;
+            }
+            if (!response.ok) {
+                throw new Error(`Bulut verisi alınamadı (${response.status}).`);
+            }
+
+            const json = await response.json();
+            let text = json.content ? decodeBase64Utf8(json.content) : '';
+            if (!text && json.size > 0) {
+                // Files over 1 MB come without inline content: fetch the raw body instead
+                const raw = await safeFetch(url, {
+                    headers: githubHeaders(config, { Accept: 'application/vnd.github.raw+json' }),
+                    cache: 'no-store'
+                });
+                const rawAuthError = authStatusError(raw.status);
+                if (rawAuthError) {
+                    throw rawAuthError;
+                }
+                if (!raw.ok) {
+                    throw new Error(`Bulut verisi alınamadı (${raw.status}).`);
+                }
+                text = await raw.text();
+            }
+            return { exists: true, sha: json.sha, text: text };
+        }
+
+        async function remotePut(text, sha) {
+            const config = getSyncConfig();
+            const body = {
+                message: `sync: ${config.deviceName || 'cihaz'} ${new Date().toISOString()}`,
+                content: encodeBase64Utf8(text),
+                branch: config.branch
+            };
+            if (sha) {
+                body.sha = sha;
+            }
+
+            const response = await safeFetch(syncUrl(config), {
+                method: 'PUT',
+                headers: githubHeaders(config, { 'Content-Type': 'application/json' }),
+                cache: 'no-store',
+                body: JSON.stringify(body)
+            });
+            if (response.status === 409 || response.status === 422) {
+                const error = new Error('Bulut verisi değişti.');
+                error.stale = true;
+                throw error;
+            }
+            if (response.status === 404) {
+                throw new Error(REPO_NOT_FOUND_MESSAGE);
+            }
+            const authError = authStatusError(response.status);
+            if (authError) {
+                throw authError;
+            }
+            if (!response.ok) {
+                throw new Error(`Buluta yazılamadı (${response.status}).`);
+            }
+            const json = await response.json();
+            return json.content.sha;
+        }
+
+        // ── Indicator ──
+        function syncText() {
+            const state = getSyncState();
+            if (!syncConfigured()) {
+                return 'Senkron ayarlanmamış';
+            }
+            if (navigator.onLine === false) {
+                return 'Çevrimdışı';
+            }
+            if (syncPaused) {
+                return 'Senkron bekletildi';
+            }
+            if (state.dirty && !syncPromise && !pushAllowed(state)) {
+                return 'Gün bitince gönderilecek';
+            }
+            if (syncPromise || state.dirty) {
+                return 'Senkron bekliyor';
+            }
+            if (state.lastError) {
+                return state.lastError;
+            }
+            return 'Senkronize';
+        }
+
+        function updateSyncIndicator() {
+            const button = document.getElementById('syncButton');
+            const dot = document.getElementById('syncDot');
+            if (!button || !dot) {
+                return;
+            }
+
+            const state = getSyncState();
+            let dotClass = '';
+            if (syncConfigured()) {
+                if (navigator.onLine === false || syncPaused || state.lastError) {
+                    dotClass = 'error';
+                } else if (syncPromise || state.dirty) {
+                    dotClass = 'pending';
+                } else {
+                    dotClass = 'synced';
+                }
+            }
+            dot.className = dotClass ? `sync-dot ${dotClass}` : 'sync-dot';
+            button.title = syncText();
+
+            const status = document.getElementById('syncStatus');
+            if (status) {
+                const lastSynced = state.lastSyncedAt ?
+                    new Date(state.lastSyncedAt).toLocaleString('tr-TR') : 'henüz yok';
+                const errorLine = state.lastError ?
+                    `<br><span class="sync-error">${escHtml(state.lastError)}</span>` : '';
+                status.innerHTML = `${escHtml(syncText())}<br>Son senkron: ${lastSynced}${errorLine}`;
+            }
+        }
+
+        // ── Sync core ──
+        function isPristine(data) {
+            if (!data || !Array.isArray(data.weeks) || data.weeks.length !== 1) {
+                return false;
+            }
+            return (data.weeks[0].days || []).every(day => {
+                return (day.exercises || []).every(ex => {
+                    const w = (ex.weight || '').toString().trim().toLowerCase();
+                    return ex.status === 'none' && (w === '' || w === 'bw');
+                });
+            });
+        }
+
+        function scheduleSync(ms) {
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(() => {
+                syncNow();
+            }, ms);
+        }
+
+        function syncFailure(error) {
+            const state = getSyncState();
+            state.lastError = error && error.message ? error.message : 'Senkron hatası.';
+            setSyncState(state);
+        }
+
+        async function syncPush(sha) {
+            const counter = localChangeCounter;
+            const text = JSON.stringify(programData, null, 1);
+            const newSha = await remotePut(text, sha);
+            const state = getSyncState();
+            state.lastSha = newSha;
+            state.lastSyncedAt = new Date().toISOString();
+            state.lastError = null;
+            // A local edit during the upload keeps the state dirty and pushes again shortly
+            state.dirty = localChangeCounter !== counter;
+            if (!state.dirty) {
+                state.pushDue = false;
+                state.dirtySince = null;
+                state.pushedComplete = completedKeys();
+            }
+            setSyncState(state);
+            if (state.dirty) {
+                scheduleSync(1000);
+            }
+        }
+
+        function adoptRemote(data, sha) {
+            const wasPristine = isPristine(programData);
+            migrationRaw = JSON.stringify(data);
+            const migrated = migrateData(data);
+            migrationRaw = null;
+            if (migrated.__migrationRefused) {
+                throw new Error('Bulutta daha yeni bir uygulama sürümünün verisi var, sayfayı yenile.');
+            }
+
+            programData = migrated;
+            saveLocalOnly(programData);
+
+            const state = getSyncState();
+            state.lastSha = sha;
+            state.pushedComplete = completedKeys();
+            // Older cloud data that migration changed is pushed back
+            state.dirty = !!migrated.__migrationChanged;
+            state.pushDue = state.dirty;
+            state.dirtySince = state.dirty ? new Date().toISOString() : null;
+            state.lastSyncedAt = new Date().toISOString();
+            state.lastError = null;
+            setSyncState(state);
+
+            // First sync on a fresh device, or an index the new data no longer has: jump to the current week
+            if (wasPristine || currentWeekIdx >= programData.weeks.length) {
+                selectLastIncompleteWeek();
+            }
+            clampIndexes();
+            render();
+            if (state.dirty) {
+                scheduleSync(1000);
+            }
+        }
+
+        // One pass of the sync algorithm; throws on failure
+        async function syncAttempt() {
+            if (!programData || programData.__migrationRefused) {
+                throw new Error('Bu cihazdaki veri daha yeni bir uygulama sürümüne ait, sayfayı yenile.');
+            }
+
+            const remote = await remoteGet();
+            const state = getSyncState();
+            if (!remote.exists) {
+                await syncPush(null);
+                return;
+            }
+            if (remote.sha === state.lastSha) {
+                if (state.dirty && pushAllowed(state)) {
+                    await syncPush(remote.sha);
+                } else if (state.lastError) {
+                    state.lastError = null;
+                    setSyncState(state);
+                }
+                return;
+            }
+
+            let remoteData = null;
+            try {
+                remoteData = JSON.parse(remote.text);
+            } catch (_) {
+                remoteData = null;
+            }
+            if (!remoteData || typeof remoteData !== 'object' || !Array.isArray(remoteData.weeks)) {
+                throw new Error('Buluttaki veri geçerli JSON değil; üzerine yazılmadı.');
+            }
+            if (Number(remoteData._version) > DATA_VERSION) {
+                throw new Error('Bulutta daha yeni bir uygulama sürümünün verisi var, sayfayı yenile.');
+            }
+
+            const canAdopt = state.lastSha ? !state.dirty : isPristine(programData);
+            if (canAdopt) {
+                adoptRemote(remoteData, remote.sha);
+                return;
+            }
+            openConflictModal(remoteData, remote.sha);
+        }
+
+        // At most two attempts: a stale PUT (409/422) re-reads the cloud once
+        async function syncWithRetry() {
+            for (let attempt = 1; attempt <= 2; attempt++) {
+                try {
+                    await syncAttempt();
+                    return;
+                } catch (error) {
+                    if (!(error && error.stale) || attempt === 2) {
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        async function runSyncLoop() {
+            try {
+                do {
+                    syncRerun = false;
+                    try {
+                        await syncWithRetry();
+                    } catch (error) {
+                        syncFailure(error);
+                    }
+                } while (syncRerun && !syncPaused);
+            } finally {
+                syncPromise = null;
+                syncRerun = false;
+                updateSyncIndicator();
+            }
+        }
+
+        // Single-flight entry point. The returned promise never rejects; errors land in state.lastError.
+        function syncNow({ manual = false } = {}) {
+            if (!syncConfigured() || navigator.onLine === false) {
+                updateSyncIndicator();
+                return Promise.resolve();
+            }
+            if (manual) {
+                syncPaused = false;
+                const state = getSyncState();
+                if (state.dirty) {
+                    state.pushDue = true;
+                    setSyncState(state);
+                }
+            }
+            if (syncPromise) {
+                // Queue one rerun; the running promise resolves after it has finished too
+                syncRerun = true;
+                return syncPromise;
+            }
+            if (syncPaused) {
+                return Promise.resolve();
+            }
+
+            syncPromise = runSyncLoop().catch(error => {
+                console.warn('Senkron hatası:', error);
+            });
+            updateSyncIndicator();
+            return syncPromise;
+        }
+
+        function setupSyncTriggers() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' || getSyncState().dirty) {
+                    syncNow();
+                }
+            });
+            window.addEventListener('online', () => {
+                syncNow();
+            });
+            window.addEventListener('pagehide', () => {
+                if (getSyncState().dirty) {
+                    syncNow();
+                }
+            });
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    syncNow();
+                }
+            }, 60000);
+        }
+
+        // ── Conflict modal ──
+        function conflictSummary(data) {
+            const weeks = Array.isArray(data.weeks) ? data.weeks : [];
+            const last = weeks[weeks.length - 1];
+            const updated = data.updatedAt ? new Date(data.updatedAt).toLocaleString('tr-TR') : 'bilinmiyor';
+            const lastNumber = last ? escHtml(String(last.weekNumber)) : 'bilinmiyor';
+            return `Güncelleme: ${updated}<br>Hafta: ${weeks.length}<br>Son hafta: ${lastNumber}`;
+        }
+
+        function openConflictModal(remoteData, remoteSha) {
+            pendingConflict = { remoteData: remoteData, remoteSha: remoteSha };
+            document.getElementById('conflictInfo').innerHTML = `
+                <div><strong>Bu cihaz</strong><br>${conflictSummary(programData)}</div>
+                <div><strong>Bulut</strong><br>${conflictSummary(remoteData)}</div>
+            `;
+            document.getElementById('conflictModal').classList.add('open');
+        }
+
+        function closeConflictModal() {
+            document.getElementById('conflictModal').classList.remove('open');
+            const conflict = pendingConflict;
+            pendingConflict = null;
+            return conflict;
+        }
+
+        function useLocalConflict() {
+            const conflict = closeConflictModal();
+            if (conflict) {
+                syncPush(conflict.remoteSha).catch(syncFailure);
+            }
+        }
+
+        function useRemoteConflict() {
+            const conflict = closeConflictModal();
+            if (!conflict) {
+                return;
+            }
+            try {
+                adoptRemote(conflict.remoteData, conflict.remoteSha);
+            } catch (error) {
+                syncFailure(error);
+            }
+        }
+
+        function cancelConflict() {
+            closeConflictModal();
+            syncPaused = true;
+            updateSyncIndicator();
+        }
+
+        // ── Sync modal ──
+        function openSyncModal() {
+            const config = getSyncConfig();
+            document.getElementById('syncOwner').value = config.owner;
+            document.getElementById('syncRepo').value = config.repo;
+            document.getElementById('syncBranch').value = config.branch;
+            document.getElementById('syncPath').value = config.path;
+            document.getElementById('syncToken').value = config.token;
+            document.getElementById('syncDeviceName').value = config.deviceName;
+            updateSyncIndicator();
+            document.getElementById('syncModal').classList.add('open');
+        }
+
+        function closeSyncModal() {
+            document.getElementById('syncModal').classList.remove('open');
+        }
+
+        async function saveSyncConfig() {
+            const config = {
+                owner: document.getElementById('syncOwner').value.trim(),
+                repo: document.getElementById('syncRepo').value.trim(),
+                branch: document.getElementById('syncBranch').value.trim() || 'main',
+                path: document.getElementById('syncPath').value.trim() || 'calisthenics-data.json',
+                token: document.getElementById('syncToken').value.trim(),
+                deviceName: document.getElementById('syncDeviceName').value.trim()
+            };
+            localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(config));
+            syncPaused = false;
+
+            const status = document.getElementById('syncStatus');
+            if (!config.token) {
+                if (status) {
+                    status.innerHTML = `<span class="sync-error">${escHtml('Token boş.')}</span>`;
+                }
+                return;
+            }
+
+            const saveButton = document.getElementById('syncSaveButton');
+            if (saveButton) {
+                saveButton.disabled = true;
+            }
+            if (status) {
+                status.textContent = 'Senkronlanıyor…';
+            }
+            await syncNow({ manual: true });
+            if (saveButton) {
+                saveButton.disabled = false;
+            }
+            updateSyncIndicator();
+        }
+
+        function disconnectSync() {
+            if (!confirm('Bulut bağlantısı kesilsin mi? Yerel veriler korunur.')) {
+                return;
+            }
+            const config = getSyncConfig();
+            config.token = '';
+            localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(config));
+            localStorage.setItem(SYNC_STATE_KEY, JSON.stringify({
+                lastSha: null,
+                lastSyncedAt: null,
+                dirty: false,
+                lastError: null
+            }));
+            syncPaused = false;
+            updateSyncIndicator();
+        }
+
+        // ── Backup ──
+        function downloadBackup() {
+            const blob = new Blob([JSON.stringify(programData, null, 1)], { type: 'application/json' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = `calisthenics-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function uploadBackup(event) {
+            const input = event.target;
+            const file = input.files && input.files[0];
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                let data = null;
+                try {
+                    data = JSON.parse(reader.result);
+                } catch (_) {
+                    data = null;
+                }
+                if (!data || !Array.isArray(data.weeks) || !data.weeks.length) {
+                    alert('Geçerli bir yedek dosyası seçin.');
+                    return;
+                }
+                if (!confirm('Yerel veriler yedekle değiştirilsin mi?')) {
+                    return;
+                }
+
+                let migrated;
+                try {
+                    migrationRaw = reader.result;
+                    migrated = migrateData(data);
+                } catch (_) {
+                    alert('Geçerli bir yedek dosyası seçin.');
+                    return;
+                } finally {
+                    migrationRaw = null;
+                }
+                if (migrated.__migrationRefused) {
+                    alert('Daha yeni bir uygulama sürümünün verisi var.');
+                    return;
+                }
+
+                programData = migrated;
+                saveData();
+                selectLastIncompleteWeek();
+                clampIndexes();
+                render();
+            };
+            reader.readAsText(file, 'utf-8');
+            input.value = '';
+        }
+
+        // ───────────────────────────────────────────────────────────────
+        // INIT
+        // ───────────────────────────────────────────────────────────────
+
+        initProgram();
+
+        let foundIncomplete = false;
+        for (let i = programData.weeks.length - 1; i >= 0; i--) {
+            if (!programData.weeks[i].completed) {
+                currentWeekIdx = i;
+                foundIncomplete = true;
+                break;
+            }
+        }
+        if (!foundIncomplete && programData.weeks.length > 0) {
+            currentWeekIdx = programData.weeks.length - 1;
+        }
+        currentDayIdx = 0;
+
+        requestNotificationPermission();
+        render();
+        setupSyncTriggers();
+        syncNow();
+
+        // ───────────────────────────────────────────────────────────────
+        // SERVICE WORKER
+        // ───────────────────────────────────────────────────────────────
+
+        // legacy/ sits inside the new app's scope: register only its own worker (scope legacy/) and
+        // leave every other registration and cache alone, so opening the old app never harms the new one.
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js?v=5', { scope: './' })
+                .then(reg => {
+                    reg.addEventListener('updatefound', () => {
+                        const newWorker = reg.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker
+                                .controller) {
+                                if (confirm('Yeni güncelleme var! Şimdi yenilensin mi?')) {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
+                })
+                .catch(err => console.log('SW kaydı başarısız:', err));
+        }
+    </script>
+</body>
+</html>

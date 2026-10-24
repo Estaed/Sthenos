@@ -1,0 +1,156 @@
+/* Calisthenics shell styles: Tarik Base v6 (tokens.css, by name) with the round-6 layer (design/r6/screens.html),
+   shared by every screen. A feature's own classes carry its prefix and live in its own stylesheet (app/<feature>.css,
+   listed in app/registry.js). Font sizes are in rem (1rem = 16 px at text size 1.0), spacing in px.
+
+   Shared here: the round-6 colour tokens below, .screen, .appbar and .bar2 (the day screen's and an inner screen's
+   top bar), [data-slot] holders and .slot-end, .iconbtn, .btn (.primary, .secondary), .ghost, .card, .group, .eyebrow, .num,
+   .tag, .pill, .anchor (the inverted box with .top, .metric, .bar), .cell (a set: .todo, .now, .hit, .short with
+   --p = reps/target, .void), .snack (the snackbar), .banner, .note and the Lucide icon class .i. */
+@font-face { font-family: Manrope; src: url(../fonts/Manrope.woff2) format('woff2'); font-weight: 200 800; font-display: swap; }
+
+/* round-6 colour layer (design/r6/screens.html, design/deviations.md: orange means a done set) */
+:root, [data-theme="dark"] {
+  --card: #191919; --card-line: #262626; --divider: #2A2A2A; --tonal: #2E2E2E; --outline: #6B6B6B;
+  --hit-bg: #5A2208; --hit-ink: #FF8A4C;
+  --short-base: #191919; --short-line: #686868; --short-ink: #EEEEEE; --short-of: #ABABAB; --level: #FF5A00;
+  --todo-line: #686868; --todo-ink: #8C8C8C;
+  --now-ring: #EEEEEE; --now-ink: #EEEEEE;
+  --spark: #767676; --spark-now: #FF5A00;
+  --sheet: #1F1F1F; --sheet-line: #333333; --sheet-shadow: none;
+  --anchor-rule: #CFCFCF; --slab: #3D3D3D;
+  --toast: #2E2E2E; --toast-line: #6B6B6B;
+}
+[data-theme="light"] {
+  --card: #FFFFFF; --card-line: #E3E3E3; --divider: #EBEBEB; --tonal: #EBEBEB; --outline: #8A8A8A;
+  --hit-bg: #F8E1D7; --hit-ink: #A83400;
+  --short-base: #FFFFFF; --short-line: #8F8F8F; --short-ink: #121212; --short-of: #5B5B5B; --level: #D34303;
+  --todo-line: #8F8F8F; --todo-ink: #6C6C6C;
+  --now-ring: #121212; --now-ink: #121212;
+  --spark: #8C8C8C; --spark-now: #D34303;
+  --sheet: #FFFFFF; --sheet-line: #E3E3E3; --sheet-shadow: 0 -8px 24px #12121214;
+  --anchor-rule: #383838; --slab: #12121259;
+  --toast: #E8E8E8; --toast-line: #949494;
+}
+:root {
+  --font-num: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --num-stretch: 112%; --num-stretch-big: 118%;
+  --margin: 8px; --radius-card: 16px; --radius-cell: 12px;
+  --cell-w: 44px; --cell-h: 42px; --cell-gap: 3px;
+  --slab-x: 6px; --slab-y: 7px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overscroll-behavior-y: none; }
+html { font-size: 100%; background: var(--canvas); -webkit-text-size-adjust: none; text-size-adjust: none; scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
+body {
+  margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--canvas); color: var(--ink);
+  font: 500 1rem/1.5 var(--font-sans); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+}
+button, input, select { font: inherit; color: inherit; margin: 0; }
+button { cursor: pointer; border: 0; background: none; padding: 0; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.screen {
+  min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+}
+.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.num { font-family: var(--font-num); font-stretch: var(--num-stretch); font-weight: 700; font-variant-numeric: tabular-nums; }
+.note { margin: 16px; color: var(--ink-muted); font-size: 0.875rem; }
+.banner {
+  margin: 8px var(--margin); padding: 10px 14px; border-radius: var(--r-card); background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--danger); font-size: 0.875rem; font-weight: 600;
+}
+
+/* slot holders (Cali.slot): a data-fallback child shows only while no feature's node is in the holder. The app bar's
+   'topbar' holder is a flex row filling the bar between the session clock and Finish: a node starts at its left (the
+   timer pill); the first node that belongs on the right takes .slot-end (the timer and settings buttons). */
+[data-slot] { display: contents; }
+[data-slot] > [data-fallback]:not(:only-child) { display: none; }
+.appbar > [data-slot="topbar"] { display: flex; flex: 1 1 auto; min-width: 0; align-items: center; gap: 2px; }
+.slot-end { margin-left: auto; }
+
+/* top bars: the day screen's app bar, and an inner screen's bar with a back button and a title */
+.appbar { height: 44px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 6px 0 2px; }
+.appbar .week {
+  height: 44px; display: flex; align-items: center; padding: 0 0 0 12px; font-size: 1.25rem; font-weight: 700;
+  letter-spacing: -0.3px; white-space: nowrap;
+}
+.appbar .spacer { flex: 1; }
+.bar2 { height: 52px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 8px 0 2px; }
+.bar2 .iconbtn { color: var(--ink); }
+.bar2 h2 { margin: 0; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; }
+
+.iconbtn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 22px; color: var(--ink-muted); flex: none; }
+.btn {
+  min-height: 48px; border-radius: var(--r-button); display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; font-size: 1rem; font-weight: 700; padding: 0 16px;
+}
+.btn .i { width: 20px; height: 20px; }
+.btn.primary { background: var(--action); color: var(--on-action); }
+.btn.primary:active { background: var(--action-pressed); }
+.btn.secondary { background: var(--surface-2); color: var(--ink); box-shadow: inset 0 0 0 1px var(--card-line); }
+.ghost { height: 44px; padding: 0 4px; font-size: 0.8125rem; font-weight: 700; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+.ghost .i { width: 16px; height: 16px; }
+
+.card { background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius-card); }
+.group { background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius-card); }
+.eyebrow { font-size: 0.75rem; font-weight: 600; color: var(--ink-muted); line-height: 1rem; }
+.tag {
+  height: 18px; display: inline-flex; align-items: center; padding: 0 5px; border-radius: 6px; border: 1px solid var(--primary);
+  color: var(--primary-text); font-weight: 700; white-space: nowrap;
+}
+.pill {
+  height: 24px; padding: 0 9px; border-radius: 12px; border: 1px solid var(--outline); font-size: 0.75rem; font-weight: 600;
+  color: var(--ink-muted); display: inline-flex; align-items: center;
+}
+
+/* the anchor box: one inverted box per screen for the key number (the score bug, the timer, the summary) */
+.anchor {
+  background: var(--anchor); color: var(--on-anchor); border-radius: var(--r-anchor); overflow: hidden;
+  box-shadow: var(--slab-x) var(--slab-y) 0 var(--slab); margin-right: var(--slab-x);
+}
+.anchor .top {
+  display: flex; justify-content: space-between; align-items: baseline; padding: 12px 16px 0;
+  font-size: 0.8125rem; font-weight: 700; color: var(--on-anchor-muted);
+}
+.anchor .top b { color: var(--on-anchor); font-weight: 800; font-size: 0.9375rem; }
+.anchor .metric {
+  font-family: var(--font-num); font-stretch: var(--num-stretch-big); font-weight: 800; font-size: 4.5rem; line-height: 1;
+  letter-spacing: -0.03em; padding: 6px 16px 14px; color: var(--on-anchor-accent); font-variant-numeric: tabular-nums;
+}
+.anchor .bar { height: 5px; background: var(--anchor-rule); }
+.anchor .bar i { display: block; height: 100%; background: var(--on-anchor-accent); }
+
+/* a set cell: to do (target in grey), now (ink ring), hit (orange tint), short (an orange ring for reps/target) */
+.cell {
+  width: var(--cell-w); height: var(--cell-h); border-radius: var(--radius-cell); display: grid; place-items: center;
+  font-family: var(--font-num); font-stretch: var(--num-stretch); font-weight: 700; font-variant-numeric: tabular-nums;
+  font-size: 1.1875rem; position: relative; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+.cell small { font-family: var(--font-sans); font-size: 0.6875rem; font-weight: 700; margin-left: 1px; }
+.cell.todo { box-shadow: inset 0 0 0 1.5px var(--todo-line); color: var(--todo-ink); font-weight: 600; }
+.cell.now { box-shadow: inset 0 0 0 3px var(--now-ring); color: var(--now-ink); font-weight: 800; }
+.cell.hit { background: var(--hit-bg); color: var(--hit-ink); }
+.cell.short {
+  color: var(--short-ink); border: 3px solid transparent;
+  background: linear-gradient(var(--short-base), var(--short-base)) padding-box,
+    conic-gradient(var(--level) 0 var(--p), var(--short-line) var(--p) 100%) border-box;
+}
+.cell.short small { color: var(--short-of); font-stretch: 100%; }
+.cell.void { visibility: hidden; }
+
+/* snackbar (Undo), above whatever is docked at the bottom */
+.snack {
+  min-height: 48px; background: var(--toast); box-shadow: inset 0 0 0 1px var(--toast-line); border-radius: 10px;
+  display: flex; align-items: center; padding: 0 4px 0 14px; gap: 8px; font-size: 0.875rem; font-weight: 600; color: var(--ink);
+}
+.snack > span { flex: 1; min-width: 0; }
+.snack button { height: 44px; padding: 0 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .cell { transition: background-color var(--fast), box-shadow var(--fast), color var(--fast); }
+}

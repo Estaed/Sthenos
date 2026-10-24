@@ -1,7 +1,7 @@
 # Tasks
 
 ## Wave 1 (v1 for Monday 2026-10-26)
-- [ ] Task-00: Shell, data core, seams and gate; old app to `legacy/` (runs first)
+- [x] Task-00: Shell, data core, seams and gate; old app to `legacy/` (runs first)
 - [ ] Task-01: The workout day: tap logging, pair order, rest timer, start/finish, summary
 - [ ] Task-02: Independent timer and alerts (rest and timer end, screen off)
 - [ ] Task-03: Settings, GitHub sync (port), JSON backup

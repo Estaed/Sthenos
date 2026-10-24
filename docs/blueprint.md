@@ -52,11 +52,12 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 
 ## Data (schema v5, one JSON document)
 - **programs:** `{ id, name, days: [{ id, name, exercises: [{ id, name, kind: reps|time|check, sets,
-  repMin, repMax, target, load, loadStep, bodyweight?, pair?, note? }] }] }`; `activeProgram`,
+  repMin, repMax, target, load, loadStep, bodyweight?, pair?, note?, duration? }] }] }`; `activeProgram`,
   `nextProgram` (used from the next week built). Pairs are adjacent exercises with the same `pair`.
 - **weeks:** `{ n, program, startedAt, finishedAt?, days: { <dayId>: { startedAt?, finishedAt?,
-  exercises: { <exId>: { load, target, sets: [{ r, at, pain? }] } } } } }`. A week copies its
-  program's values when built, so editing a program never rewrites history.
+  exercises: { <exId>: { name, kind, repMin, repMax, loadStep, …, load, target, sets: [{ r, at, pain? }] } } } } }`.
+  A week copies its program's exercise (rules, load, target) when built, so editing a program never
+  rewrites history.
 - **body:** `[{ date, kg }]`. **settings:** rest (pair 90 s, between exercises 120 s), start rest
   after a log, heads-up 10 s, vibrate, sound, keep awake, default load step 2.5, theme.
 - `calisthenics-data.json` with `_version: 5` in the private repo; the v4 file moves to `archive/` untouched. The
@@ -72,7 +73,9 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   target → target + 1; past `repMax` → load + `loadStep` and target back to `repMin`; any short set →
   no change; short at the same load three weeks running → load −10 % rounded to `loadStep` (no change
   at 0 added load). A day not done carries over unchanged and does not count toward the stall.
-  Bodyweight lifts progress on the added load. The rules live in `app/progress.js` as `Cali.progress`.
+  Bodyweight lifts progress on the added load. A `time` row with every set at target → target + 5 s,
+  any short set → no change (Tarık 2026-10-24); `check` rows copy. The rules live in `app/progress.js`
+  as `Cali.progress`.
 - **Timers** are computed from start timestamps, never from counted ticks; the rest timer and the
   independent timer run at once.
 - **Sync:** a day's edits push at Done; Finish week, an edit to a finished day or to a program push at once;

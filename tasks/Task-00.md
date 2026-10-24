@@ -1,4 +1,5 @@
 # Task-00: Shell, data core and the thinnest path
+**Status: DONE** — verified 2026-10-24, eye check pending: 1
 > **Execution:** agent `ultracode`
 > *Why:* every wave-1 feature builds against the core, the routes, the events and the gate laid here.
 
@@ -20,24 +21,24 @@ Retires the plumbing risk (shell, storage, routes, service worker on a GitHub Pa
 gives the wave one green gate to build against.
 
 ## Acceptance
-- [ ] Old app moved with history (`git mv`) to `legacy/` (its `index.html`, `tests/`). Its block that
+- [x] Old app moved with history (`git mv`) to `legacy/` (its `index.html`, `tests/`). Its block that
   unregisters every service worker and deletes every cache on load (old `index.html` ~4068-4074) is
   removed, its own `sw.js` registration points inside `legacy/`, and a test opens `/legacy/` and then
   checks the new app still loads offline. Legacy refuses a document with `_version > 4` (it already does;
   a test proves it on a v5 fixture).
-- [ ] `app/core.js`: schema v5 with `_version: 5` (Blueprint → Data); defaults for every setting;
+- [x] `app/core.js`: schema v5 with `_version: 5` (Blueprint → Data); defaults for every setting;
   first open builds week 1 from `activeProgram`; storage key `cali.v5`; nothing writes `cali4_*` or
   `pantry.*`. Everything under Fixed exists and is documented in a header comment.
-- [ ] `app/default-program.js`: Tarık's current A/B/C program as the built-in default, generated once by
+- [x] `app/default-program.js`: Tarık's current A/B/C program as the built-in default, generated once by
   `tools/default_program.py` from the v4 file's plans (days, exercises, pairs, ranges, loads, steps,
   notes; kinds reps/time/check); no logs.
-- [ ] Logging rule in `Cali.log`'s caller helper `Cali.tap(dayId, exId, i)` / `Cali.hold(...)`: tap =
+- [x] Logging rule in `Cali.log`'s caller helper `Cali.tap(dayId, exId, i)` / `Cali.hold(...)`: tap =
   target, again = one less down to 0 then empty, hold = one more; `time` ±5 s; `check` toggles.
-- [ ] `app/registry.js` lists each feature's script and stylesheet (append-only); `index.html` loads
+- [x] `app/registry.js` lists each feature's script and stylesheet (append-only); `index.html` loads
   them; the top bar and the day header take slot items from features.
-- [ ] Service worker caches the shell with a versioned cache name and deletes only its own old caches
+- [x] Service worker caches the shell with a versioned cache name and deletes only its own old caches
   (`knowledge/concepts/pwa-service-worker-onbellek-guncelleme.md`); manifest `start_url` relative.
-- [ ] `tests/acceptance.py`: serves `D:/Projects`, opens `/Calisthenics-App/` at 360×740 with
+- [x] `tests/acceptance.py`: serves `D:/Projects`, opens `/Calisthenics-App/` at 360×740 with
   `hasTouch`, a mocked GitHub API, runs every `tests/test_*.py`, non-zero on any failure; tests drive
   `Cali.now()`, never real time, and write only to `.tmp/`. Here: no console errors; touch-tap Pull-up
   set 1 → 6 stored; reload → 6; tap again → 5; hold → 6; first open builds week 1.

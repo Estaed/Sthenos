@@ -20,7 +20,8 @@ Double progression is the point of the log; it must be right on his real numbers
 - [ ] `tests/test_progress.py` is written from Blueprint → Rules before the code, one case per rule: all
   sets at target → target + 1; past `repMax` → load + `loadStep`, target `repMin`; a short set → no change;
   three short weeks at one load → −10 % rounded to `loadStep`, none at 0 added load; a day not done →
-  unchanged and not counted toward the stall; bodyweight on added load; `time` and `check` rows copy.
+  unchanged and not counted toward the stall; bodyweight on added load; a `time` row all at target →
+  target + 5 s, short → no change; `check` rows copy (Tarık 2026-10-24: Plank +5 s, as on screen 6).
 - [ ] A week copies program values when built; editing the program afterwards changes no past week.
 - [ ] Finish week asks for confirmation, emits `weekFinished`, and can be undone until the next `log` event.
 - [ ] Tests check routes and stored state, not Task-01's DOM.

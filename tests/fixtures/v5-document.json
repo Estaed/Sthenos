@@ -1,0 +1,61 @@
+{
+  "_version": 5,
+  "updatedAt": "2026-10-26T00:00:00.000Z",
+  "programs": [
+    {
+      "id": "fixture",
+      "name": "Fixture",
+      "days": [
+        {
+          "id": "F",
+          "name": "F Fixture",
+          "exercises": [
+            { "id": "f1", "name": "Fixture Row", "kind": "reps", "sets": 2, "target": 8, "repMin": 6, "repMax": 10, "load": 20, "loadStep": 2.5, "pair": "p1" },
+            { "id": "f2", "name": "Fixture Dip", "kind": "reps", "sets": 2, "target": 6, "repMin": 4, "repMax": 8, "load": 0, "loadStep": 2.5, "bodyweight": true, "pair": "p1" },
+            { "id": "f3", "name": "Fixture Hold", "kind": "time", "sets": 1, "target": 30, "repMin": null, "repMax": null, "load": 0, "loadStep": 2.5, "bodyweight": true },
+            { "id": "f4", "name": "Fixture Walk", "kind": "check", "sets": 1, "target": 1, "repMin": null, "repMax": null, "load": 0, "loadStep": 0, "duration": 600 }
+          ]
+        }
+      ]
+    }
+  ],
+  "activeProgram": "fixture",
+  "nextProgram": "fixture",
+  "weeks": [
+    {
+      "n": 1,
+      "program": "fixture",
+      "startedAt": "2026-10-19T00:00:00.000Z",
+      "finishedAt": "2026-10-25T00:00:00.000Z",
+      "days": {
+        "F": {
+          "startedAt": "2026-10-19T09:00:00.000Z",
+          "finishedAt": "2026-10-19T09:40:00.000Z",
+          "exercises": {
+            "f1": { "load": 20, "target": 8, "sets": [{ "r": 8, "at": "2026-10-19T09:05:00.000Z" }, { "r": 7, "at": "2026-10-19T09:10:00.000Z" }] },
+            "f2": { "load": 0, "target": 6, "sets": [{ "r": 6, "at": "2026-10-19T09:07:00.000Z" }, { "r": 6, "at": "2026-10-19T09:12:00.000Z" }] },
+            "f3": { "load": 0, "target": 30, "sets": [{ "r": 30, "at": "2026-10-19T09:20:00.000Z" }] },
+            "f4": { "load": 0, "target": 1, "sets": [null] }
+          }
+        }
+      }
+    },
+    {
+      "n": 2,
+      "program": "fixture",
+      "startedAt": "2026-10-26T00:00:00.000Z",
+      "days": {
+        "F": {
+          "exercises": {
+            "f1": { "load": 20, "target": 8, "sets": [null, null] },
+            "f2": { "load": 0, "target": 7, "sets": [null, null] },
+            "f3": { "load": 0, "target": 30, "sets": [null] },
+            "f4": { "load": 0, "target": 1, "sets": [null] }
+          }
+        }
+      }
+    }
+  ],
+  "body": [],
+  "settings": { "restPair": 90, "restExercise": 120, "restAfterLog": true, "headsUp": 10, "vibrate": true, "sound": true, "keepAwake": true, "loadStep": 2.5, "theme": "system" }
+}
