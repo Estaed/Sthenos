@@ -31,3 +31,6 @@ below. None yet.
   arrow rising over it) and C07 Sets row (orange set cells, the last one partial), liking the orange detail ("turuncu
   detay güzel"). Read (hypothesis): the icon should show the app's own moment (a set logged, a rep over the bar) with
   orange as the result, not an object in plain ink. Round 2 (`design/icons-2.html`) derives 10 from those two.
+- 2026-10-24, app icon final: C16 Muscle-up ("C16 olsun son kararim"), over its own derivations (C21-C23, C28) and the
+  set-cell family (C07, C24-C27, C29, C30). Source `icon.svg`, rendered to the PNGs and favicons. Rejected the six
+  plain-noun names of round 1 (Chalk, Tally, Rings, Grip, Notch, Hang: "begenmedim").
