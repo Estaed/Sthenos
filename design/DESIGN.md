@@ -16,3 +16,9 @@ below. None yet.
 - 2026-10-24, round 3 (clickable proto-sheet / proto-dock / proto-notebook, deleted, in git): none sat right; the
   Day sheet came closest ("aralarında en çok hoşuma giden ama yeterli değil"). Round 4 (`design/r4/index.html`) holds
   the Day sheet's working core fixed and varies only the style, ten directions, static, to choose the look first.
+- 2026-10-24, round 4 picks: liked 05 Instrument's last-week column and its small 4-week trend line
+  ("last set ve ufak grafik hoşuma gitti"); asked for 06 Material native, maybe mixed with 04 Scoreboard, and said
+  something blocks liking any of them that he cannot name ("temelde mi acaba?"). Read across (hypothesis): all ten
+  share one foundation (pure grey ground, grey cells, Manrope, one orange) and differ only in layout, so the block is
+  likely in what they share. Round 5 (`design/r5/`) holds a 06+04 control fixed and changes one foundation axis per
+  screen (colour, type, imagery, ground, density) to find it.
