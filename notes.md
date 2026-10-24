@@ -28,8 +28,8 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 2. **Design:** a style from round 4 (`design/r4/index.html`, ten static directions on the Day
    sheet's working core); round 3's prototypes were deleted 2026-10-24 (Tarık: none sat right, Day
    sheet closest), git keeps them.
-3. **Data:** same private repo `Estaed/Calisthenics-Data`, schema v5 (per-set reps, workout
-   start/finish) migrated from v4 — recommended (git history stays one time series). Rejected: a new repo.
+3. **Data:** same private repo `Estaed/Calisthenics-Data`, a fresh schema v5 file (per-set reps, workout
+   start/finish, body weight); the v4 file moves to `archive/`, nothing is migrated (Tarık 2026-10-24).
 4. **Old app:** the new one takes the same URL (his home-screen icon keeps working), the old
    `index.html` moves to `legacy/` until v1 has run a week — recommended. Rejected: a second URL.
 - **Look:** round 1 of `design/yonler.html` kept P3 Focus (one exercise big, thumb buttons) and
@@ -63,8 +63,13 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
   `b47cf0c`); Pantry keeps its own policy (Tarık: "pantry kalsın aynen").
 - Deadline: gym reopens Monday 2026-10-26; the app should be ready for that day.
 - Look: round 6 (`design/r6/screens.html`) approved 2026-10-24 ("güzel bence"). One way to change a set's reps, not
-  two ("1 özellik 2 farklı şekilde yapılmasın"): the sheet's number strip; tapping a cell only selects that set.
+  two ("1 özellik 2 farklı şekilde yapılmasın"): tapping the cell, StrongLifts style (Tarık: "dokunarak yapalım"): tap =
+  target, tap again = one less, hold = one more; no number strip (`design/r6/screens.html` screens 7-8).
 - Body weight is logged here, not in Pantry (Tarık 2026-10-24); Pantry's notes left it an open idea.
+- v1 also has (Tarık 2026-10-24, from Eko's list): body weight with a 7-day average; a lasting note per exercise
+  and a pain flag on a set; a weekly summary to Discord by Hermes; Pantry's weekly calories beside body weight
+  (read only). After v1: swapping an exercise when the machine is busy.
+- Old data is not used ("eski verileri kullanmayacağız"): v1 starts empty, no v4 migration.
 
 ## Ideas
 - Set-by-set logging (P4) with a focus view for the current exercise (P3).

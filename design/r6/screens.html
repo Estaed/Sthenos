@@ -276,6 +276,13 @@ button:focus-visible { outline: 2px solid #FF5A00; outline-offset: 2px; }
 .lrow + .lrow { border-top: 1px solid var(--divider); }
 .lrow .n { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lrow .from { font-size: 12px; font-weight: 600; color: var(--ink-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.phone.tap { --row-h: 46px; --cell-w: 44px; --cell-h: 42px; --trend-w: 40px; }
+.phone.tap .row { column-gap: 4px; padding-left: 10px; }
+.phone.tap .cells { --cell-gap: 3px; }
+.phone.tap .row { grid-template-columns: minmax(0, 1fr) var(--trend-w) calc(3 * var(--cell-w) + 2 * 3px); }
+.taplegend { margin: calc(var(--slab-y) + 8px) 0 2px; text-align: center; font-size: 13px; color: var(--ink-muted, #9a9a9a); }
+.taplegend b { color: var(--ink, inherit); font-weight: 700; }
+.taplegend span { margin: 0 7px; opacity: .6; }
 .lrow .c { --cell-w: 40px; --cell-h: 34px; --fs-cell: 16px; }
 .reps { padding: 10px 14px 12px; font-size: 13px; font-weight: 600; color: var(--ink-muted); line-height: 18px; }
 .reps b { color: var(--ink); font-weight: 700; }
@@ -483,11 +490,12 @@ function sheet(o) {
       '</div>' +
       '<div class="bar" aria-hidden="true"><i style="width:' + o.restPct + '%"></i></div>' +
     '</div>' +
+    (o.tap ? '<p class="taplegend"><b>Tap</b> done<span>·</span><b>again</b> −1<span>·</span><b>hold</b> +1</p>' :
     '<div class="pick" role="group" aria-label="Reps done">' + picks.map(function (p) {
       return p === t
         ? '<button type="button" class="num log" aria-label="Log the target, ' + t + ' reps">' + ic('check') + t + '</button>'
         : '<button type="button" class="num" aria-label="Log ' + p + ' reps">' + p + '</button>';
-    }).join('') + '</div>' +
+    }).join('') + '</div>') +
   '</section>';
 }
 
@@ -498,6 +506,7 @@ function workout(o) {
 /* ---------- the six screens ---------- */
 var S1 = moment({ pullw: [6, 6, 6], dipw: [8, 8, 8], lp: [10], lr: [9] }, ['lp', 1]);
 var S2 = moment({ pullw: [6, 6, 6], dipw: [8, 8, 8], lp: [10, 10, 10], lr: [9, 12], row: [10, 10], sp: [10, 8], curl: [12, 12], calf: [12, 12] }, ['curl', 2]);
+var S3b = moment({ pullw: [6, 6, 6], dipw: [8, 8, 8], lp: [10, 9], lr: [9] }, ['lr', 1], ['lp', 1, true]);
 var S3 = moment({ pullw: [6, 6, 6], dipw: [8, 8, 8], lp: [10, 8], lr: [9] }, ['lr', 1], ['lp', 1, true]);
 
 function timerScreen() {
@@ -610,6 +619,10 @@ var SCREENS = [
     html: function () { return workout({ clock: '34:05', pill: '2:16', day: S2, ex: 'curl', set: 3, rest: '0:48', restPct: 53 }); } },
   { id: '03-tap-down', title: '3  Short set, StrongLifts style', note: 'Tap a cell: the target is logged. Tap it again: one rep less (10, 9, 8). The strip stays for big jumps.',
     html: function () { return workout({ clock: '25:58', day: S3, ex: 'lr', set: 2, rest: '1:24', restPct: 93, snack: 'Leg Press set 2: <span class="num">8</span> of 10. Tap again: <span class="num">7</span>' }); } },
+  { id: '07-tap', cls: 'tap', title: '7  Tap only (chosen)', note: 'No number strip: tapping the cells is the one way to log. Cells grow to 44×42 (46 px tap area) since they are the control now.',
+    html: function () { return workout({ tap: true, clock: '23:41', day: S1, ex: 'lp', set: 2, rest: '1:12', restPct: 80 }); } },
+  { id: '08-tap-down', cls: 'tap', title: '8  Tap only: a short set', note: 'Leg Press set 2 tapped twice: 10, then 9; tap again for 8. Hold a cell to go above the target.',
+    html: function () { return workout({ tap: true, clock: '25:58', day: S3b, ex: 'lr', set: 2, rest: '1:24', restPct: 93, snack: 'Leg Press set 2: <span class="num">9</span> of 10. Tap again: <span class="num">8</span>' }); } },
   { id: '04-timer', title: '4  Timer', note: 'Countdown running from the 4 min preset; the stopwatch is paused with two laps. Separate from the rest timer.',
     html: timerScreen },
   { id: '05-settings', title: '5  Settings', note: 'Added for the gym: rest between exercises, a heads-up 10 s before the end, a test alert.',
@@ -619,7 +632,7 @@ var SCREENS = [
 ];
 
 function phone(s, theme, inert) {
-  return '<div class="phone" data-theme="' + theme + '"' + (inert ? ' inert' : '') + ' role="img"aria-label="' + s.title.replace(/^\d\s+/, '') + ', ' + theme + ' mode">' + s.html() + '</div>';
+  return '<div class="phone' + (s.cls ? ' ' + s.cls : '') + '" data-theme="' + theme + '"' + (inert ? ' inert' : '') + ' role="img"aria-label="' + s.title.replace(/^\d\s+/, '') + ', ' + theme + ' mode">' + s.html() + '</div>';
 }
 
 var q = new URLSearchParams(location.search);
