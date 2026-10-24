@@ -39,7 +39,7 @@ def off_blueprint(doc):
 
 
 PULL, DIP, LP, ROW, CALF, PLANK, STRETCH = (ex_id(DAYS[0], n) for n in (
-    "Weighted Pull-up", "Weighted Dip", "Leg Press", "Machine Row", "Standing Calf Raise", "Plank", "Esneme"))
+    "Weighted Pull-up", "Weighted Dip", "Leg Press", "Machine Row", "Standing Calf Raise", "Plank", "Stretch"))
 B_PULL = ex_id(DAYS[1], "Pull-up")
 
 LOG = """([dayId, rows]) => { for (const [exId, sets] of Object.entries(rows)) sets.forEach((r, i) => Cali.log(dayId, exId, i, r)); }"""

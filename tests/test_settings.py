@@ -55,8 +55,9 @@ def main():
         tap(page, gear)
         page.wait_for_selector('[data-screen="settings"] .settings-body')
         text = page.locator('[data-screen="settings"]').inner_text()
-        want = ["Settings", "Rest and alerts", "Test alert", "Pair rest", "1:30", "Rest between exercises", "2:00",
-                "Start rest after a log", "Heads-up 10 s before the end", "Vibrate", "Sound", "Notifications", "Workout",
+        want = ["Settings", "How to use", "Rest and alerts", "Test alert", "Pair rest", "1:30", "Rest between sets", "2:00",
+                "Alternate paired exercises", "Start rest after a log", "Heads-up 10 s before the end", "Vibration", "Short",
+                "Long", "Pulse", "Sound", "Beep", "Bell", "Chirp", "Volume", "Notifications", "Workout",
                 "Keep screen awake", "Load step", "Theme", "System", "Light", "Dark", "Data", "GitHub sync",
                 "Estaed/Calisthenics-Data", "Download backup", "Restore from backup"]
         A.check("screen 5 shows every setting with its default", all(w in text for w in want), [w for w in want if w not in text])
@@ -72,7 +73,7 @@ def main():
         A.check("a rest started after the change reads 60 s (the rest timer's source)",
                 page.evaluate("() => { const t = Cali.timers.start('probe', { duration: Cali.settings.get('restPair') * 1000 }); Cali.timers.stop('probe'); return t.remaining; }") == 60000)
         tap(page, '[data-key="restExercise"][data-step="15"]')
-        A.check("Rest between exercises plus: 2:00 -> 2:15", setting(page, "restExercise") == [135, 135]
+        A.check("Rest between sets plus: 2:00 -> 2:15", setting(page, "restExercise") == [135, 135]
                 and page.locator('[data-show="restExercise"]').inner_text() == "2:15", setting(page, "restExercise"))
         for _ in range(3):
             ctx.clock.run_for(1000)
@@ -81,7 +82,7 @@ def main():
                 and page.locator(minus).is_disabled(), setting(page, "restPair"))
 
         # ── toggles and choices ──
-        for key, after in (("restAfterLog", False), ("headsUp", 0), ("vibrate", False), ("sound", False), ("keepAwake", False)):
+        for key, after in (("restAfterLog", False), ("headsUp", 0), ("keepAwake", False)):
             sel = f'[role="switch"][data-key="{key}"]'
             tap(page, sel)
             ok = setting(page, key) == [after, after] and page.locator(sel).get_attribute("aria-checked") == "false"

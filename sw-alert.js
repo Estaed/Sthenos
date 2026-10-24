@@ -26,7 +26,7 @@
       const id = `${m.tag}\n${m.kind}\n${m.endAt}`;
       const shown = await self.registration.getNotifications({ tag: m.tag });
       if (shown.some(n => n.data && n.data.id === id)) return;
-      await self.registration.showNotification(String(m.title || 'Calisthenics'), {
+      await self.registration.showNotification(String(m.title || 'Sthenos'), {
         tag: m.tag, renotify: true, requireInteraction: true, icon: 'icon-192.png', timestamp: m.endAt,
         data: { app: 'cali-alert', id, kind: m.kind, endAt: m.endAt, by },
       });

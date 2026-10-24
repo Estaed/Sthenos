@@ -2,7 +2,7 @@
   "id": "./index.html",
   "name": "Sthenos",
   "short_name": "Sthenos",
-  "description": "Tarık's workout log: the day's program on one screen, a set logged by a tap.",
+  "description": "A workout log: the day's program on one screen, a set logged by a tap.",
   "lang": "en",
   "start_url": "./index.html",
   "scope": "./",

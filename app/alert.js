@@ -3,10 +3,13 @@
    Riskiest assumption): the screen kept awake with an in-page beep, vibration and visual change is the main path; a
    service-worker notification at the end time is the fallback.
 
-   Cali.alert(kind)       'rest', 'headsup', 'timer' or 'test': a beep (Web Audio; the audio context is made on the first
-                          tap, since a phone plays nothing before one) when settings.sound is on, a vibration
-                          (navigator.vibrate, only after a tap) when settings.vibrate is on, and the visual change: the
-                          whole screen flashes inverted with the alert's words (role="alert"); it never catches a tap.
+   Cali.alert(kind)       'rest', 'headsup', 'timer' or 'test': a sound (Web Audio; the audio context is made on the first
+                          tap, since a phone plays nothing before one) when settings.sound is on, in settings.tone
+                          ('beep' square, 'bell' a struck sine, 'chirp' a rising sweep) at settings.volume (1-3, a share
+                          of the phone's media volume), a vibration (navigator.vibrate, only after a tap) when
+                          settings.vibrate is on, in settings.buzz ('short', 'long', 'pulse'; a page sets the length and
+                          rhythm, never the strength), and the visual change: the whole screen flashes inverted with the
+                          alert's words (role="alert"); it never catches a tap.
    Cali.alert.schedule(kind, endAt, tag)
                           Two triggers for one end:
                           1. the page posts { type: 'cali-alert', op: 'schedule', kind, endAt, tag, title } to the
@@ -33,14 +36,17 @@
   const LATE_MS = 60000;
   const GAP_MS = 110;
   const REST = [[1046, 180], [1046, 180], [1046, 360]];
-  const REST_BUZZ = [300, 120, 300, 120, 500];
+  const pulses = (n, end) => [...Array(n).fill([120, 80]).flat(), end];
+  const REST_BUZZ = { short: [300, 120, 300, 120, 500], long: [1000, 250, 1000, 250, 1500], pulse: pulses(8, 600) };
   const KINDS = {
     rest: { title: () => 'Rest over', tones: REST, buzz: REST_BUZZ, flashes: 2 },
-    headsup: { title: () => `Rest ends in ${Cali.settings.get('headsUp')} s`, tones: [[784, 140]], buzz: [150], flashes: 1 },
+    headsup: { title: () => `Rest ends in ${Cali.settings.get('headsUp')} s`, tones: [[784, 140]],
+      buzz: { short: [150], long: [500], pulse: [100, 80, 100] }, flashes: 1 },
     timer: { title: () => 'Countdown done', tones: [[1175, 220], [1175, 220], [1175, 220], [1568, 420]],
-      buzz: [500, 150, 500, 150, 500], flashes: 2 },
+      buzz: { short: [500, 150, 500, 150, 500], long: [1200, 250, 1200, 250, 1200], pulse: pulses(10, 800) }, flashes: 2 },
     test: { title: () => 'Test alert', tones: REST, buzz: REST_BUZZ, flashes: 2 },
   };
+  const VOLUME = { 1: 0.07, 2: 0.2, 3: 0.45 };   // square-wave gain; the sine tones get more, as they sound softer
 
   const style = document.createElement('style');
   style.textContent = `
@@ -70,20 +76,39 @@
   function beep(tones) {
     if (!audio || audio.state === 'closed') return;
     if (audio.state !== 'running') audio.resume().catch(() => {});
+    const tone = Cali.settings.get('tone');
+    const peak = VOLUME[Cali.settings.get('volume')] * (tone === 'beep' ? 1 : 2);
     let t = audio.currentTime + 0.03;
     for (const [hz, ms] of tones) {
       const end = t + ms / 1000;
       const osc = audio.createOscillator();
       const gain = audio.createGain();
-      osc.type = 'square';
-      osc.frequency.value = hz;
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.2, t + 0.01);
-      gain.gain.setValueAtTime(0.2, end - 0.02);
-      gain.gain.linearRampToValueAtTime(0, end);
+      const g = gain.gain;
+      if (tone === 'bell') {          // struck: a fast attack, then it rings away past the note
+        osc.type = 'sine';
+        osc.frequency.value = hz;
+        g.setValueAtTime(0, t);
+        g.linearRampToValueAtTime(peak, t + 0.005);
+        g.exponentialRampToValueAtTime(0.001, end + 0.25);
+      } else if (tone === 'chirp') {  // a rising sweep across the note
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(hz * 0.7, t);
+        osc.frequency.exponentialRampToValueAtTime(hz * 1.3, end);
+        g.setValueAtTime(0, t);
+        g.linearRampToValueAtTime(peak, t + 0.02);
+        g.setValueAtTime(peak, end - 0.03);
+        g.linearRampToValueAtTime(0, end);
+      } else {
+        osc.type = 'square';
+        osc.frequency.value = hz;
+        g.setValueAtTime(0, t);
+        g.linearRampToValueAtTime(peak, t + 0.01);
+        g.setValueAtTime(peak, end - 0.02);
+        g.linearRampToValueAtTime(0, end);
+      }
       osc.connect(gain).connect(audio.destination);
       osc.start(t);
-      osc.stop(end + 0.01);
+      osc.stop((tone === 'bell' ? end + 0.25 : end) + 0.01);
       t = end + GAP_MS / 1000;
     }
   }
@@ -109,7 +134,7 @@
   function alert(kind) {
     const k = KINDS[kind];
     if (Cali.settings.get('sound')) beep(k.tones);
-    if (Cali.settings.get('vibrate') && canBuzz()) navigator.vibrate(k.buzz);
+    if (Cali.settings.get('vibrate') && canBuzz()) navigator.vibrate(k.buzz[Cali.settings.get('buzz')]);
     flash(kind);
   }
 

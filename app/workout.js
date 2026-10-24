@@ -15,8 +15,10 @@
    check row) as the countdown 'rest' in Cali.timers, scheduled at once with Cali.alert.schedule('rest', endAt, 'rest')
    and 'headsup' (tag 'rest-headsup') headsUp seconds before; an edit of a logged set keeps the rest running; tapping
    the set the rest belongs to down to 0 or clearing it stops it, and a hold back up from 0 starts a new one (a set at
-   0 counts as not done). The first log of a day that was never started starts it; clearing (or undoing) the last
-   logged set of a running day takes it back to not started, which is how a day is reset (Tarık 2026-10-24). A rest lives only
+   0 counts as not done everywhere: it can be the set in hand again). Each exercise runs through its sets before the
+   next (Cali.setOrder), so every rest is restExercise unless settings.alternatePairs is on. The first log of a day
+   that was never started starts it; clearing, undoing or tapping down to 0 the last done set of a running day takes it
+   back to not started, which is how a day is reset (Tarık 2026-10-24). A rest lives only
    while its day runs in the current week: Finish (or the summary's Done, a new week) stops it and cancels its alerts,
    and the score bug shows a rest only on its own day; any other day shows the rest its next log will start.
 
@@ -45,6 +47,7 @@
   const running = day => Boolean(day && day.startedAt && !day.finishedAt);
   const unit = ex => (ex.kind === 'time' ? 's' : '');
   const minutes = s => (s % 60 ? hms(s) : `${s / 60} min`);
+  const did = v => Boolean(v && v.r > 0);   // a set at 0 is not done: it holds no rest and does not keep a day started
 
   let screen = null;   // the day screen shown: { root, args, a, key, list, now, cache, ticker }
 
@@ -64,24 +67,24 @@
     return cards;
   }
 
-  // the set in hand: the first empty set after the one logged last (pair order), else the first empty one
+  // the set in hand: the first set not done after the one done last (Cali.setOrder), else the first not done
   function currentSet(n, dayId) {
     const day = dayOf(n, dayId);
     if (!day) return null;
     const order = Cali.setOrder(dayId, n);
-    const at = s => { const v = day.exercises[s.exId].sets[s.i]; return v ? v.at : null; };
+    const at = s => { const v = day.exercises[s.exId].sets[s.i]; return v && v.r > 0 ? v.at : null; };   // a set at 0 is not done
     let last = -1, lastAt = '';
     order.forEach((s, k) => { const t = at(s); if (t !== null && t >= lastAt) { lastAt = t; last = k; } });
     for (let k = last + 1; k < order.length; k++) if (at(order[k]) === null) return order[k];
     return order.find(s => at(s) === null) || null;
   }
 
-  // which rest follows set i of exId: 'pair' inside a pair, 'exercise' after the pair's last set or a single exercise
+  // which rest follows set i of exId: with alternatePairs on, 'pair' inside a pair; else 'exercise'
   function restKind(n, dayId, exId, i) {
     const list = Cali.dayExercises(n, dayId);
     const k = list.findIndex(e => e.id === exId);
     const ex = list[k];
-    if (!ex || !ex.pair) return 'exercise';
+    if (!ex || !ex.pair || !Cali.settings.get('alternatePairs')) return 'exercise';
     let from = k, to = k;
     while (from > 0 && list[from - 1].pair === ex.pair) from--;
     while (to < list.length - 1 && list[to + 1].pair === ex.pair) to++;
@@ -99,7 +102,7 @@
     const now = s.now;
     const ex = now && s.list.find(e => e.id === now.exId);
     if (!ex || ex.kind === 'check' || (day && day.finishedAt) || !Cali.settings.get('restAfterLog')) return null;
-    if (!s.list.some(e => e.sets.some((x, i) => x === null && !(e.id === now.exId && i === now.i)))) return null;
+    if (!s.list.some(e => e.sets.some((x, i) => !did(x) && !(e.id === now.exId && i === now.i)))) return null;
     const kind = restKind(s.a.week, s.a.dayId, now.exId, now.i);
     return restSeconds(kind) > 0 ? kind : null;
   }
@@ -142,13 +145,14 @@
     undoing = true;
     try { Cali.log(u.l.dayId, u.l.exId, u.l.i, u.l.prev); } finally { undoing = false; }
     if (u.rest && restOf(u.l)) stopRest();
-    if (u.l.prev === null) unstartIfEmpty(u.l.week, u.l.dayId);
+    if (!did(u.l.prev)) unstartIfEmpty(u.l.week, u.l.dayId);
   }
 
-  // a running day whose last logged set was cleared goes back to not started (its clock and rest stop with it)
+  // a running day whose last done set was cleared or tapped down to 0 goes back to not started (its clock and rest
+  // stop with it); sets left at 0 stay as they are, a tap clears them
   function unstartIfEmpty(week, dayId) {
     const day = dayOf(week, dayId);
-    if (!running(day) || Object.values(day.exercises || {}).some(e => e.sets.some(x => x !== null))) return;
+    if (!running(day) || Object.values(day.exercises || {}).some(e => e.sets.some(did))) return;
     setDay(week, dayId, 'unstart', d => { delete d.startedAt; });
   }
 
@@ -156,9 +160,8 @@
     const cur = Cali.week();
     if (undoing || !cur || l.week !== cur.n) return;
     let day = cur.days[l.dayId];
-    if (l.value !== null && day && !day.startedAt) { startDay(l.week, l.dayId); day = dayOf(l.week, l.dayId); }
+    if (did(l.value) && day && !day.startedAt) { startDay(l.week, l.dayId); day = dayOf(l.week, l.dayId); }
     const ex = Cali.weekExercise(l.week, l.dayId, l.exId);
-    const did = v => Boolean(v && v.r > 0);   // a set at 0 is not done: it holds no rest
     let rest = false;
     if (!did(l.prev) && did(l.value)) {
       stopRest();
@@ -166,7 +169,7 @@
         rest = startRest(l.week, l.dayId, l.exId, l.i);
       }
     } else if (!did(l.value) && restOf(l)) stopRest();
-    if (l.value === null) unstartIfEmpty(l.week, l.dayId);
+    if (!did(l.value)) unstartIfEmpty(l.week, l.dayId);
     clearTimeout(undoTimer);
     undo = { l, until: Cali.now() + UNDO_MS, rest };
     undoTimer = setTimeout(hideUndo, UNDO_MS);
@@ -304,10 +307,13 @@
     const tag = a.readOnly ? 'span' : 'button';
     const cells = ex.sets.map((_, i) => `<${tag} ${setAttrs(a, ex, i)} class="cell num"><span></span></${tag}>`);
     while (cells.length % 3) cells.push('<span class="cell void" aria-hidden="true"></span>');
+    const head = a.readOnly ? '<div class="workout-ex">'
+      : `<button type="button" class="workout-ex" data-edit="${esc(ex.id)}" aria-expanded="false" aria-controls="workout-ed-${esc(ex.id)}">`;
     return `<div class="workout-row" data-ex="${esc(ex.id)}">` +
-      `<div class="workout-ex"><div class="workout-name">${esc(ex.name)}</div><div class="workout-meta"></div></div>` +
+      `${head}<div class="workout-name">${esc(ex.name)}</div><div class="workout-meta"></div>${a.readOnly ? '</div>' : '</button>'}` +
       '<div class="workout-trend"><span class="workout-spark-box"></span><span class="workout-last"></span></div>' +
-      `<div class="workout-cells">${cells.join('')}</div></div>`;
+      `<div class="workout-cells">${cells.join('')}</div></div>` +
+      (a.readOnly ? '' : `<div class="workout-ed" id="workout-ed-${esc(ex.id)}" data-ed="${esc(ex.id)}" hidden></div>`);
   }
   function tileHtml(a, ex) {
     const tag = a.readOnly ? 'span' : 'button';
@@ -349,7 +355,6 @@
             '</div>' +
             '<div class="bar" aria-hidden="true"><i style="width:0%"></i></div>' +
           '</div>' +
-          '<p class="workout-legend"><b>Tap</b> done<span>·</span><b>again</b> −1<span>·</span><b>hold</b> +1</p>' +
         '</section>');
     s.cache = new Map();
   }
@@ -406,6 +411,7 @@
         put(s, el && el.firstElementChild, 'html', v.html);
       });
     }
+    patchEditor(s);
     patchSession(s);
     patchBug(s);
     patchSnack(s);
@@ -480,7 +486,8 @@
     put(s, at(box, '.workout-snack-text'), 'html', snackHtml(undo.l));
     const l = undo.l, sheet = box.parentElement, home = sheet.getBoundingClientRect().top + sheet.clientTop - 8, h = box.offsetHeight;
     const keep = [s.now, l.week === s.a.week && l.dayId === s.a.dayId ? l : null]
-      .map(c => c && at(s.root, `[data-cell="${CSS.escape(c.exId)}:${c.i}"]`)).filter(Boolean)
+      .map(c => c && at(s.root, `[data-cell="${CSS.escape(c.exId)}:${c.i}"]`))
+      .concat(at(s.root, '.workout-ed:not([hidden]) [data-act="ed-done"]')).filter(Boolean)   // and an open editor's Done
       .map(el => el.getBoundingClientRect()).sort((p, q) => q.top - p.top);
     let bottom = home;
     for (const r of keep) if (r.bottom > bottom - h && r.top < bottom) bottom = r.top - 8;
@@ -524,6 +531,112 @@
     put(s, at(rest, '[data-big="rest"]'), 'text', big);
     put(s, rest, 'aria-label', on ? `${lab}, ${big} left ${of}` : kind ? `${lab} after this set: ${big}` : 'No rest after this set');
     put(s, at(root, '.workout-bug .bar i'), 'width', `${width}%`);
+  }
+
+  // ── the exercise editor, inside its card ──────────────────────────
+  // A tap on an exercise's name opens its editor under the row (one at a time; it stays open across a redraw): load,
+  // target, sets, the rep range, the load step and the name. A change is written to this week's copy and to the
+  // program (the week's and the next one), so it holds for the weeks after; earlier weeks keep their own copy. Sets
+  // never drop below the last logged one, so no logged set is lost.
+  const LOAD_STEPS = [1, 1.25, 2.5, 5];
+  let editing = null;   // { week, dayId, exId } of the open editor
+  const r2 = v => Math.round(v * 100) / 100;
+  const loadStepOf = ex => (ex.loadStep > 0 ? ex.loadStep : Cali.settings.get('loadStep'));
+
+  // each stepper: its label, the value shown, the step, and its bounds for this exercise
+  function fields(ex) {
+    const time = ex.kind === 'time';
+    const lastLogged = ex.sets.reduce((k, x, i) => (x !== null ? i + 1 : k), 0);
+    const out = [
+      { k: 'load', label: ex.bodyweight ? 'Added load' : 'Load', show: `${r2(ex.load)} kg`, step: loadStepOf(ex), min: 0, max: 500 },
+      { k: 'target', label: time ? 'Target hold' : 'Target reps', show: time ? `${ex.target} s` : String(ex.target), step: time ? 5 : 1, min: time ? 5 : 1, max: time ? 600 : 100 },
+      { k: 'sets', label: 'Sets', show: String(ex.sets.length), step: 1, min: Math.max(1, lastLogged), max: 10 },
+    ];
+    if (ex.kind === 'reps') {
+      out.push({ k: 'repMin', label: 'Range low', show: String(ex.repMin), step: 1, min: 1, max: ex.repMax });
+      out.push({ k: 'repMax', label: 'Range high', show: String(ex.repMax), step: 1, min: ex.repMin, max: 100 });
+    }
+    return out;
+  }
+  const valueOf = (ex, k) => (k === 'sets' ? ex.sets.length : ex[k]);
+
+  function editorHtml(ex) {
+    const steps = LOAD_STEPS.includes(ex.loadStep) || !(ex.loadStep > 0) ? LOAD_STEPS : [...LOAD_STEPS, ex.loadStep].sort((p, q) => p - q);
+    return '<div class="workout-ed-grid">' + fields(ex).map(f =>
+      `<div class="workout-ed-f" role="group" aria-labelledby="workout-ed-l-${esc(ex.id)}-${f.k}">` +
+        `<span class="workout-ed-l" id="workout-ed-l-${esc(ex.id)}-${f.k}">${f.label}</span><div class="workout-ed-step">` +
+        `<button type="button" data-ed-k="${f.k}" data-ed-d="-1" aria-label="${f.label} down"><span>−</span></button>` +
+        `<span class="num" data-ed-v="${f.k}" aria-live="polite"></span>` +
+        `<button type="button" data-ed-k="${f.k}" data-ed-d="1" aria-label="${f.label} up"><span>+</span></button></div></div>`).join('') +
+      '</div>' +
+      '<div class="workout-ed-f workout-ed-wide"><span class="workout-ed-l">Load step, kg</span>' +
+        `<div class="workout-ed-seg" role="group" aria-label="Load step in kg">${steps.map(v =>
+          `<button type="button" data-ed-step="${v}" aria-pressed="false">${v}</button>`).join('')}</div></div>` +
+      `<label class="workout-ed-f workout-ed-wide"><span class="workout-ed-l">Name</span>` +
+        `<input type="text" class="workout-ed-name" maxlength="80" autocomplete="off" value="${esc(ex.name)}"></label>` +
+      '<div class="workout-ed-foot"><span>This week and the weeks after</span>' +
+        '<button type="button" class="btn secondary" data-act="ed-done">Done</button></div>';
+  }
+
+  function patchEditor(s) {
+    const { a, root } = s;
+    for (const box of root.querySelectorAll('[data-ed]')) {
+      const id = box.dataset.ed;
+      const open = Boolean(editing && editing.week === a.week && editing.dayId === a.dayId && editing.exId === id);
+      const btn = at(root, `[data-edit="${CSS.escape(id)}"]`);
+      put(s, btn, 'aria-expanded', String(open));
+      put(s, box, 'hidden', !open);
+      if (!open) { if (box.firstChild) { box.innerHTML = ''; s.cache.delete(box); } continue; }
+      const ex = s.list.find(e => e.id === id);
+      if (!ex) continue;
+      if (!box.firstChild) box.innerHTML = editorHtml(ex);
+      for (const f of fields(ex)) {
+        put(s, at(box, `[data-ed-v="${f.k}"]`), 'text', f.show);
+        const v = valueOf(ex, f.k);
+        put(s, at(box, `[data-ed-k="${f.k}"][data-ed-d="-1"]`), 'disabled', v - f.step < f.min - 1e-9 ? '' : null);
+        put(s, at(box, `[data-ed-k="${f.k}"][data-ed-d="1"]`), 'disabled', v + f.step > f.max + 1e-9 ? '' : null);
+      }
+      for (const b of box.querySelectorAll('[data-ed-step]')) put(s, b, 'aria-pressed', String(Number(b.dataset.edStep) === ex.loadStep));
+      const name = at(box, '.workout-ed-name');
+      if (name && document.activeElement !== name && name.value !== ex.name) name.value = ex.name;
+    }
+  }
+
+  function editExercise(a, exId, key, value) {
+    try {
+      Cali.change(d => {
+        const w = d.weeks.find(x => x.n === a.week);
+        const ex = w.days[a.dayId].exercises[exId];
+        if (key === 'sets') {
+          while (ex.sets.length < value) ex.sets.push(null);
+          while (ex.sets.length > value && ex.sets[ex.sets.length - 1] === null) ex.sets.pop();
+        } else ex[key] = value;
+        for (const p of d.programs) {
+          if (p.id !== w.program && p.id !== d.nextProgram) continue;
+          const day = p.days.find(x => x.id === a.dayId);
+          const pe = day && day.exercises.find(e => e.id === exId);
+          if (pe) pe[key] = key === 'sets' ? ex.sets.length : value;
+        }
+      }, { why: 'editExercise', detail: { week: a.week, dayId: a.dayId, exId, key, value } });
+    } catch (e) { console.warn('Cali: the exercise was not changed', e); }
+  }
+
+  function stepField(a, exId, k, dir) {
+    const ex = Cali.weekExercise(a.week, a.dayId, exId);
+    const f = ex && fields(ex).find(x => x.k === k);
+    if (!f) return;
+    const v = r2(valueOf(ex, k) + dir * f.step);
+    if (v < f.min - 1e-9 || v > f.max + 1e-9) return;
+    editExercise(a, exId, k, k === 'load' ? Math.max(0, v) : v);
+  }
+
+  function toggleEditor(a, exId) {
+    const open = editing && editing.week === a.week && editing.dayId === a.dayId && editing.exId === exId;
+    editing = open ? null : { week: a.week, dayId: a.dayId, exId };
+    if (!screen) return;
+    patch(screen);
+    const box = editing && at(screen.root, `[data-ed="${CSS.escape(exId)}"]`);
+    if (box && box.scrollIntoView) box.scrollIntoView({ block: 'nearest' });
   }
 
   // ── gestures ──────────────────────────────────────────────────────
@@ -579,10 +692,29 @@
         Cali.go('day', { week: a.week, dayId: day.dataset.day, ...(a.readOnly ? { readOnly: true } : {}) }, { replace: true });
         return;
       }
+      if (!screen) return;
+      const a = screen.a;
+      const ed = e.target.closest('[data-edit]');
+      if (ed) { toggleEditor(a, ed.dataset.edit); return; }
+      const box = e.target.closest('[data-ed]');
+      const stepBtn = e.target.closest('[data-ed-k]');
+      if (box && stepBtn) { if (!stepBtn.disabled) stepField(a, box.dataset.ed, stepBtn.dataset.edK, Number(stepBtn.dataset.edD)); return; }
+      const loadStep = e.target.closest('[data-ed-step]');
+      if (box && loadStep) { editExercise(a, box.dataset.ed, 'loadStep', Number(loadStep.dataset.edStep)); return; }
       const btn = e.target.closest('[data-act]');
       if (btn && btn.dataset.act === 'undo') doUndo();
-      else if (btn && btn.dataset.act === 'session') session(screen.a);
+      else if (btn && btn.dataset.act === 'session') session(a);
+      else if (btn && btn.dataset.act === 'ed-done') { const n = root.querySelector('.workout-ed-name'); if (n) n.blur(); toggleEditor(a, box.dataset.ed); }
     });
+    root.addEventListener('change', e => {   // the name, saved when it is left or Enter is pressed
+      const input = e.target.closest('.workout-ed-name');
+      const box = input && input.closest('[data-ed]');
+      if (!box || !screen) return;
+      const name = input.value.trim();
+      if (name && name !== Cali.weekExercise(screen.a.week, screen.a.dayId, box.dataset.ed).name) editExercise(screen.a, box.dataset.ed, 'name', name);
+      else input.value = Cali.weekExercise(screen.a.week, screen.a.dayId, box.dataset.ed).name;
+    });
+    root.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('workout-ed-name')) e.target.blur(); });
   }
 
   function session(a) {

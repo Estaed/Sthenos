@@ -38,6 +38,21 @@ PAIRS = {
 }
 
 
+# English names for the app (Tarık 2026-10-24: the whole app in English); the v4 file and PAIRS keep the Turkish ones.
+ENGLISH = {
+    "A Ağır": "A Heavy",
+    "B Hacim": "B Volume",
+    "C Bacak": "C Legs",
+    "Bilek ısınması 1 dk (daire + dört ayakta ağrısız sallanma)": "Wrist warm-up 1 min (circles + pain-free rocking on all fours)",
+    "Captain's Chair Knee Raise (diz bükük)": "Captain's Chair Knee Raise (knees bent)",
+    "Esneme 4 dk: sinir kayması 10/bacak + hamstring havlu 1 dk/bacak (diz arkası yanmadan, ayak serbest)": "Stretch 4 min: nerve glide 10/leg + towel hamstring 1 min/leg (no burn behind the knee, foot free)",
+    "Eğimli Yürüyüş 22 dk (5,0 km/h · %6, her hafta +%2 → %12)": "Incline Walk 22 min (5.0 km/h · 6%, +2% a week → 12%)",
+    "Glute Kickback (makine/kablo)": "Glute Kickback (machine/cable)",
+    "Leg Press (ayak yüksek)": "Leg Press (feet high)",
+    "Pike Push-up (dambıl/paralet üstünde, bilek düz)": "Pike Push-up (on dumbbells/parallettes, wrists straight)",
+}
+
+
 def load_of(weight):
     """'BW' -> (0, True); 'BW + 5 kg' or '+5 kg' -> (5, True); '110 kg' -> (110, False)."""
     w = str(weight or "").strip().replace(",", ".")
@@ -107,6 +122,10 @@ def build(v4):
         if src["name"] not in PAIRS:
             raise ValueError(f"no pairs listed for day {src['name']}")
         days.append({"id": day_id, "name": src["name"], "exercises": exercises})
+    for d in days:
+        d["name"] = ENGLISH.get(d["name"], d["name"])
+        for e in d["exercises"]:
+            e["name"] = ENGLISH.get(e["name"], e["name"])
     return {"id": PROGRAM_ID, "name": PROGRAM_NAME, "days": days}
 
 

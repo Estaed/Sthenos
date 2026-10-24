@@ -33,7 +33,7 @@ def main():
         ctx.clock.pause_at(A.NOW + datetime.timedelta(seconds=30))
         ev = page.evaluate
         ids = ev("""() => { const d = Cali.program().days[0]; const by = n => d.exercises.find(e => e.name.startsWith(n)).id;
-            return { day: d.id, pull: by('Weighted Pull-up'), dip: by('Weighted Dip'), plank: by('Plank'), walk: by('Eğimli'),
+            return { day: d.id, pull: by('Weighted Pull-up'), dip: by('Weighted Dip'), plank: by('Plank'), walk: by('Incline Walk'),
                      lp: by('Leg Press'), lat: by('Side Lateral Raise') }; }""")
         D = json.dumps(ids["day"])
 
@@ -87,13 +87,15 @@ def main():
                 and throws(page, "(() => { 'use strict'; Cali.doc().settings.restPair = 1; })()"))
         A.check("a change that breaks the shape throws", throws(page, "Cali.change(d => { d.weeks[0].n = 7; })"))
 
-        # ── the pair alternation ──
+        # ── the pair alternation (Settings -> Alternate paired exercises; off by default, tests/test_edit.py) ──
+        ev("() => Cali.settings.set('alternatePairs', true)")
         got = ev(f"() => Cali.setOrder({D}).slice(0, 11).map(s => s.exId + ':' + s.i)")
         P, Q, L, T = ids["pull"], ids["dip"], ids["lp"], ids["lat"]
         want = [f"{P}:0", f"{Q}:0", f"{P}:1", f"{Q}:1", f"{P}:2", f"{Q}:2", f"{L}:0", f"{T}:0", f"{L}:1", f"{T}:1", f"{L}:2"]
         A.check("setOrder alternates a pair set by set (3 and 2 sets end on the longer one)", got == want, got)
         got = ev(f"() => Cali.nextSet({D})")
         A.check("nextSet is the first set in that order not logged", got == {"exId": ids["pull"], "i": 0}, got)
+        ev("() => Cali.settings.set('alternatePairs', false)")
 
         # ── settings and theme ──
         got = ev("() => Cali.settings.all()")
@@ -218,8 +220,8 @@ def main():
         A.check("Cali.weekExercise joins the program's rules with the week's values",
                 got == ["Fixture Dip", "reps", 7, 0, True, "p1", 4, 8, 2.5, 2, "F", 2, True], got)
         got = ev("() => [Cali.setOrder('F').map(s => s.exId + ':' + s.i), Cali.dayArgs({}), Cali.dayExercises(2, 'F').map(e => e.id)]")
-        A.check("setOrder, dayArgs and dayExercises on the fixture",
-                got == [["f1:0", "f2:0", "f1:1", "f2:1", "f3:0", "f4:0"], {"week": 2, "dayId": "F", "readOnly": False}, ["f1", "f2", "f3", "f4"]], got)
+        A.check("setOrder (one exercise at a time, the default), dayArgs and dayExercises on the fixture",
+                got == [["f1:0", "f1:1", "f2:0", "f2:1", "f3:0", "f4:0"], {"week": 2, "dayId": "F", "readOnly": False}, ["f1", "f2", "f3", "f4"]], got)
         got = ev("""() => { Cali.change(d => { d.weeks.push(Cali.weekFrom(d.programs[0], 3)); }, { why: 'week' });
             const w3 = Cali.week(3).days.F.exercises; Cali.change(d => { d.programs[0].days[0].exercises[1].target = 99; }, { why: 'program' });
             return [w3.f2, Cali.week(1).days.F.exercises.f2.target, Cali.week(2).days.F.exercises.f2.target, Cali.week(3).days.F.exercises.f2.target,

@@ -59,10 +59,11 @@ def main():
         ctx.clock.pause_at(A.NOW + datetime.timedelta(seconds=30))
         ev = page.evaluate
         ev(ALERTS)
+        ev("() => Cali.settings.set('alternatePairs', true)")   # this file checks the pair alternation
         ids = ev("""() => { const d = Cali.program().days[0]; const by = n => d.exercises.find(e => e.name.startsWith(n)).id;
             return { day: d.id, dayB: Cali.program().days[1].id, pull: by('Weighted Pull-up'), dip: by('Weighted Dip'),
                      lp: by('Leg Press'), lat: by('Side Lateral Raise'), row: by('Machine Row'), plank: by('Plank'),
-                     walk: by('Eğimli'), stretch: by('Esneme') }; }""")
+                     walk: by('Incline Walk'), stretch: by('Stretch') }; }""")
         D = ids["day"]
         cell = lambda ex, i: f'[data-screen="day"] [data-set="{D}:{ids[ex]}:{i}"]'
         got_set = lambda ex, i: ev(f"() => Cali.week().days[{json.dumps(D)}].exercises[{json.dumps(ids[ex])}].sets[{i}]")
@@ -440,7 +441,7 @@ def main():
         A.check("two-digit short sets (11/12, 35/40), a 120 s hold and a 95 of 100 s hold fit their cells; the ring still "
                 "shows reps/target", spill == [] and ["11/12", True, "92%"] in got and ["95", True, "95%"] in got
                 and ["9/10", False, "90%"] in got, (spill, got))
-        ev("() => Cali.settings.set('restAfterLog', false)")
+        ev("() => { Cali.settings.set('restAfterLog', false); Cali.settings.set('alternatePairs', true); }")
         ev("() => Cali.go('day', { dayId: Cali.program().days[1].id }, { replace: true })")
         page.wait_for_selector(f'[data-screen="day"] [data-set^="{ev("() => Cali.program().days[1].id")}:"]')
         ev("""() => { const D = Cali.program().days[1].id, list = Cali.dayExercises(null, D);

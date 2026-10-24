@@ -7,7 +7,7 @@ self.CALI_DEFAULT_PROGRAM = {
   "days": [
     {
       "id": "mh4v24uyz2_gra7",
-      "name": "A Ağır",
+      "name": "A Heavy",
       "exercises": [
         {
           "id": "mh4v2qgzri_5zmn",
@@ -121,7 +121,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2crf3j_300t",
-          "name": "Esneme 4 dk: sinir kayması 10/bacak + hamstring havlu 1 dk/bacak (diz arkası yanmadan, ayak serbest)",
+          "name": "Stretch 4 min: nerve glide 10/leg + towel hamstring 1 min/leg (no burn behind the knee, foot free)",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -133,7 +133,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2nzrtm_c05q",
-          "name": "Eğimli Yürüyüş 22 dk (5,0 km/h · %6, her hafta +%2 → %12)",
+          "name": "Incline Walk 22 min (5.0 km/h · 6%, +2% a week → 12%)",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -147,11 +147,11 @@ self.CALI_DEFAULT_PROGRAM = {
     },
     {
       "id": "mh4v2xm2u0_5y8l",
-      "name": "B Hacim",
+      "name": "B Volume",
       "exercises": [
         {
           "id": "mh4wrrjxde_juu9",
-          "name": "Bilek ısınması 1 dk (daire + dört ayakta ağrısız sallanma)",
+          "name": "Wrist warm-up 1 min (circles + pain-free rocking on all fours)",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -189,7 +189,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2e4fug_lqan",
-          "name": "Pike Push-up (dambıl/paralet üstünde, bilek düz)",
+          "name": "Pike Push-up (on dumbbells/parallettes, wrists straight)",
           "kind": "reps",
           "sets": 2,
           "target": 6,
@@ -262,7 +262,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2csh9z_ynj5",
-          "name": "Captain's Chair Knee Raise (diz bükük)",
+          "name": "Captain's Chair Knee Raise (knees bent)",
           "kind": "reps",
           "sets": 2,
           "target": 10,
@@ -274,7 +274,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2l2yvg_acl9",
-          "name": "Esneme 4 dk: sinir kayması 10/bacak + hamstring havlu 1 dk/bacak (diz arkası yanmadan, ayak serbest)",
+          "name": "Stretch 4 min: nerve glide 10/leg + towel hamstring 1 min/leg (no burn behind the knee, foot free)",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -286,7 +286,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2rd5cu_jbph",
-          "name": "Eğimli Yürüyüş 22 dk (5,0 km/h · %6, her hafta +%2 → %12)",
+          "name": "Incline Walk 22 min (5.0 km/h · 6%, +2% a week → 12%)",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -300,7 +300,7 @@ self.CALI_DEFAULT_PROGRAM = {
     },
     {
       "id": "mh4v23fat8_wr8d",
-      "name": "C Bacak",
+      "name": "C Legs",
       "exercises": [
         {
           "id": "mh4v2p22bu_a5ka",
@@ -329,7 +329,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2a3h2r_jbo4",
-          "name": "Leg Press (ayak yüksek)",
+          "name": "Leg Press (feet high)",
           "kind": "reps",
           "sets": 3,
           "target": 12,
@@ -353,7 +353,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2zwy0v_vby3",
-          "name": "Glute Kickback (makine/kablo)",
+          "name": "Glute Kickback (machine/cable)",
           "kind": "reps",
           "sets": 3,
           "target": 12,
@@ -437,7 +437,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v26e2mb_f54j",
-          "name": "Esneme 4 dk: sinir kayması 10/bacak + hamstring havlu 1 dk/bacak (diz arkası yanmadan, ayak serbest)",
+          "name": "Stretch 4 min: nerve glide 10/leg + towel hamstring 1 min/leg (no burn behind the knee, foot free)",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -449,7 +449,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2aqrsm_08jg",
-          "name": "Eğimli Yürüyüş 22 dk (5,0 km/h · %6, her hafta +%2 → %12)",
+          "name": "Incline Walk 22 min (5.0 km/h · 6%, +2% a week → 12%)",
           "kind": "check",
           "sets": 1,
           "target": 1,

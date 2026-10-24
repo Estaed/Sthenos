@@ -74,17 +74,21 @@
      Cali.tap(dayId, exId, i)        the tap rule: an empty set gets the target; a logged one goes one down (reps 1,
                                      time 5 s) to 0, then empty; a check toggles between 1 and empty. Calls Cali.log.
      Cali.hold(dayId, exId, i)       the hold rule: one up (an empty set: target + 1 step); a check toggles.
-     Cali.setOrder(dayId, n)         the day's sets in doing order: a pair alternates set by set (A1 B1 A2 B2 A3,
-                                     unequal counts end on the longer one), single exercises run through: [{ exId, i }].
-     Cali.nextSet(dayId, n)          the first set in that order that is not logged, or null.
+     Cali.setOrder(dayId, n)         the day's sets in doing order: [{ exId, i }]. Each exercise runs through its
+                                     sets before the next (A1 A2 A3 B1 B2 B3, Tarık 2026-10-24); with settings
+                                     alternatePairs on, a pair alternates set by set (A1 B1 A2 B2 A3, unequal counts
+                                     end on the longer one).
+     Cali.nextSet(dayId, n)          the first set in that order that is not done (empty or at 0), or null.
      Cali.progress(weekExercise, history)  next week's { load, target, reason } for one exercise: weekExercise from
                                      Cali.weekExercise(n, ...), history from Cali.history(dayId, exId, n). Filled by
                                      app/progress.js through Cali.provide('progress', fn); here a stub that answers
                                      { load, target, reason: 'no change' }. A result of the wrong shape throws.
      Cali.settings.get(key)          a setting, its default when unset. Keys and defaults: restPair 90 and
                                      restExercise 120 (seconds), restAfterLog true, headsUp 10 (seconds before the
-                                     end; 0 = off), vibrate true, sound true, keepAwake true, loadStep 2.5 (kg),
-                                     theme 'system' ('light', 'dark'). An unknown key throws.
+                                     end; 0 = off), alternatePairs false, vibrate true, buzz 'short' ('long',
+                                     'pulse'), sound true, tone 'beep' ('bell', 'chirp'), volume 2 (1-3),
+                                     keepAwake true, loadStep 2.5 (kg), theme 'system' ('light', 'dark'). An
+                                     unknown key throws.
      Cali.settings.set(key, value)   validates and saves it (Cali.change, why 'settings', detail { key, value }).
      Cali.settings.all()             every setting with defaults filled in.
      Cali.settings.defaults          the defaults (frozen).
@@ -182,16 +186,20 @@
   const bool = v => typeof v === 'boolean';
 
   const DEFAULTS = Object.freeze({
-    restPair: 90, restExercise: 120, restAfterLog: true, headsUp: 10, vibrate: true, sound: true,
-    keepAwake: true, loadStep: 2.5, theme: 'system',
+    restPair: 90, restExercise: 120, restAfterLog: true, headsUp: 10, alternatePairs: false, vibrate: true,
+    buzz: 'short', sound: true, tone: 'beep', volume: 2, keepAwake: true, loadStep: 2.5, theme: 'system',
   });
   const VALID = {
     restPair: v => Number.isInteger(v) && v >= 0 && v <= 3600,
     restExercise: v => Number.isInteger(v) && v >= 0 && v <= 3600,
     restAfterLog: bool,
     headsUp: v => Number.isInteger(v) && v >= 0 && v <= 60,
+    alternatePairs: bool,
     vibrate: bool,
+    buzz: v => ['short', 'long', 'pulse'].includes(v),
     sound: bool,
+    tone: v => ['beep', 'bell', 'chirp'].includes(v),
+    volume: v => [1, 2, 3].includes(v),
     keepAwake: bool,
     loadStep: v => isNum(v) && v > 0 && v <= 50,
     theme: v => ['system', 'light', 'dark'].includes(v),
@@ -550,7 +558,7 @@
     const out = [];
     for (let k = 0; k < list.length;) {
       const group = [list[k]];
-      while (list[k].pair && list[k + group.length] && list[k + group.length].pair === list[k].pair) group.push(list[k + group.length]);
+      while (settings.get('alternatePairs') && list[k].pair && list[k + group.length] && list[k + group.length].pair === list[k].pair) group.push(list[k + group.length]);
       const most = Math.max(...group.map(e => e.sets.length));
       for (let i = 0; i < most; i++) for (const e of group) if (i < e.sets.length) out.push({ exId: e.id, i });
       k += group.length;
@@ -560,7 +568,7 @@
   function nextSet(dayId, n) {
     const w = week(n);
     if (!w || !w.days[dayId]) return null;
-    return setOrder(dayId, w.n).find(({ exId, i }) => w.days[dayId].exercises[exId].sets[i] === null) || null;
+    return setOrder(dayId, w.n).find(({ exId, i }) => { const s = w.days[dayId].exercises[exId].sets[i]; return !s || s.r <= 0; }) || null;
   }
 
   // ── implementations features provide ──────────────────────────────

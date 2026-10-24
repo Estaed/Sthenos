@@ -3,8 +3,12 @@
    buttons, before Finish). Every value goes through Cali.settings (core saves it in the document and applies the
    theme app-wide).
 
-   Rest and alerts   pair rest and rest between exercises (steps of 15 s, 0:15 to 10:00), start rest after a log,
-                     heads-up 10 s before the end, vibrate, sound; "Test alert" (Cali.alert('test')) and
+   How to use        a row that opens the gestures and the day's other moves (the tap legend lived under the score
+                     bug until Tarık moved it here, 2026-10-24).
+   Rest and alerts   rest between sets and pair rest (steps of 15 s, 0:15 to 10:00), alternate paired exercises,
+                     start rest after a log, heads-up 10 s before the end, vibration (off, short, long, pulse: vibrate +
+                     buzz), sound (off, beep, bell, chirp: sound + tone) and its volume; picking a vibration, a sound
+                     or a volume plays the test alert; "Test alert" (Cali.alert('test')) and
                      notifications: "Allow" calls Cali.alert.requestPermission(); while Notification.permission is
                      not 'granted' one line says the alert then needs the screen kept awake and how to allow them.
    Workout           keep screen awake, default load step (1, 1.25, 2.5, 5 kg), theme (system, light, dark).
@@ -23,6 +27,21 @@
   const REST_MAX = 600;
   const LOAD_STEPS = [1, 1.25, 2.5, 5];
   const THEMES = [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']];
+  const BUZZ = [['off', 'Off'], ['short', 'Short'], ['long', 'Long'], ['pulse', 'Pulse']];
+  const TONES = [['off', 'Off'], ['beep', 'Beep'], ['bell', 'Bell'], ['chirp', 'Chirp']];
+  const VOLUMES = [['1', 'Low'], ['2', 'Medium'], ['3', 'High']];
+  // off-or-kind choices: one row shows a boolean setting and its kind together
+  const PAIRED = { buzz: 'vibrate', tone: 'sound' };
+  const HOW = [
+    ['Tap a set', 'done at its target'],
+    ['Tap it again', 'one less, down to 0, then empty'],
+    ['Hold it', 'one more'],
+    ["Tap an exercise's name", 'edit its load, target, sets, rep range, load step and name'],
+    ['Start', 'starts the workout clock; Finish ends the day and shows its summary'],
+    ['Tap every set back to 0 or empty', 'the day goes back to not started'],
+    ['The bar at the bottom', 'the set in hand and its rest; the rest starts after each set'],
+    ['Week N at the top', 'the weeks; Finish week moves loads and targets on'],
+  ];
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const PERMISSION_HELP = 'Until notifications are allowed, the rest alert needs the screen kept awake. Tap Allow; if ' +
     'nothing changes, allow notifications for this site in the browser\'s site settings, then come back.';
@@ -38,6 +57,7 @@
     cloud: '<path d="M12 13v8"/><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="m8 17 4-4 4 4"/>',
     download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
     upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+    chevron: '<path d="m6 9 6 6 6-6"/>',
     alert: '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>',
   };
   const icon = name => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[name]}</svg>`;
@@ -92,8 +112,8 @@
       `<span class="settings-t"><span data-label="${key}">${esc(label)}</span>${sub ? `<small>${esc(sub)}</small>` : ''}</span>` +
       '<span class="settings-tog" aria-hidden="true"></span></button>';
   }
-  function seg(key, label, sub, options, groupLabel) {
-    return `<div class="settings-row"><span class="settings-t">${esc(label)}${sub ? `<small>${esc(sub)}</small>` : ''}</span>` +
+  function seg(key, label, sub, options, groupLabel, wide) {
+    return `<div class="settings-row${wide ? ' settings-wide' : ''}"><span class="settings-t">${esc(label)}${sub ? `<small>${esc(sub)}</small>` : ''}</span>` +
       `<div class="settings-seg" role="group" aria-label="${esc(groupLabel)}">` +
       options.map(([value, text]) => `<button type="button" data-key="${key}" data-val="${esc(value)}" aria-pressed="false">${icon('check')}${esc(text)}</button>`).join('') +
       '</div></div>';
@@ -102,15 +122,23 @@
   function markup() {
     return '<header class="bar2"><button type="button" class="iconbtn" data-act="back" aria-label="Back">' + icon('back') +
       '</button><h2>Settings</h2></header><div class="settings-body">' +
-      '<div class="settings-head"><h3 class="settings-eyebrow">Rest and alerts</h3>' +
+      '<div class="group">' +
+        '<button type="button" class="settings-row" data-act="how" aria-expanded="false" aria-controls="settings-how">' +
+          '<span class="settings-t">How to use<small>Tap, tap again, hold, and the rest</small></span>' +
+          `<span class="settings-chev">${icon('chevron')}</span></button>` +
+        `<dl class="settings-how" id="settings-how" hidden>${HOW.map(([t, d]) => `<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl>` +
+      '</div>' +
+      '<div class="settings-head settings-section"><h3 class="settings-eyebrow">Rest and alerts</h3>' +
       `<button type="button" class="ghost" data-act="test">${icon('bell')}Test alert</button></div>` +
       '<div class="group settings-first">' +
+        stepper('restExercise', 'Rest between sets') +
+        toggle('alternatePairs', 'Alternate paired exercises', 'A1 B1 A2 B2; off: all sets of A, then B') +
         stepper('restPair', 'Pair rest') +
-        stepper('restExercise', 'Rest between exercises') +
         toggle('restAfterLog', 'Start rest after a log') +
         toggle('headsUp', 'Heads-up 10 s before the end', 'Time to get set before the beep') +
-        toggle('vibrate', 'Vibrate') +
-        toggle('sound', 'Sound') +
+        seg('buzz', 'Vibration', 'Its length; the phone sets the strength', BUZZ, 'Vibration', true) +
+        seg('tone', 'Sound', '', TONES, 'Sound', true) +
+        seg('volume', 'Volume', 'A share of the media volume', VOLUMES, 'Volume') +
         '<div class="settings-row"><span class="settings-t">Notifications<small>For the alert while the screen is off</small></span>' +
         '<span data-perm></span></div>' +
       '</div>' +
@@ -118,7 +146,7 @@
       '<h3 class="settings-eyebrow settings-section">Workout</h3>' +
       '<div class="group">' +
         toggle('keepAwake', 'Keep screen awake', 'While a workout runs') +
-        seg('loadStep', 'Load step', 'For new exercises', LOAD_STEPS.map(v => [String(v), String(v)]), 'Default load step in kg') +
+        seg('loadStep', 'Load step', 'For an exercise without its own', LOAD_STEPS.map(v => [String(v), String(v)]), 'Default load step in kg') +
         seg('theme', 'Theme', '', THEMES, 'Theme') +
       '</div>' +
       '<h3 class="settings-eyebrow settings-section">Data</h3>' +
@@ -174,9 +202,12 @@
     }
     root.querySelector('[data-label="headsUp"]').textContent = `Heads-up ${all.headsUp > 0 ? all.headsUp : 10} s before the end`;
     for (const b of root.querySelectorAll('.settings-seg [data-key]')) {
-      const v = all[b.dataset.key];
-      b.setAttribute('aria-pressed', String(b.dataset.key === 'theme' ? v === b.dataset.val : v === Number(b.dataset.val)));
+      const k = b.dataset.key, v = all[k];
+      const on = PAIRED[k] ? (all[PAIRED[k]] ? v === b.dataset.val : b.dataset.val === 'off')
+        : typeof v === 'string' ? v === b.dataset.val : v === Number(b.dataset.val);
+      b.setAttribute('aria-pressed', String(on));
     }
+    root.querySelector('[data-key="restPair"]').closest('.settings-row').classList.toggle('settings-off', !all.alternatePairs);
 
     const p = permission();
     root.querySelector('[data-perm]').innerHTML = p === 'granted' ? '<span class="pill">Allowed</span>'
@@ -296,6 +327,12 @@
       paint(root);
       return;
     }
+    if (name === 'how') {
+      const panel = root.querySelector('#settings-how');
+      panel.hidden = !panel.hidden;
+      b.setAttribute('aria-expanded', String(!panel.hidden));
+      return;
+    }
     if (name === 'github') {
       const panel = root.querySelector('#settings-gh');
       panel.hidden = !panel.hidden;
@@ -336,8 +373,13 @@
           if (v >= REST_MIN) set(key, v);
         } else if (key && b.getAttribute('role') === 'switch') {
           set(key, key === 'headsUp' ? (Cali.settings.get(key) > 0 ? 0 : 10) : !Cali.settings.get(key));
+        } else if (key && PAIRED[key]) {
+          const off = b.dataset.val === 'off';
+          set(PAIRED[key], !off);
+          if (!off) { set(key, b.dataset.val); Cali.alert('test'); }   // hear or feel the pick at once
         } else if (key && b.dataset.val !== undefined) {
-          set(key, key === 'theme' ? b.dataset.val : Number(b.dataset.val));
+          set(key, typeof Cali.settings.get(key) === 'string' ? b.dataset.val : Number(b.dataset.val));
+          if (key === 'volume' && Cali.settings.get('sound')) Cali.alert('test');
         } else if (b.dataset.act) act(root, b);
       });
       root.querySelector('[data-restore]').addEventListener('change', e => {

@@ -1,6 +1,6 @@
 """Calisthenics acceptance gate. Run from the repo root:  python tests/acceptance.py
 
-Serves THIS repo (the folder holding tests/) under /Calisthenics-App/, the GitHub Pages path, on a free local port,
+Serves THIS repo (the folder holding tests/) under /Sthenos/, the GitHub Pages path, on a free local port,
 mocks the GitHub API, and drives Chromium as Tarik's phone: 360 x 740, touch, Australia/Darwin. Then runs every
 tests/test_*.py as `python <file>` from the repo root; a file's exit code is its verdict. Prints PASS or FAIL per
 check and exits 1 on any FAIL. Nothing is written to the repo (a test that needs files writes under .tmp/).
@@ -36,7 +36,7 @@ import urllib.request
 from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-BASE = "/Calisthenics-App/"
+BASE = "/Sthenos/"
 DARWIN = datetime.timezone(datetime.timedelta(hours=9, minutes=30))
 NOW = datetime.datetime(2026, 10, 26, 7, 0, tzinfo=DARWIN)        # Monday, the first gym day
 PHONE = dict(viewport={"width": 360, "height": 740}, device_scale_factor=3, is_mobile=True, has_touch=True,
@@ -52,7 +52,7 @@ def check(name, ok, detail=""):
     return ok
 
 
-# ── a GitHub Pages stand-in: this repo under /Calisthenics-App/, with overlays and a switch that cuts the network ──
+# ── a GitHub Pages stand-in: this repo under /Sthenos/, with overlays and a switch that cuts the network ──
 class Site:
     def __init__(self):
         self.overlay = {}        # path -> bytes served instead of the file
@@ -234,8 +234,9 @@ def default_program():
     return json.loads(body)
 
 
-DEFAULTS = {"restPair": 90, "restExercise": 120, "restAfterLog": True, "headsUp": 10, "vibrate": True, "sound": True,
-            "keepAwake": True, "loadStep": 2.5, "theme": "system"}
+DEFAULTS = {"restPair": 90, "restExercise": 120, "restAfterLog": True, "headsUp": 10, "alternatePairs": False,
+            "vibrate": True, "buzz": "short", "sound": True, "tone": "beep", "volume": 2, "keepAwake": True,
+            "loadStep": 2.5, "theme": "system"}
 
 
 # ── checks ────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-# Blueprint — Calisthenics-App
+# Blueprint — Sthenos
 
 The plan v1 is built from. Binding until changed on purpose (PRINCIPLES #5); the `blueprint`
 skill writes and amends it. Constraints live in `AGENTS.md`, because every session must see them.
@@ -59,8 +59,9 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   exercises: { <exId>: { name, kind, repMin, repMax, loadStep, …, load, target, sets: [{ r, at, pain? }] } } } } }`.
   A week copies its program's exercise (rules, load, target) when built, so editing a program never
   rewrites history.
-- **body:** `[{ date, kg }]`. **settings:** rest (pair 90 s, between exercises 120 s), start rest
-  after a log, heads-up 10 s, vibrate, sound, keep awake, default load step 2.5, theme.
+- **body:** `[{ date, kg }]`. **settings:** rest (between sets 120 s, pair 90 s), alternate pairs
+  (off), start rest after a log, heads-up 10 s, vibration (off, short, long, pulse), sound (off, beep,
+  bell, chirp) and volume, keep awake, default load step 2.5, theme.
 - `calisthenics-data.json` with `_version: 5` in the private repo; the v4 file moves to `archive/` untouched. The
   phone keeps a copy in localStorage (`cali.v5`) and works offline; the token and sync marks stay on the phone under
   `cali.sync`, running timers under `cali.timers` (start timestamps), none of them in the document.
@@ -68,9 +69,12 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 ## Rules
 - **Logging:** tap a cell = target; tap again = one less (down to 0, then empty); hold = one more.
   `time` steps by 5 s, `check` toggles. The one way to enter reps (Tarık: "1 özellik 2 farklı şekilde
-  yapılmasın"); the pencil in the sheet edits load, never reps.
-- **Next set** follows the pair alternation (A1 → B1 → A2 …); after a log the rest timer starts
-  (pair rest inside a pair, the other after the pair's last set).
+  yapılmasın"). A set at 0 counts as not done (no rest, can be the set in hand); a day with no set done
+  goes back to not started. A tap on an exercise's name opens its editor in the card (load, target,
+  sets, rep range, load step, name), written to this week and the program, never to reps.
+- **Next set:** each exercise runs through its sets before the next (A1 A2 A3, then B; Tarık
+  2026-10-24: "önce pull up bitireyim sonra dip geçerim"); Settings → Alternate paired exercises gives
+  A1 → B1 → A2 with the pair rest inside the pair. After a log the rest timer starts.
 - **Finish week** (manual) builds the next week from `nextProgram`, as the old app did: every set at
   target → target + 1; past `repMax` → load + `loadStep` and target back to `repMin`; any short set →
   no change; short at the same load three weeks running → load −10 % rounded to `loadStep` (no change
@@ -93,7 +97,7 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   listed once each in the append-only `app/registry.js`; `app/base.css` for shared classes, each
   feature's classes carry its prefix. `tokens.css`, `fonts/`, `sw.js`, `manifest.json`, icons at the root.
 - `legacy/`: the old app (`index.html`, its `tests/`) until v1 has run a week; then deleted.
-- `tests/acceptance.py` (Playwright, 360 px, mocked GitHub API, served under `/Calisthenics-App/`)
+- `tests/acceptance.py` (Playwright, 360 px, mocked GitHub API, served under `/Sthenos/`)
   runs every `tests/test_<feature>.py`; a feature's tests reach its screen by route.
 - `design/` source of truth; `reports/` research; `references/` inputs.
 - Hermes' weekly summary is a Hermes skill in `D:/TarikOS/.brain/hermes-skills/`, reading the data

@@ -113,3 +113,18 @@
 @media (prefers-reduced-motion: no-preference) {
   .settings-tog, .settings-tog::after { transition: background-color var(--fast), left var(--fast); }
 }
+
+/* a choice too wide beside its label sits under it, across the row */
+.settings-row.settings-wide { flex-wrap: wrap; row-gap: 0; padding-bottom: 10px; }
+.settings-wide .settings-t { flex-basis: 100%; }
+.settings-wide .settings-seg { flex: 1; }
+.settings-wide .settings-seg button { flex: 1; justify-content: center; padding: 0 6px; }
+/* pair rest while pairs do not alternate: kept, but it does nothing then */
+.settings-off .settings-t { color: var(--ink-muted); }
+
+/* How to use */
+.settings-chev { display: grid; place-items: center; color: var(--ink-muted); }
+[aria-expanded="true"] > .settings-chev { transform: rotate(180deg); }
+.settings-how { margin: 0; padding: 2px 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+.settings-how dt { font-size: 0.875rem; font-weight: 700; line-height: 18px; }
+.settings-how dd { margin: 0; font-size: 0.8125rem; font-weight: 500; line-height: 17px; color: var(--ink-muted); }
