@@ -94,13 +94,10 @@ keeps every version.
 
 ## How it works
 
-```mermaid
-flowchart LR
-  T["Tap a set"] --> L["This phone<br/>(browser storage)"]
-  L -->|"Done, Finish week"| G["GitHub Contents API<br/>(your token)"]
-  G --> R[("your private repo<br/>calisthenics-data.json")]
-  R -->|"on open"| L
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/how-it-works-dark.png">
+  <img src="docs/img/how-it-works-light.png" width="880" alt="Tap a set, it is saved on this phone; an optional sync keeps the log in your private GitHub repo; Finish week raises the load where you reached the top of the range.">
+</picture>
 
 1. The app is static files on GitHub Pages; a service worker keeps a copy so it opens offline.
 2. Your log is one JSON document in the browser's storage (`cali.v5`). Nothing is sent anywhere by default.
