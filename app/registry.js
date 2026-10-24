@@ -13,3 +13,6 @@ CALI_FEATURES.push('app/summary.css');
 CALI_FEATURES.push('app/alert.js');
 CALI_FEATURES.push('app/timer.js');
 CALI_FEATURES.push('app/timer.css');
+CALI_FEATURES.push('app/sync.js');
+CALI_FEATURES.push('app/settings.js');
+CALI_FEATURES.push('app/settings.css');
