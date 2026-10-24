@@ -46,6 +46,8 @@ def main():
         ev = page.evaluate
         step = lambda ms=1000: ctx.clock.run_for(ms)
         ev("(fx) => Cali.replace(fx)", FIXTURE)
+        # nothing moves until REAL below: the same no-change answer as Task-00's stub, since app/progress.js now has the rules
+        ev("() => Cali.provide('progress', ex => ({ load: ex.load, target: ex.target, reason: 'no change' }))")
         ev("() => { window.__done = []; Cali.on('dayDone', d => __done.push(d)); }")
         ev("() => Cali.go('day', { week: 2, dayId: 'F' }, { replace: true })")
         page.wait_for_selector('[data-set="F:f1:0"]')
@@ -73,7 +75,7 @@ def main():
                 and s["times"] == "07:00 to 07:38", s)
         A.check("sets done counts reps and time sets (4 of 5); short sets 1", s["sets"] == "4 of 5" and s["short"] == "1", s)
         A.check("the short set is listed with its share (Fixture Dip, set 2, 5/7)", s["shorts"] == "Fixture Dip Set 2 5 /7", s["shorts"])
-        A.check("with the progress stub nothing moves: 'Same loads and targets next week.'",
+        A.check("with a no-change progress nothing moves: 'Same loads and targets next week.'",
                 s["next"] == "Same loads and targets next week.", s["next"])
         A.check("Resume and Done at the bottom", s["buttons"] == ["Resume", "Done"], s["buttons"])
 

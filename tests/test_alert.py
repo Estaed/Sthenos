@@ -81,7 +81,7 @@ def part_page(browser, url):
             got == [[], [], [["rest", "Rest over"]], True], got)
 
     # ── the first tap unlocks the sound; every kind beeps, vibrates and flashes ──
-    A.touch_tap(page, ".appbar .week")
+    A.touch_tap(page, ".workout-cols")  # a tap on something inert (the list's column header)
     state = A.poll(page, "() => __probe.ctx && __probe.ctx.state === 'running' && __probe.ctx.state")
     A.check("the first tap makes the audio context and it runs", state == "running", state)
     want = {"rest": (3, REST_BUZZ, "Rest over"), "headsup": (1, [150], "Rest ends in 10 s"),
