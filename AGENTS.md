@@ -36,7 +36,7 @@ and `notes.md` keeps a one-line link.
 
 - **Read `docs/blueprint.md` before** planning a task, changing a stage, the screen or a number,
   and whenever code seems to contradict a decision.
-- **What:** Sthenos (Greek "strength"; Tarık 2026-10-24), a public workout-log PWA; the repo, Pages path and data repo keep the Calisthenics name; Tarık syncs to private `Estaed/Calisthenics-Data` with his key. v1 wave 1 due Monday 2026-10-26.
+- **What:** Sthenos (Greek "strength"; Tarık 2026-10-24), a public workout-log PWA; the data repo keeps its name; the repo, folder and Pages path become Sthenos after wave 1 (vault task `sthenos-depo-adi`); Tarık syncs to private `Estaed/Calisthenics-Data` with his key. v1 wave 1 due Monday 2026-10-26.
 - **Code:** `index.html` shell, `app/` one script per feature + `app/registry.js`, `tests/`, `design/r6/screens.html` (look), `legacy/` (old app).
 - **Commands:** serve `python -m http.server` from `D:/Projects` and open `/Calisthenics-App/`; test `python tests/acceptance.py`.
 - **Gate:** `python tests/acceptance.py` from the repo root; clean = every check PASS, exit 0.
