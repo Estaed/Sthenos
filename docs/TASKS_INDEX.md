@@ -14,3 +14,6 @@ Task-00 runs alone; Task-01 to Task-04 then run in parallel (disjoint OWNS, all 
   history per exercise (needs Task-04's weeks); body weight with a 7-day average and Pantry's weekly kcal;
   a note per exercise and a pain flag per set (needs Task-01's cells); Hermes' weekly Discord summary
   (needs Task-03's v5 file in the repo; checks Hermes' GitHub access first).
+  Open before planning: on the phone Sthenos is installed from Chrome and `pantry.v1` is not in its storage
+  (checked 2026-10-24), so Blueprint's same-origin Pantry kcal read finds nothing; read `Estaed/Pantry-Data`
+  through sync instead, or install both apps from one browser (Tarık's call).
