@@ -1,4 +1,5 @@
 # Task-01: The workout day
+**Status: DONE** — verified 2026-10-24, eye check pending: 1
 > **Execution:** agent `ultracode`
 > *Why:* the screen Tarık uses three times a week between sets; Monday's session runs on it.
 
@@ -18,21 +19,21 @@ Finish shows the summary (duration, sets, short sets, what moves up next week) a
 This is v1's main task; everything else supports it.
 
 ## Acceptance
-- [ ] Touch tests (`hasTouch`): one tap logs the target, two taps one short, hold adds one; the hold never
+- [x] Touch tests (`hasTouch`): one tap logs the target, two taps one short, hold adds one; the hold never
   opens a context menu or selects text; a second touch within 150 ms of the first is ignored as a bounce.
-- [ ] Done sets orange tint, short sets the partial orange ring at reps/target, the current set the ink
+- [x] Done sets orange tint, short sets the partial orange ring at reps/target, the current set the ink
   ring; a logged set stays editable by the same taps; Undo restores the previous value and stays until
   the next log or 8 s.
-- [ ] Next set follows the pair alternation. After a log the rest starts from `Cali.settings` (pair rest
+- [x] Next set follows the pair alternation. After a log the rest starts from `Cali.settings` (pair rest
   inside a pair, the other after the pair's last set), computed from timestamps, and is scheduled at
   once with `Cali.alert.schedule('rest', endAt, 'rest')` (plus `headsup` 10 s before when on); the next
   log cancels it.
-- [ ] Start/Finish store `startedAt`/`finishedAt`; Finish → summary (screen 6, "moves up" from
+- [x] Start/Finish store `startedAt`/`finishedAt`; Finish → summary (screen 6, "moves up" from
   `Cali.progress`, tested with the stub and with a real result) → Done marks the day and emits `dayDone`.
   Wake Lock is held while a workout runs when the setting is on and re-acquired on visibility.
-- [ ] `Cali.go('day', { week, dayId, readOnly: true })` renders a past week's day with no taps.
-- [ ] Timed rows (stretch, walk) open `Cali.go('timer', { countdown: seconds })`.
-- [ ] Tests drive `Cali.now()`; they read last week's values in both states (none yet, present).
+- [x] `Cali.go('day', { week, dayId, readOnly: true })` renders a past week's day with no taps.
+- [x] Timed rows (stretch, walk) open `Cali.go('timer', { countdown: seconds })`.
+- [x] Tests drive `Cali.now()`; they read last week's values in both states (none yet, present).
 - [ ] (eye) screens 1, 2, 6, 7, 8 of `design/r6/screens.html`, both modes; at 360×740 the whole of day A
   is visible without scrolling.
 

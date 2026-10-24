@@ -1,4 +1,5 @@
 # Task-04: Weeks and double progression
+**Status: DONE** — verified 2026-10-24, eye check pending: 1
 > **Execution:** agent `ultracode`
 > *Why:* the numbers that drive Tarık's training decisions; a wrong load next week is the costliest bug.
 
@@ -17,14 +18,14 @@ the week menu (Week 1 ⌄, added through `Cali.slot('dayheader')`) opens any pas
 Double progression is the point of the log; it must be right on his real numbers.
 
 ## Acceptance
-- [ ] `tests/test_progress.py` is written from Blueprint → Rules before the code, one case per rule: all
+- [x] `tests/test_progress.py` is written from Blueprint → Rules before the code, one case per rule: all
   sets at target → target + 1; past `repMax` → load + `loadStep`, target `repMin`; a short set → no change;
   three short weeks at one load → −10 % rounded to `loadStep`, none at 0 added load; a day not done →
   unchanged and not counted toward the stall; bodyweight on added load; a `time` row all at target →
   target + 5 s, short → no change; `check` rows copy (Tarık 2026-10-24: Plank +5 s, as on screen 6).
-- [ ] A week copies program values when built; editing the program afterwards changes no past week.
-- [ ] Finish week asks for confirmation, emits `weekFinished`, and can be undone until the next `log` event.
-- [ ] Tests check routes and stored state, not Task-01's DOM.
+- [x] A week copies program values when built; editing the program afterwards changes no past week.
+- [x] Finish week asks for confirmation, emits `weekFinished`, and can be undone until the next `log` event.
+- [x] Tests check routes and stored state, not Task-01's DOM.
 - [ ] (eye) the week menu, and a past week shown read-only in the day sheet's look.
 
 ## Out of scope

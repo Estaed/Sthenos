@@ -51,6 +51,7 @@ the phone feel falls short as in Pantry, native goes to *After v1* with the meas
 framework or bundler; IndexedDB (years of sets fit localStorage).
 
 ## Data (schema v5, one JSON document)
+- **document:** `{ _version: 5, updatedAt, programs, activeProgram, nextProgram, weeks, body, settings }`.
 - **programs:** `{ id, name, days: [{ id, name, exercises: [{ id, name, kind: reps|time|check, sets,
   repMin, repMax, target, load, loadStep, bodyweight?, pair?, note?, duration? }] }] }`; `activeProgram`,
   `nextProgram` (used from the next week built). Pairs are adjacent exercises with the same `pair`.
@@ -61,7 +62,8 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 - **body:** `[{ date, kg }]`. **settings:** rest (pair 90 s, between exercises 120 s), start rest
   after a log, heads-up 10 s, vibrate, sound, keep awake, default load step 2.5, theme.
 - `calisthenics-data.json` with `_version: 5` in the private repo; the v4 file moves to `archive/` untouched. The
-  phone keeps a copy in localStorage and works offline; the token stays on the phone under its own key.
+  phone keeps a copy in localStorage (`cali.v5`) and works offline; the token and sync marks stay on the phone under
+  `cali.sync`, running timers under `cali.timers` (start timestamps), none of them in the document.
 
 ## Rules
 - **Logging:** tap a cell = target; tap again = one less (down to 0, then empty); hold = one more.

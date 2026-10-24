@@ -432,9 +432,10 @@ def check_legacy(browser, url, site, errors):
     regs = regs or page.evaluate("async () => (await navigator.serviceWorker.getRegistrations()).map(x => x.scope)")
     check("legacy/ registers its own worker with scope legacy/, and the app's worker stays",
           f"{origin}{BASE}legacy/" in regs and f"{origin}{BASE}" in regs, regs)
+    cache = re.search(r"const CACHE = '(cali-app-v\d+)';", (ROOT / "sw.js").read_text(encoding="utf-8")).group(1)
     keys = page.evaluate("() => caches.keys()")
-    check("opening legacy/ deletes no cache of the new app", "cali-app-v1" in keys, keys)
-    app_urls = page.evaluate("async () => (await (await caches.open('cali-app-v1')).keys()).map(r => r.url)")
+    check("opening legacy/ deletes no cache of the new app", cache in keys, keys)
+    app_urls = page.evaluate("async (c) => (await (await caches.open(c)).keys()).map(r => r.url)", cache)
     check("the app's worker caches nothing under legacy/", app_urls and not any("/legacy/" in u for u in app_urls),
           [u for u in app_urls if "/legacy/" in u][:3])
     go_offline(ctx, site)

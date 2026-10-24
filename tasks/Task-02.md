@@ -1,4 +1,5 @@
 # Task-02: Independent timer and alerts
+**Status: DONE** — verified 2026-10-24, eye check pending: 1
 > **Execution:** agent `ultracode`
 > *Why:* a rest or a timed stretch that ends unnoticed wastes the session; the alert path is v1's riskiest assumption.
 
@@ -19,18 +20,18 @@ the service worker as the fallback when it is not.
 Blueprint → Riskiest assumption: keep-awake is the main path, the service-worker notification the fallback.
 
 ## Acceptance
-- [ ] Countdown, stopwatch, laps, pause, reset, +1 min through `Cali.timers`; correct after the page was
+- [x] Countdown, stopwatch, laps, pause, reset, +1 min through `Cali.timers`; correct after the page was
   hidden for minutes (tests jump `Cali.now()`).
-- [ ] `Cali.go('timer', { countdown })` starts a countdown with that duration.
-- [ ] `Cali.alert(kind)` plays a beep (Web Audio, unlocked on the first tap) and vibrates when the
+- [x] `Cali.go('timer', { countdown })` starts a countdown with that duration.
+- [x] `Cali.alert(kind)` plays a beep (Web Audio, unlocked on the first tap) and vibrates when the
   settings allow, for kinds `rest`, `headsup`, `timer`, `test`.
-- [ ] `Cali.alert.schedule(kind, endAt, tag)` posts `{ endAt, tag, kind }` to the service worker
+- [x] `Cali.alert.schedule(kind, endAt, tag)` posts `{ endAt, tag, kind }` to the service worker
   (`sw-alert.js`: waits with `event.waitUntil`, shows a `requireInteraction` notification with that tag);
   the page shows the same tag itself when it is awake at the end, so only one appears; `cancel(tag)`
   stops both. Design from `reports/2026-10-24-rest-alert-screen-off.md` → Recommended design.
-- [ ] A Playwright test registers the real service worker, schedules a 2 s alert, and sees the
+- [x] A Playwright test registers the real service worker, schedules a 2 s alert, and sees the
   notification with its tag; `cancel` before the end shows none.
-- [ ] `Cali.alert.requestPermission()` asks once; never on load (Task-03 puts the button in Settings).
+- [x] `Cali.alert.requestPermission()` asks once; never on load (Task-03 puts the button in Settings).
 - [ ] (eye) screen 4 and the top-bar pill (screen 2) of `design/r6/screens.html`, both modes.
 
 ## Out of scope

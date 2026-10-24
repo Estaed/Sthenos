@@ -2,10 +2,10 @@
 
 ## Wave 1 (v1 for Monday 2026-10-26)
 - [x] Task-00: Shell, data core, seams and gate; old app to `legacy/` (runs first)
-- [ ] Task-01: The workout day: tap logging, pair order, rest timer, start/finish, summary
-- [ ] Task-02: Independent timer and alerts (rest and timer end, screen off)
-- [ ] Task-03: Settings, GitHub sync (port), JSON backup
-- [ ] Task-04: Weeks and double progression
+- [x] Task-01: The workout day: tap logging, pair order, rest timer, start/finish, summary
+- [x] Task-02: Independent timer and alerts (rest and timer end, screen off)
+- [x] Task-03: Settings, GitHub sync (port), JSON backup
+- [x] Task-04: Weeks and double progression
 
 Task-00 runs alone; Task-01 to Task-04 then run in parallel (disjoint OWNS, all depend only on Task-00).
 
