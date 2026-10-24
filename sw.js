@@ -52,3 +52,4 @@ self.addEventListener('fetch', event => {
   event.respondWith(Promise.race([network, slow]).catch(() => cached().then(hit => hit || Response.error())));
   event.waitUntil(network.then(() => saved, () => undefined));
 });
+importScripts('sw-alert.js');

@@ -10,3 +10,6 @@ CALI_FEATURES.push('app/progress.js');
 CALI_FEATURES.push('app/workout.css');
 CALI_FEATURES.push('app/summary.js');
 CALI_FEATURES.push('app/summary.css');
+CALI_FEATURES.push('app/alert.js');
+CALI_FEATURES.push('app/timer.js');
+CALI_FEATURES.push('app/timer.css');
