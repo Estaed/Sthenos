@@ -87,8 +87,10 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 - **Sync:** a day's edits push at Done; Finish week, an edit to a finished day or to a program push at once;
   a change older than 12 h goes on the next open. Pull on open, last-write-wins per document with
   the remote `sha` checked. A remote document without `_version: 5` is never adopted.
-- **Pantry kcal:** read only from Pantry's `localStorage` key `pantry.v1` (same origin,
-  `estaed.github.io`): weekly average kcal beside body weight; absent → the line is hidden.
+- **Pantry kcal:** read only, from `pantry-data.json` in the private repo `Estaed/Pantry-Data` through the
+  sync token (which then also needs read access to that repo): weekly average kcal beside body weight;
+  absent or unreadable → the line is hidden. Not from `pantry.v1`: on the phone the two apps sit in
+  different browsers, so that key is not visible (checked 2026-10-24; Tarık chose the repo read, 2026-10-24).
 
 ## Layout
 - `index.html` shell; `app/core.js` (data, state, routing, rules above), one `app/<feature>.js` per
