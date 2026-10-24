@@ -10,8 +10,8 @@ A workout log for the gym on an Android phone, between sets, one hand: the whole
 one screen, a set logged by tapping its cell, workout start and finish, a rest timer and an
 independent timer, weeks with double progression, program editing, history, body weight. A public
 site: anyone uses it without sync (data on their phone); Tarık adds his GitHub key and syncs to
-his private data repo. English UI. Starts empty except for Tarık's current A/B/C program as the
-seed program; no old logs come in.
+his private data repo. English UI. Ships Tarık's current A/B/C program as the built-in default
+program (week 1 is built from it on first open); no old logs come in.
 
 Done when:
 - wave 1 by Monday 2026-10-26: Tarık logs his first A Heavy session in the gym only in this app,
@@ -58,7 +58,7 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   program's values when built, so editing a program never rewrites history.
 - **body:** `[{ date, kg }]`. **settings:** rest (pair 90 s, between exercises 120 s), start rest
   after a log, heads-up 10 s, vibrate, sound, keep awake, default load step 2.5, theme.
-- `calisthenics-data.json` v5 in the private repo; the v4 file moves to `archive/` untouched. The
+- `calisthenics-data.json` with `_version: 5` in the private repo; the v4 file moves to `archive/` untouched. The
   phone keeps a copy in localStorage and works offline; the token stays on the phone under its own key.
 
 ## Rules
@@ -67,21 +67,23 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   yapılmasın"); the pencil in the sheet edits load, never reps.
 - **Next set** follows the pair alternation (A1 → B1 → A2 …); after a log the rest timer starts
   (pair rest inside a pair, the other after the pair's last set).
-- **Finish week** (manual) builds the next week from `nextProgram`: every set at `repMax` → load +
-  `loadStep`, target back to `repMin`; any short set → no change; short at the same load three weeks
-  running → load −10 % rounded to `loadStep`. A day not done carries over with no progression.
-  Bodyweight lifts progress on the added load.
+- **Finish week** (manual) builds the next week from `nextProgram`, as the old app did: every set at
+  target → target + 1; past `repMax` → load + `loadStep` and target back to `repMin`; any short set →
+  no change; short at the same load three weeks running → load −10 % rounded to `loadStep` (no change
+  at 0 added load). A day not done carries over unchanged and does not count toward the stall.
+  Bodyweight lifts progress on the added load. The rules live in `app/progress.js` as `Cali.progress`.
 - **Timers** are computed from start timestamps, never from counted ticks; the rest timer and the
   independent timer run at once.
-- **Sync:** a day's edits push at Finish; an edit to a finished day or to a program pushes at once;
+- **Sync:** a day's edits push at Done; Finish week, an edit to a finished day or to a program push at once;
   a change older than 12 h goes on the next open. Pull on open, last-write-wins per document with
-  the remote `sha` checked.
+  the remote `sha` checked. A remote document without `_version: 5` is never adopted.
 - **Pantry kcal:** read only from Pantry's `localStorage` key `pantry.v1` (same origin,
   `estaed.github.io`): weekly average kcal beside body weight; absent → the line is hidden.
 
 ## Layout
 - `index.html` shell; `app/core.js` (data, state, routing, rules above), one `app/<feature>.js` per
-  feature (`workout`, `timer`, `settings`, `sync`, `week`, `program`, `history`, `body`, `summary`),
+  feature (`workout`, `summary`, `timer`, `alert`, `settings`, `sync`, `week`, `progress`; wave 2:
+  `program`, `history`, `body`),
   listed once each in the append-only `app/registry.js`; `app/base.css` for shared classes, each
   feature's classes carry its prefix. `tokens.css`, `fonts/`, `sw.js`, `manifest.json`, icons at the root.
 - `legacy/`: the old app (`index.html`, its `tests/`) until v1 has run a week; then deleted.

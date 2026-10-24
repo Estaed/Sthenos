@@ -42,7 +42,7 @@ and `notes.md` keeps a one-line link.
 - **Gate:** `python tests/acceptance.py` from the repo root; clean = every check PASS, exit 0.
 
 ## Constraints
-- localStorage keys start with `cali.`; never write `cali4_*` (the legacy app) or any `pantry.*` key; `pantry.v1` is read only.
+- localStorage keys start with `cali.`; never write the legacy app's keys (`cali4_*`, `cali_sync_config`) or any `pantry.*` key; `pantry.v1` and `cali_sync_config` are read only.
 - The GitHub token never enters the synced document or the repo.
 - Reps are entered only by tapping the set cell (tap, tap again, hold); no second input path.
 - Timers are computed from stored start timestamps, never from counted ticks.
