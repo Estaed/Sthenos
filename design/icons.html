@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Icons and Name</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="fonts/archivo.css">
+<style>
+@font-face { font-family: 'Manrope'; font-weight: 200 800; font-display: swap; src: url(fonts/Manrope.woff2) format('woff2'); }
+:root { --ic-bg: #0E0E0E; --ic-ink: #EEEEEE; --ic-or: #FF5A00; }
+:root[data-icon="light"] { --ic-bg: #F7F7F7; --ic-ink: #121212; --ic-or: #D34303; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: 'Manrope', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+h1, h2 { font-family: 'Archivo', sans-serif; font-stretch: 118%; font-weight: 700; margin: 0; }
+h1 { font-size: 32px; letter-spacing: -.01em; }
+h2 { font-size: 22px; margin-top: 48px; }
+.bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 12px; padding: 4px; }
+.seg button { font: 600 14px 'Manrope', sans-serif; color: var(--ink-muted); background: none; border: 0;
+  border-radius: 9px; padding: 10px 14px; min-height: 44px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--action, var(--ink)); color: var(--on-action, var(--canvas)); }
+.seg button:focus-visible, .tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.names { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 16px; }
+.name { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 12px; padding: 16px; }
+.name b { display: block; font-family: 'Archivo', sans-serif; font-stretch: 118%; font-size: 24px; }
+.name p { margin: 6px 0 0; color: var(--ink-muted); font-size: 14px; line-height: 1.45; }
+.name.rec { background: var(--anchor); color: var(--on-anchor); border-color: transparent; box-shadow: var(--shadow-anchor); }
+.name.rec p { color: var(--on-anchor-muted); }
+.name.rec i { font-style: normal; color: var(--on-anchor-accent); font-weight: 700; font-size: 13px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(184px, 1fr)); gap: 12px; margin-top: 16px; }
+.tile { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px;
+  display: flex; flex-direction: column; gap: 10px; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.tile[aria-pressed="true"] { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.big { width: 100%; aspect-ratio: 1; border-radius: 22%; display: block; }
+.row { display: flex; align-items: center; gap: 10px; }
+.small { width: 48px; height: 48px; border-radius: 50%; flex: none; }
+.row b { font-family: 'Archivo', sans-serif; font-stretch: 118%; font-size: 15px; display: block; }
+.row span { color: var(--ink-subtle); font-size: 13px; }
+.or { color: var(--primary-text); font-size: 12px; font-weight: 700; }
+svg .s { fill: none; stroke: var(--ic-ink); stroke-linecap: round; stroke-linejoin: round; }
+svg .o { fill: none; stroke: var(--ic-or); stroke-linecap: round; stroke-linejoin: round; }
+svg .f { fill: var(--ic-ink); stroke: none; }
+svg .fo { fill: var(--ic-or); stroke: none; }
+svg .bg { fill: var(--ic-bg); }
+.pick { position: sticky; bottom: 0; background: var(--surface-3, var(--surface-2)); border-top: 1px solid var(--hairline);
+  padding: 14px 16px; font-weight: 600; text-align: center; }
+.pick code { font-family: 'Archivo', sans-serif; font-stretch: 118%; color: var(--primary-text); }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">
+    <h1>Name and icon</h1>
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Page theme">
+        <button data-theme-btn="dark" aria-pressed="true">Page dark</button>
+        <button data-theme-btn="light" aria-pressed="false">Page light</button>
+      </div>
+      <div class="seg" role="group" aria-label="Icon ground">
+        <button data-icon-btn="dark" aria-pressed="true">Icon dark</button>
+        <button data-icon-btn="light" aria-pressed="false">Icon light</button>
+      </div>
+    </div>
+  </div>
+
+  <h2>Calisthenics name</h2>
+  <div class="names">
+    <div class="name rec"><b>Chalk</b><p>What you put on your hands before the bar, and the marks you tally sets with. One plain object, like Pantry.</p><i>Recommended</i></div>
+    <div class="name"><b>Tally</b><p>Counting sets by a tap; says what the app does.</p></div>
+    <div class="name"><b>Rings</b><p>The gymnastics rings; pure calisthenics, misses the weighted work.</p></div>
+    <div class="name"><b>Grip</b><p>Hands on the bar; short, physical.</p></div>
+    <div class="name"><b>Notch</b><p>One notch up each week; about progression.</p></div>
+    <div class="name"><b>Hang</b><p>The first move on a bar; quiet, a bit vague.</p></div>
+  </div>
+
+  <h2>Calisthenics icon</h2>
+  <div class="grid" id="cali"></div>
+
+  <h2>Pantry icon</h2>
+  <div class="grid" id="pantry"></div>
+</main>
+<div class="pick" aria-live="polite">Tap to choose: <code id="pick">name? · C? · P?</code></div>
+
+<script>
+const S = (w, d) => `<path class="s" stroke-width="${w}" d="${d}"/>`;
+const O = (w, d) => `<path class="o" stroke-width="${w}" d="${d}"/>`;
+const JAR = 'M200 166v14c0 8-12 14-28 24-16 10-22 22-22 40v114c0 22 14 36 36 36h140c22 0 36-14 36-36V244c0-18-6-30-22-40-16-10-28-16-28-24v-14';
+const LID = '<rect class="s" stroke-width="24" x="186" y="122" width="140" height="44" rx="12"/>';
+
+const cali = [
+  ['Bar', 'Grip', 0, S(28, 'M120 160H392M160 160V380M352 160V380M128 380h64M320 380h64')],
+  ['Rings', 'Rings', 0, S(26, 'M190 120V250M322 120V250') + '<circle class="s" stroke-width="26" cx="190" cy="298" r="48"/><circle class="s" stroke-width="26" cx="322" cy="298" r="48"/>'],
+  ['One ring', 'Rings', 0, S(28, 'M256 112V214M226 168h60') + '<circle class="s" stroke-width="28" cx="256" cy="300" r="86"/>'],
+  ['Tally', 'Tally · Chalk', 0, S(28, 'M170 150V362M227 150V362M284 150V362M341 150V362M128 332L384 180')],
+  ['Tally, last stroke', 'Tally · Chalk', 1, S(28, 'M170 150V362M227 150V362M284 150V362M341 150V362') + O(28, 'M128 332L384 180')],
+  ['Set cells', 'Tally', 0, '<rect class="f" x="131" y="131" width="110" height="110" rx="22"/>' +
+    [[271,131],[131,271],[271,271]].map(([x,y]) => `<rect class="s" stroke-width="22" x="${x}" y="${y}" width="110" height="110" rx="22"/>`).join('')],
+  ['Sets row', 'Tally', 1, '<rect class="fo" x="111" y="181" width="56" height="150" rx="14"/><rect class="fo" x="189" y="181" width="56" height="150" rx="14"/>' +
+    '<rect class="o" stroke-width="16" x="275" y="189" width="40" height="134" rx="10"/><rect class="fo" x="275" y="268" width="40" height="55" rx="6"/>' +
+    '<rect class="s" stroke-width="16" x="353" y="189" width="40" height="134" rx="10"/>'],
+  ['Set ring', 'Notch', 1, '<circle cx="256" cy="256" r="130" fill="none" stroke="var(--ic-ink)" stroke-opacity=".22" stroke-width="36"/>' + O(36, 'M256 126A130 130 0 1 1 126 256')],
+  ['Pull-up', 'Hang · Grip', 0, S(26, 'M128 130H384M196 130L226 226H286L316 130M256 226V312M256 312L228 392M256 312L284 392') + '<circle class="f" cx="256" cy="180" r="30"/>'],
+  ['Handstand', 'Chalk', 0, S(26, 'M168 392H344M196 392L220 296H292L316 392M256 296V204M256 204L236 120M256 204L276 120') + '<circle class="f" cx="256" cy="346" r="24"/>'],
+  ['Parallettes', 'Grip', 0, S(28, 'M128 220H384M168 220L148 320M344 220L364 320M116 320H180M332 320H396')],
+  ['Dip', 'Chalk', 0, S(26, 'M160 240V392M352 240V392M136 240H184M328 240H376M176 236L204 180H308L336 236M256 180V296M256 296L238 372M256 296L274 372') + '<circle class="f" cx="256" cy="134" r="28"/>'],
+  ['Steps', 'Notch', 0, S(28, 'M128 376V296H213V216H298V136H384V376Z')],
+  ['Kettlebell', 'Grip', 0, S(28, 'M196 232V180a60 60 0 0 1 120 0V232') + '<circle class="s" stroke-width="28" cx="256" cy="300" r="92"/>'],
+  ['Plate', 'Notch', 0, '<circle class="s" stroke-width="26" cx="256" cy="256" r="140"/><circle class="s" stroke-width="18" cx="256" cy="256" r="92"/><circle class="f" cx="256" cy="256" r="28"/>'],
+  ['Muscle-up', 'Hang', 1, S(28, 'M128 272H384') + O(28, 'M184 384C184 250 328 250 328 152M292 188L328 152L364 188')],
+  ['Chalk block', 'Chalk', 0, '<rect class="s" stroke-width="26" x="148" y="204" width="216" height="168" rx="30"/>' + S(20, 'M148 262H364') +
+    '<circle class="f" cx="200" cy="150" r="13"/><circle class="f" cx="256" cy="124" r="13"/><circle class="f" cx="312" cy="150" r="13"/>'],
+  ['Taped bar', 'Grip · Chalk', 1, S(40, 'M112 256H400') + '<rect class="fo" x="176" y="206" width="34" height="100" rx="8"/><rect class="fo" x="302" y="206" width="34" height="100" rx="8"/>'],
+  ['Front lever', 'Hang', 0, S(28, 'M128 140H384M184 140V240H388') + '<circle class="f" cx="140" cy="240" r="26"/>'],
+  ['Rest timer', 'Tally', 1, '<circle class="s" stroke-width="26" cx="256" cy="286" r="110"/>' + S(26, 'M226 132H286M256 132V176M346 196l22-22') + O(26, 'M256 286V222')],
+];
+
+const pantry = [
+  ['Jar (now)', 'current icon', 0, LID + S(24, JAR + 'M150 262h212M150 338h212')],
+  ['Jar, level', 'stock level', 1, LID + S(24, JAR) + O(24, 'M150 300h212')],
+  ['Jar, half full', 'stock level', 0, LID + S(24, JAR) + '<path class="f" d="M150 296V358c0 22 14 36 36 36h140c22 0 36-14 36-36V296Z"/>'],
+  ['Shelf', 'stock', 0, S(22, 'M108 372H404M140 214H192M230 174H282M320 238H372') +
+    '<rect class="s" stroke-width="22" x="128" y="236" width="76" height="136" rx="14"/><rect class="s" stroke-width="22" x="218" y="196" width="76" height="176" rx="14"/><rect class="s" stroke-width="22" x="308" y="260" width="76" height="112" rx="14"/>'],
+  ['Tin', 'stock', 0, '<ellipse class="s" stroke-width="24" cx="256" cy="160" rx="100" ry="30"/>' + S(24, 'M156 160V352M356 160V352M156 352a100 30 0 0 0 200 0M156 206a100 30 0 0 0 200 0')],
+  ['Bowl', 'food log', 0, S(24, 'M120 250H392A136 120 0 0 1 120 250ZM196 204c-20-24 20-40 0-68M256 204c-20-24 20-40 0-68M316 204c-20-24 20-40 0-68')],
+  ['Fork and spoon', 'food log', 0, S(24, 'M168 124V200a32 32 0 0 0 64 0V124M200 124V392M312 238V392') + '<ellipse class="s" stroke-width="24" cx="312" cy="180" rx="40" ry="58"/>'],
+  ['Apple', 'food', 0, S(24, 'M256 168c-40-20-120-20-120 70 0 80 50 150 90 150 14 0 20-8 30-8s16 8 30 8c40 0 90-70 90-150 0-90-80-90-120-70ZM256 168V122M256 142c20-30 50-30 66-22-14 30-40 36-66 22Z')],
+  ['Bag', 'shopping', 0, S(24, 'M152 196H360L376 388H136ZM208 196V172a48 48 0 0 1 96 0V196')],
+  ['Scale', 'by the gram', 1, '<rect class="s" stroke-width="24" x="136" y="236" width="240" height="148" rx="28"/>' + S(24, 'M160 196H352M256 196V236') +
+    '<circle class="s" stroke-width="18" cx="256" cy="310" r="46"/>' + O(18, 'M256 310L282 284')],
+  ['Barcode', 'scan', 1, S(24, 'M136 196V152a16 16 0 0 1 16-16h44M316 136h44a16 16 0 0 1 16 16v44M376 316v44a16 16 0 0 1-16 16h-44M196 376h-44a16 16 0 0 1-16-16v-44') +
+    S(14, 'M200 200V312M228 200V312M312 200V312') + S(24, 'M258 200V312M286 200V312') + O(18, 'M164 256H348')],
+  ['Carrot', 'food', 0, S(24, 'M330 182c-30-30-80-20-110 20l-90 160c-4 8 4 16 12 12l160-90c40-30 50-80 28-102ZM330 182l40-60M330 182l60-20M330 182l56-46')],
+  ['Egg', 'food', 0, S(26, 'M256 120c-70 0-116 110-116 170 0 60 52 102 116 102s116-42 116-102c0-60-46-170-116-170Z')],
+  ['Cupboard', 'pantry', 0, '<rect class="s" stroke-width="24" x="144" y="128" width="224" height="256" rx="18"/>' + S(24, 'M256 128V384') +
+    '<circle class="f" cx="230" cy="256" r="12"/><circle class="f" cx="282" cy="256" r="12"/>'],
+  ['Plate, kcal left', 'food log', 1, '<circle class="s" stroke-width="24" cx="256" cy="256" r="140"/>' + O(28, 'M256 166A90 90 0 1 1 166 256')],
+  ['Jar, barcode', 'scan', 0, LID + S(24, JAR) + S(12, 'M204 272V340M276 272V340M306 272V340') + S(22, 'M232 272V340M254 272V340')],
+  ['Carton', 'shopping', 0, S(24, 'M176 204V384H336V204ZM176 204L216 148H296L336 204M232 148V120H280V148')],
+  ['Loaf', 'food', 0, S(24, 'M152 380V246C110 230 120 140 256 140S402 230 360 246V380ZM220 196l22 30M270 192l22 30')],
+  ['Receipt', 'Coles receipts', 0, S(24, 'M168 120H344V392l-29-20-29 20-29-20-29 20-29-20-29 20ZM208 176H304M208 224H304M208 272H272')],
+  ['Jar, solid', 'current, filled', 0, '<rect class="f" x="174" y="110" width="164" height="56" rx="18"/>' +
+    '<path class="f" d="M190 180c0 6-10 12-24 20-20 12-28 26-28 44v114c0 30 18 48 48 48h140c30 0 48-18 48-48V244c0-18-8-32-28-44-14-8-24-14-24-20Z"/>' +
+    '<path class="bg" d="M138 290h236v22H138Z"/>'],
+];
+
+const svg = (inner, cls) => `<svg class="${cls}" viewBox="0 0 512 512" aria-hidden="true"><rect class="bg" width="512" height="512"/>${inner}</svg>`;
+const picks = { C: '', P: '' };
+function render(id, list, key) {
+  document.getElementById(id).innerHTML = list.map(([name, hint, orange, inner], i) => {
+    const code = key + String(i + 1).padStart(2, '0');
+    return `<button class="tile" data-code="${code}" aria-pressed="false">${svg(inner, 'big')}
+      <div class="row">${svg(inner, 'small')}<div><b>${code} ${name}</b><span>${hint}</span>${orange ? '<div class="or">orange detail</div>' : ''}</div></div></button>`;
+  }).join('');
+}
+render('cali', cali, 'C');
+render('pantry', pantry, 'P');
+document.querySelectorAll('.tile').forEach(t => t.addEventListener('click', () => {
+  const code = t.dataset.code, key = code[0];
+  picks[key] = picks[key] === code ? '' : code;
+  document.querySelectorAll(`.tile[data-code^="${key}"]`).forEach(o => o.setAttribute('aria-pressed', o.dataset.code === picks[key]));
+  document.getElementById('pick').textContent = `name? · ${picks.C || 'C?'} · ${picks.P || 'P?'}`;
+}));
+function seg(attr, apply) {
+  document.querySelectorAll(`[${attr}]`).forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll(`[${attr}]`).forEach(o => o.setAttribute('aria-pressed', o === b));
+    apply(b.getAttribute(attr));
+  }));
+}
+seg('data-theme-btn', v => document.documentElement.setAttribute('data-theme', v));
+seg('data-icon-btn', v => document.documentElement.setAttribute('data-icon', v));
+</script>
+</body>
+</html>
