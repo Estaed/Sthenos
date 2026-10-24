@@ -13,3 +13,6 @@ below. None yet.
   day. A round object earns its place when it measures the current exercise (P3's set ring), not the day.
   Grain lost on the same screen as P1, so the app stays flat. Round 2 (`design/yonler-2.html`) varies P3
   and P4 only.
+- 2026-10-24, round 3 (clickable proto-sheet / proto-dock / proto-notebook, deleted, in git): none sat right; the
+  Day sheet came closest ("aralarında en çok hoşuma giden ama yeterli değil"). Round 4 (`design/r4/index.html`) holds
+  the Day sheet's working core fixed and varies only the style, ten directions, static, to choose the look first.

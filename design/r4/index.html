@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Round 4 Styles</title>
+<style>
+  :root { --bg:#0E0E0E; --card:#161616; --line:#2A2A2A; --ink:#F2F2F2; --mute:#9A9A9A; --acc:#FF5A00; }
+  :root[data-theme="light"] { --bg:#F7F7F7; --card:#FFFFFF; --line:#E2E2E2; --ink:#111111; --mute:#5E5E5E; --acc:#D34303; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 system-ui, "Segoe UI", sans-serif; }
+  header { padding:24px 16px 8px; max-width:1500px; margin:0 auto; display:flex; gap:16px; align-items:baseline; flex-wrap:wrap; }
+  h1 { font-size:26px; margin:0; letter-spacing:-.01em; }
+  header p { margin:0; color:var(--mute); flex:1 1 420px; }
+  header button { background:none; border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:8px 14px; font:inherit; cursor:pointer; min-height:44px; }
+  .answer { max-width:1500px; margin:0 auto; padding:0 16px 8px; color:var(--mute); }
+  .answer code { color:var(--ink); background:var(--card); border:1px solid var(--line); padding:2px 6px; border-radius:6px; }
+  main { max-width:1500px; margin:0 auto; padding:8px 16px 48px; display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:20px; }
+  .item { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; }
+  .item h2 { font-size:17px; margin:0 0 2px; }
+  .item h2 b { color:var(--acc); margin-right:6px; }
+  .item p { margin:0 0 10px; color:var(--mute); font-size:13px; min-height:38px; }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .pair a { display:block; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+  .pair img { display:block; width:100%; height:auto; }
+  .pair a.missing { aspect-ratio:360/780; display:grid; place-items:center; color:var(--mute); font-size:12px; }
+  .src { display:inline-block; margin-top:8px; font-size:13px; color:var(--mute); }
+  dialog { padding:0; border:0; background:transparent; max-height:96vh; }
+  dialog img { max-height:94vh; width:auto; display:block; border-radius:10px; }
+  dialog::backdrop { background:rgba(0,0,0,.85); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Round 4: ten styles</h1>
+  <p>Same screen in every one: A Heavy mid-workout, Leg Press set 2 next, Side Lateral Raise set 1 short (9 of 12), rest 1:12. Left dark, right light; click for full size.</p>
+  <button id="t" type="button">Light page</button>
+</header>
+<div class="answer">Answer like <code>05 + 03's table, 09 too loud</code>: the number you like, the parts you want from others, the ones to drop.</div>
+<main id="g"></main>
+<dialog id="d"><img id="di" alt=""></dialog>
+<script>
+const S = [
+  ["01","sheet-plus","Sheet+","Round 3's Day sheet finished properly: Tarik Base v6, anchor box carrying the current set."],
+  ["02","neo-brutal","Neo-brutal","Thick ink borders, hard slab shadows, chunky press-buttons; light mode first."],
+  ["03","departure-board","Departure board","No cards: a Swiss timetable grid, tabular numbers, current row inverted."],
+  ["04","scoreboard","Scoreboard","Sports broadcast: a score bug with the current set, the day as a league table."],
+  ["05","instrument","Instrument","Whoop/Garmin cockpit: thin lines, a small trend line beside each exercise."],
+  ["06","material-native","Material native","A real Android app: M3 tonal surfaces, rounded containers, bottom sheet."],
+  ["07","heat-matrix","Heat matrix","The day as one grid of set tiles; fill tone shows how each set went."],
+  ["08","rail-timeline","Rail timeline","A vertical rail; the current pair opens in place with the rep picker inline."],
+  ["09","volt-poster","Volt poster","Nike Training energy, big pair numbers; tests volt green instead of orange."],
+  ["10","pair-columns","Pair columns","Each pair one card in two columns, so the alternation reads as a zig-zag."]
+];
+const g = document.getElementById("g"), d = document.getElementById("d"), di = document.getElementById("di");
+for (const [n, slug, name, idea] of S) {
+  const el = document.createElement("section");
+  el.className = "item";
+  el.innerHTML = `<h2><b>${n}</b>${name}</h2><p>${idea}</p><div class="pair">` +
+    ["dark","light"].map(m => `<a href="shots/${n}-${m}.png" data-m="${m}"><img src="shots/${n}-${m}.png" alt="${name}, ${m} mode" loading="lazy"></a>`).join("") +
+    `</div><a class="src" href="${n}-${slug}.html">open the HTML</a>`;
+  g.appendChild(el);
+}
+g.addEventListener("click", e => {
+  const a = e.target.closest(".pair a"); if (!a || a.classList.contains("missing")) return;
+  e.preventDefault(); di.src = a.getAttribute("href"); d.showModal();
+});
+g.addEventListener("error", e => {
+  if (e.target.tagName === "IMG") { const a = e.target.parentElement; a.classList.add("missing"); a.textContent = "not ready"; }
+}, true);
+d.addEventListener("click", () => d.close());
+const t = document.getElementById("t");
+t.onclick = () => {
+  const r = document.documentElement, light = r.dataset.theme !== "light";
+  r.dataset.theme = light ? "light" : "dark"; t.textContent = light ? "Dark page" : "Light page";
+};
+</script>
+</body>
+</html>

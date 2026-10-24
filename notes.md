@@ -25,8 +25,9 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
    Pantry the same way. Rejected for v1: Flutter/Kotlin native (the blueprint skill notes Pantry's
    web build fell short in scrolling and feel, 2026-10-21; if the workout app feels the same, native
    goes to *After v1* with the measured complaint).
-2. **Design:** one of round 3's clickable prototypes (`design/proto-sheet.html`, `proto-dock.html`,
-   `proto-notebook.html`) or named parts of them.
+2. **Design:** a style from round 4 (`design/r4/index.html`, ten static directions on the Day
+   sheet's working core); round 3's prototypes were deleted 2026-10-24 (Tarık: none sat right, Day
+   sheet closest), git keeps them.
 3. **Data:** same private repo `Estaed/Calisthenics-Data`, schema v5 (per-set reps, workout
    start/finish) migrated from v4 — recommended (git history stays one time series). Rejected: a new repo.
 4. **Old app:** the new one takes the same URL (his home-screen icon keeps working), the old
@@ -66,7 +67,7 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 - Set-by-set logging (P4) with a focus view for the current exercise (P3).
 - Rest timer between alternated pairs (~90 s).
 - Last week's value under every exercise; "+2.5 kg next" when the range top is reached.
-- Round 3 (clickable, `design/proto-*.html`): Day sheet, Program + dock, Notebook.
+- Round 3 (clickable; deleted, in git before this commit): Day sheet, Program + dock, Notebook. Day sheet liked best, "fena değil ama yeterli değil".
 
 ## Screens
 <Eko fills it by asking before the Blueprint: v1 main flow, screen list, states>
