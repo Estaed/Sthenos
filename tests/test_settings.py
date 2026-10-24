@@ -59,7 +59,7 @@ def main():
                 "Alternate paired exercises", "Start rest after a log", "Heads-up 10 s before the end", "Vibration", "Short",
                 "Long", "Pulse", "Sound", "Beep", "Bell", "Chirp", "Volume", "Notifications", "Workout",
                 "Keep screen awake", "Load step", "Theme", "System", "Light", "Dark", "Data", "GitHub sync",
-                "Estaed/Calisthenics-Data", "Download backup", "Restore from backup"]
+                "Your own private repository", "Download backup", "Restore from backup"]
         A.check("screen 5 shows every setting with its default", all(w in text for w in want), [w for w in want if w not in text])
 
         # ── rest times: the next rest reads them through Cali.settings ──

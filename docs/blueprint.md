@@ -9,8 +9,9 @@ and drops what the code now answers; it never appends a dated note (`blueprint` 
 A workout log for the gym on an Android phone, between sets, one hand: the whole day's program on
 one screen, a set logged by tapping its cell, workout start and finish, a rest timer and an
 independent timer, weeks with double progression, program editing, history, body weight. A public
-site: anyone uses it without sync (data on their phone); Tarık adds his GitHub key and syncs to
-his private data repo. English UI. Ships Tarık's current A/B/C program as the built-in default
+site: anyone uses it without sync (data on their phone); anyone may add a GitHub token and a private
+repo of their own and sync to it, Tarık to his (2026-10-24: public, so a stranger's sync never points
+at Tarık's repo). English UI. Ships Tarık's current A/B/C program as the built-in default
 program (week 1 is built from it on first open); no old logs come in.
 
 Done when:
@@ -43,7 +44,7 @@ Pantry's stack, so both apps share one style (they stay separate apps, Tarık 20
 | `tokens.css`, Archivo, Manrope | Tarik Base v6, copied unchanged | design language; fonts local, works offline |
 | Service worker + manifest | — | installable PWA, offline in the gym |
 | Wake Lock, Vibration, Web Audio, Notifications | built in | keep awake, rest and timer alerts (Riskiest assumption) |
-| GitHub Contents API | REST, fine-grained token | sync to `Estaed/Calisthenics-Data`, the old app's sync carried over |
+| GitHub Contents API | REST, fine-grained token | sync to the user's own private repo (Tarık's `Estaed/Calisthenics-Data`), the old app's sync carried over |
 | Python + Playwright | 3.13.5 / 1.62.0 (this machine) | the acceptance test |
 
 Rejected: native Kotlin or Flutter (Monday deadline; Pantry's PWA, sync and stack already exist; if
@@ -63,8 +64,10 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   (off), start rest after a log, heads-up 10 s, vibration (off, short, long, pulse), sound (off, beep,
   bell, chirp) and volume, keep awake, default load step 2.5, theme.
 - `calisthenics-data.json` with `_version: 5` in the private repo; the v4 file moves to `archive/` untouched. The
-  phone keeps a copy in localStorage (`cali.v5`) and works offline; the token and sync marks stay on the phone under
-  `cali.sync`, running timers under `cali.timers` (start timestamps), none of them in the document.
+  phone keeps a copy in localStorage (`cali.v5`) and works offline; the token, the repo (`owner/name`, set in
+  Settings; a token saved before 2026-10-24 without one means `Estaed/Calisthenics-Data`, so Tarık's phone needs no
+  step) and sync marks stay on the phone under `cali.sync`, running timers under `cali.timers` (start timestamps),
+  none of them in the document.
 
 ## Rules
 - **Logging:** tap a cell = target; tap again = one less (down to 0, then empty); hold = one more.

@@ -4,7 +4,8 @@ Run from the repo root: python tests/test_sync.py   (exit 0 = no FAIL). Reuses t
 tests/acceptance.py; GitHub is the mocked Contents API (Repo below, built on acceptance.MockGitHub: several paths, git
 blob shas as GitHub gives them, and failures to inject). Never a real token: the token is acceptance.TOKEN.
 States: no token (no request at all), a token copied from the old app's cali_sync_config with the old v4 file in the
-repo, a token typed in Settings with no file yet, a v5 file already there, and a saved log that cannot be read.
+repo, a token typed in Settings with no file yet, a v5 file already there, a saved log that cannot be read, a stranger's
+own repository typed in Settings, and Tarık's phone as it was before the repository became a setting.
 """
 import base64
 import datetime
@@ -226,6 +227,7 @@ def scenario_policy(browser, url):
     page.evaluate("() => Cali.go('settings')")
     page.wait_for_selector('[data-screen="settings"]')
     A.touch_tap(page, '[data-act="github"]')
+    page.fill("#settings-repo", "Estaed/Calisthenics-Data")
     page.fill("#settings-token", A.TOKEN)
     A.touch_tap(page, '[data-act="connect"]')
     settle(page)
@@ -503,7 +505,7 @@ def scenario_remote(browser, url):
     A.open_day(page, url)
     ids = day_ids(page)
     page.evaluate(f"() => Cali.tap({json.dumps(ids['a'])}, {json.dumps(ids['ea'])}, 0)")
-    page.evaluate(f"() => CaliSync.connect('{A.TOKEN}')")
+    page.evaluate(f"() => CaliSync.connect('{A.TOKEN}', 'Estaed/Calisthenics-Data')")
     settle(page)
     doc = local_doc(page)
     A.check("a phone with logs and no last sync that connects gets the conflict choice, never GitHub's file in silence",
@@ -535,13 +537,104 @@ def scenario_remote(browser, url):
     A.check("remote scenarios: no console or page errors", not app_errors(errors), app_errors(errors)[:5])
 
 
+def scenario_own_repo(browser, url):
+    """A stranger's phone: their own repository typed in Settings; nothing ever goes to Estaed/Calisthenics-Data."""
+    errors = []
+    gh = Repo()
+    gh.REPO = "/repos/someone/my-log"
+    ctx, page = phone(browser, errors, "own-repo", gh)
+    A.open_day(page, url)
+    ctx.clock.pause_at(A.NOW + datetime.timedelta(seconds=30))
+    page.evaluate("() => Cali.go('settings')")
+    page.wait_for_selector('[data-screen="settings"]')
+    A.touch_tap(page, '[data-act="github"]')
+    A.check("a new phone: Settings names no repository of Tarık's and the repository field is empty",
+            page.locator("[data-sync-repo]").inner_text() == "Your own private repository"
+            and page.locator("#settings-repo").input_value() == ""
+            and "Estaed" not in page.locator('[data-screen="settings"]').inner_text(),
+            page.locator("[data-sync-repo]").inner_text())
+    page.fill("#settings-token", A.TOKEN)
+    A.touch_tap(page, '[data-act="connect"]')
+    settle(page)
+    A.check("Connect with a token and no repository sends nothing and asks for owner/name",
+            not gh.requests and not status(page)["configured"]
+            and "owner/name" in page.locator(".settings-snack").inner_text(), gh.requests[:2])
+    page.fill("#settings-repo", "https://github.com/someone/my-log.git")
+    page.fill("#settings-token", A.TOKEN)
+    A.touch_tap(page, '[data-act="connect"]')
+    settle(page)
+    s = status(page)
+    A.check("Connect with the repository pasted as a link: the file is created in someone/my-log, nothing goes elsewhere",
+            s["repo"] == "someone/my-log" and gh.puts == 1 and json.loads(gh.files[PATH]) == local_doc(page)
+            and gh.requests and all("/repos/someone/my-log" in r for r in gh.requests)
+            and page.locator("[data-sync-repo]").inner_text() == "someone/my-log", (s, gh.requests[:3]))
+    A.check("the repository is kept on this phone only, never in the document or a pushed file",
+            "someone/my-log" not in json.dumps(local_doc(page)) and "someone/my-log" not in gh.files[PATH])
+
+    A.touch_tap(page, '[data-act="disconnect"]')
+    A.touch_tap(page, '.settings-dialog [data-answer="yes"]')
+    page.reload()
+    page.wait_for_selector('[data-screen="settings"]')
+    A.touch_tap(page, '[data-act="github"]')
+    A.check("Disconnect removes the token and keeps the repository, filled in for the next Connect",
+            not page.evaluate("() => Cali.syncState().token") and status(page)["repo"] == "someone/my-log"
+            and page.locator("#settings-repo").input_value() == "someone/my-log",
+            (status(page)["repo"], page.locator("#settings-repo").input_value()))
+    page.fill("#settings-repo", "someone/other")
+    page.fill("#settings-token", A.TOKEN)
+    A.touch_tap(page, '[data-act="connect"]')
+    settle(page)
+    A.check("a repository the token cannot reach: the error names it and nothing is written",
+            "Repository someone/other not found" in (status(page)["lastError"] or "") and gh.puts == 1,
+            status(page)["lastError"])
+    ctx.close()
+    A.check("own repository scenario: no console or page errors", not app_errors(errors), app_errors(errors)[:5])
+
+
+def scenario_tarik_install(browser, url):
+    """Tarık's phone as it was before the repository became a setting: a token and a last sha in cali.sync, no repo.
+    It keeps syncing to Estaed/Calisthenics-Data with no step, and his stored log is not touched."""
+    errors = []
+    gh = Repo({PATH: FIXTURE})
+    ctx, page = phone(browser, errors, "tarik", gh)
+    before = {"token": A.TOKEN, "lastSha": Repo.blob(FIXTURE), "pendingSha": None, "lastSyncedAt": "2026-10-25T00:00:00.000Z",
+              "lastError": None, "pushDue": False, "legacyChecked": True, "dirty": False, "changes": 7, "dirtySince": None}
+    ctx.add_init_script(f"""if (!localStorage.getItem('cali.v5')) {{ localStorage.setItem('cali.v5', {json.dumps(FIXTURE)});
+        localStorage.setItem('cali.sync', {json.dumps(json.dumps(before))}); }}""")
+    A.open_day(page, url)
+    ctx.clock.pause_at(A.NOW + datetime.timedelta(seconds=30))
+    settle(page)
+    s = status(page)
+    stored_sync = page.evaluate("() => JSON.parse(localStorage.getItem('cali.sync'))")
+    A.check("his phone opens on his own log, unchanged, and keeps its token and last sha (no step, nothing rewritten)",
+            A.stored(page) == json.loads(FIXTURE) and stored_sync == before, (stored_sync, A.stored(page) == json.loads(FIXTURE)))
+    A.check("the open pulls from Estaed/Calisthenics-Data only: same sha, no push, no conflict, no error",
+            s["repo"] == "Estaed/Calisthenics-Data" and s["configured"] and gh.puts == 0 and not s["conflict"]
+            and s["lastError"] is None and gh.requests and all("/repos/Estaed/Calisthenics-Data/" in r for r in gh.requests),
+            (s, gh.requests[:3]))
+    page.evaluate("() => Cali.tap('F', 'f1', 0)")
+    finish_day(page, "F")
+    settle(page)
+    remote = json.loads(gh.files[PATH])
+    A.check("his next Done pushes to Estaed/Calisthenics-Data as before, with the new set",
+            gh.puts == 1 and remote == local_doc(page) and remote["weeks"][1]["days"]["F"]["exercises"]["f1"]["sets"][0]["r"] == 8
+            and status(page)["dirty"] is False, (gh.puts, gh.requests[-2:]))
+    page.evaluate("() => Cali.go('settings')")
+    page.wait_for_selector('[data-screen="settings"]')
+    A.check("Settings shows his repository on the GitHub row", page.locator("[data-sync-repo]").inner_text() == "Estaed/Calisthenics-Data",
+            page.locator("[data-sync-repo]").inner_text())
+    ctx.close()
+    A.check("Tarık's install scenario: no console or page errors", not app_errors(errors), app_errors(errors)[:5])
+
+
 def main():
     srv, site, url = A.start_site()
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for name, fn in (("no token", scenario_no_token), ("v4 archive", scenario_v4), ("push policy", scenario_policy),
                          ("finished edits", scenario_finished_edits), ("push in flight", scenario_in_flight),
-                         ("conflict", scenario_conflict), ("remote file", scenario_remote), ("unreadable log", scenario_problem)):
+                         ("conflict", scenario_conflict), ("remote file", scenario_remote), ("unreadable log", scenario_problem),
+                         ("own repository", scenario_own_repo), ("Tarık's install", scenario_tarik_install)):
             A.guarded(f"sync scenario: {name}", fn, browser, url)
         browser.close()
     srv.shutdown()

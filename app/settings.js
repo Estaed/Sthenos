@@ -12,8 +12,9 @@
                      notifications: "Allow" calls Cali.alert.requestPermission(); while Notification.permission is
                      not 'granted' one line says the alert then needs the screen kept awake and how to allow them.
    Workout           keep screen awake, default load step (1, 1.25, 2.5, 5 kg), theme (system, light, dark).
-   Data              GitHub sync (app/sync.js through self.CaliSync): its state, a token to connect, Sync now and
-                     Disconnect; "Download backup" saves the whole v5 document as JSON (the token is never in it;
+   Data              GitHub sync (app/sync.js through self.CaliSync): its state, the user's own repository
+                     (owner/name, kept after Disconnect) and a token to connect, Sync now and Disconnect;
+                     "Download backup" saves the whole v5 document as JSON (the token is never in it;
                      while Cali.problem() is set it saves nothing and says why, as the document in memory is then
                      core's empty stand-in, not the stored log);
                      "Restore from backup" accepts only a file with _version 5 and asks before it replaces the log
@@ -156,9 +157,11 @@
         '<div class="settings-gh" id="settings-gh" hidden>' +
           '<p class="settings-gh-detail" data-sync-detail role="status"></p>' +
           '<div class="settings-gh-form" data-sync-form>' +
+            '<label for="settings-repo">Repository</label>' +
+            '<input id="settings-repo" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="owner/name">' +
             '<label for="settings-token">Token</label>' +
             '<input id="settings-token" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…">' +
-            '<p class="settings-gh-note">A fine-grained token with Contents: Read and write on Estaed/Calisthenics-Data. It stays on this phone and never goes into the log or a backup.</p>' +
+            '<p class="settings-gh-note">A private repository of yours and a fine-grained token with Contents: Read and write on it. The token stays on this phone and never goes into the log or a backup.</p>' +
             '<button type="button" class="btn primary" data-act="connect">Connect</button>' +
           '</div>' +
           '<div class="settings-gh-actions" data-sync-actions>' +
@@ -177,7 +180,7 @@
   function syncView(s) {
     if (!s) return { word: 'Off', err: false, detail: 'Sync is not installed in this copy of the app.' };
     const last = s.lastSyncedAt ? ` Last sync ${when(s.lastSyncedAt)}.` : '';
-    if (!s.configured) return { word: 'Off', err: false, detail: 'Add a token to keep this log in Estaed/Calisthenics-Data. Without one the log stays on this phone only; download a backup now and then.' };
+    if (!s.configured) return { word: 'Off', err: false, detail: 'Add your private repository and a token to keep this log on GitHub. Without them the log stays on this phone only; download a backup now and then.' };
     if (s.problem) return { word: 'Error', err: true, detail: s.problem };
     if (s.conflict) return { word: 'Choose', err: true, detail: 'This phone and GitHub both changed: choose which log to keep.' };
     if (s.running) return { word: 'Syncing', err: false, detail: 'Syncing with GitHub…' };
@@ -217,7 +220,9 @@
 
     const s = sync() ? sync().status() : null;
     const v = syncView(s);
-    root.querySelector('[data-sync-repo]').textContent = s ? s.repo : 'Estaed/Calisthenics-Data';
+    root.querySelector('[data-sync-repo]').textContent = s && s.repo ? s.repo : 'Your own private repository';
+    const repoInput = root.querySelector('#settings-repo');
+    if (s && s.repo && !repoInput.value && document.activeElement !== repoInput) repoInput.value = s.repo;
     const pill = root.querySelector('[data-sync-pill]');
     pill.textContent = v.word;
     pill.classList.toggle('settings-pill-err', v.err);
@@ -341,10 +346,12 @@
     }
     if (name === 'connect') {
       const input = root.querySelector('#settings-token');
+      const repoInput = root.querySelector('#settings-repo');
       const value = input.value;
+      if (sync() && !sync().repoName(repoInput.value)) { snack('Enter the repository as owner/name.'); repoInput.focus(); return; }
       if (!value.trim()) { snack('Paste a token first.'); input.focus(); return; }
       input.value = '';
-      if (sync()) await sync().connect(value);
+      if (sync()) await sync().connect(value, repoInput.value);
       return;
     }
     if (name === 'syncnow') { if (sync()) await sync().now({ manual: true }); return; }

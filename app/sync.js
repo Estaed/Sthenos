@@ -1,9 +1,12 @@
-/* GitHub sync (app/sync.js): keeps the v5 document in the private repo Estaed/Calisthenics-Data, file
-   calisthenics-data.json, through the GitHub Contents API and a fine-grained token. Ported from the old app's sync
+/* GitHub sync (app/sync.js): keeps the v5 document in a private repo of the user's own ('owner/name', set in Settings
+   with the token), file calisthenics-data.json, through the GitHub Contents API and a fine-grained token. A phone
+   that held a token before the repo became a setting (2026-10-24) has no repo saved and keeps syncing to
+   Estaed/Calisthenics-Data (LEGACY_REPO), Tarık's, so his install needs no step. Ported from the old app's sync
    (legacy/index.html, "SYNC (GitHub Contents API)"), with the push policy of Blueprint -> Rules -> Sync. Without a
    token nothing here sends a request: the app works fully on the phone, offline.
 
-   The token lives only in 'cali.sync' (Cali.setSyncState): never in the document, a push, a backup or a log line.
+   The token and the repo live only in 'cali.sync' (Cali.setSyncState): never in the document, a push, a backup or a
+   log line.
    On the first open, when 'cali.sync' holds no token and the old app's cali_sync_config does, that token is copied
    once (read through Cali.readOnly; the old key is never written). Disconnecting later does not copy it again.
 
@@ -34,24 +37,23 @@
 
    self.CaliSync (frozen), used by app/settings.js
      status()             { configured, online, running, paused, conflict, dirty, due, lastSyncedAt, lastError,
-                            problem, repo, path }
+                            problem, repo, path }; repo is '' while none is set.
      now({ manual })      one sync pass, single flight; manual also unpauses and makes a dirty change due. A Promise
                           that never rejects: errors land in status().lastError.
-     connect(token)       stores the token and syncs (manual).  disconnect() removes the token and the remote marks.
+     repoName(text)       'owner/name' from what the user typed (a github.com link too), or null when it is not one.
+     connect(token, repo) stores the token and the repo (through repoName; omitted: the one saved) and syncs (manual).
+     disconnect()         removes the token and the remote marks; the repo stays, so Connect again needs only a token.
    Emits Cali.emit('syncstatus', status()) whenever the status may have changed. */
 (() => {
   'use strict';
 
-  const OWNER = 'Estaed';
-  const REPO = 'Calisthenics-Data';
+  const LEGACY_REPO = 'Estaed/Calisthenics-Data';   // a token saved before the repo setting: Tarık's phone
   const BRANCH = 'main';
   const PATH = 'calisthenics-data.json';
   const ARCHIVE = 'archive/calisthenics-data-v4.json';
   const API = 'https://api.github.com';
   const PUSH_AFTER_MS = 12 * 60 * 60 * 1000;
   const VERSION = 5;
-  const REPO_NOT_FOUND = 'Repository not found, or the token cannot reach it. In the token\'s settings, is ' +
-    'Calisthenics-Data selected under Repository access?';
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -67,6 +69,14 @@
   const st = () => Cali.syncState();
   const token = () => (typeof st().token === 'string' ? st().token : '');
   const configured = () => token() !== '';
+  const repo = (s = st()) => (typeof s.repo === 'string' && s.repo ? s.repo
+    : typeof s.token === 'string' && s.token ? LEGACY_REPO : '');
+  const repoNotFound = () => new Error(`Repository ${repo()} not found, or the token cannot reach it. In the token's ` +
+    'settings, is that repository selected under Repository access?');
+  function repoName(text) {
+    const t = String(text || '').trim().replace(/^(https?:\/\/)?(www\.)?github\.com\//i, '').replace(/(\.git)?\/*$/, '');
+    return /^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+$/.test(t) ? t : null;
+  }
   const online = () => navigator.onLine !== false;
   function due(s = st()) {
     if (s.dirty !== true) return false;
@@ -80,7 +90,7 @@
     return {
       configured: configured(), online: online(), running: running !== null, paused, conflict: conflict !== null,
       dirty: s.dirty === true, due: due(s), lastSyncedAt: s.lastSyncedAt || null, lastError: s.lastError || null,
-      problem: Cali.problem(), repo: `${OWNER}/${REPO}`, path: PATH,
+      problem: Cali.problem(), repo: repo(s), path: PATH,
     };
   }
   const notify = () => Cali.emit('syncstatus', status());
@@ -109,7 +119,7 @@
     } catch (e) { return null; }
   }
 
-  const fileUrl = path => `${API}/repos/${OWNER}/${REPO}/contents/${path.split('/').map(encodeURIComponent).join('/')}`;
+  const fileUrl = path => `${API}/repos/${repo()}/contents/${path.split('/').map(encodeURIComponent).join('/')}`;
   const headers = extra => ({
     Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28',
     ...extra,
@@ -138,10 +148,10 @@
     if (res.status === 404) {
       if (!repoCheck) return { exists: false };
       // ambiguous: a missing file, a missing repo, or a token that cannot see the repo
-      const repo = await safeFetch(`${API}/repos/${OWNER}/${REPO}`, { headers: headers() });
-      if (repo.status === 200) return { exists: false };
-      if (repo.status === 404) throw new Error(REPO_NOT_FOUND);
-      throw authError(repo.status) || new Error(`Could not read the data on GitHub (${repo.status}).`);
+      const found = await safeFetch(`${API}/repos/${repo()}`, { headers: headers() });
+      if (found.status === 200) return { exists: false };
+      if (found.status === 404) throw repoNotFound();
+      throw authError(found.status) || new Error(`Could not read the data on GitHub (${found.status}).`);
     }
     const auth = authError(res.status);
     if (auth) throw auth;
@@ -170,7 +180,7 @@
       e.stale = true;
       throw e;
     }
-    if (res.status === 404) throw new Error(REPO_NOT_FOUND);
+    if (res.status === 404) throw repoNotFound();
     const auth = authError(res.status);
     if (auth) throw auth;
     if (!res.ok) throw new Error(`Could not write to GitHub (${res.status}).`);
@@ -387,17 +397,20 @@
     Cali.setSyncState(t ? { token: t, legacyChecked: true } : { legacyChecked: true });
   }
 
-  function connect(value) {
+  function connect(value, repoText) {
     const t = String(value || '').trim();
     if (!t) { save({ lastError: 'Paste a token first.' }); return Promise.resolve(); }
-    save({ token: t, lastError: null, legacyChecked: true });
+    const r = repoText === undefined ? repo() : repoName(repoText);
+    if (!r) { save({ lastError: 'Enter the repository as owner/name.' }); return Promise.resolve(); }
+    save({ token: t, repo: r, lastError: null, legacyChecked: true });
     return now({ manual: true });
   }
 
   function disconnect() {
     if (conflict) { conflict.dialog.remove(); conflict = null; }
     paused = false;
-    save({ token: '', lastSha: null, pendingSha: null, lastSyncedAt: null, lastError: null, pushDue: false, legacyChecked: true });
+    save({ repo: repo(), token: '', lastSha: null, pendingSha: null, lastSyncedAt: null, lastError: null, pushDue: false,
+      legacyChecked: true });
   }
 
   // ── triggers ──────────────────────────────────────────────────────
@@ -410,7 +423,7 @@
   window.addEventListener('offline', notify);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') retryDue(); });
 
-  self.CaliSync = Object.freeze({ status, now, connect, disconnect });
+  self.CaliSync = Object.freeze({ status, now, repoName, connect, disconnect });
 
   copyOldToken();
   if (configured()) now();   // pull on open
