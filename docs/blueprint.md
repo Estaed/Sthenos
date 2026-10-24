@@ -30,8 +30,9 @@ schedule a real alarm: Notification Triggers ended, a service worker lives ~5 mi
 vibration needs a visible page (`reports/2026-10-24-rest-alert-screen-off.md`, sources dated there).
 So the main path is the screen kept awake (Wake Lock, re-acquired on return) with an in-page beep,
 vibration and the visual change; the fallback is a service-worker notification at the end time.
-Untested on his phone: `spikes/rest-alert/` (Pages) answers whether the fallback rings with the screen
-off on Samsung Internet; if it does not, v1 says so in Settings and relies on keep-awake.
+Tested 2026-10-24 on Tarık's phone (Samsung Internet, test page in git at 0d1332d): once site
+notifications were allowed (the first request returned `denied`), vibration and sound arrived with
+the screen off and on. Both paths stay; without permission the app says the alert needs keep-awake.
 
 ## Stack
 Pantry's stack, so both apps share one style (they stay separate apps, Tarık 2026-10-24).

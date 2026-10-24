@@ -12,7 +12,8 @@
 A Settings screen (screen 5) for rest times, start rest after a log, heads-up, vibrate, sound, keep
 awake, default load step and theme (system / light / dark, applied app-wide); an alerts section with
 "Allow notifications" (`Cali.alert.requestPermission()`), "Test alert" (`Cali.alert('test')`) and one
-line saying the alert is reliable only with the screen kept awake; a GitHub section showing the sync
+line, shown only while permission is not granted, saying the alert then needs the screen kept awake and
+how to allow site notifications (Tarık's first request returned `denied` until he allowed them); a GitHub section showing the sync
 state; JSON backup download and restore. Without a token the app works fully, offline.
 
 ## Why
