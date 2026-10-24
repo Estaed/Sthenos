@@ -158,7 +158,7 @@ def main():
         got = ev(f"""() => {{ const a = document.createElement('button'), b = document.createElement('button'), w = document.createElement('span');
             a.id = 'slot-a'; b.id = 'slot-b'; w.id = 'slot-w';
             window.__rm = Cali.slot('topbar', a, 20); Cali.slot('topbar', b, 10); Cali.slot('dayheader', w);
-            const order = () => [...document.querySelectorAll('[data-screen="day"] [data-slot="topbar"] > *')].map(x => x.id);
+            const order = () => [...document.querySelectorAll('[data-screen="day"] [data-slot="topbar"] > *')].map(x => x.id).filter(id => id.startsWith('slot-'));
             const first = order();
             Cali.tap({D}, {ex('lp')}, 0);
             const fb = document.querySelector('[data-slot="dayheader"] > [data-fallback]');
