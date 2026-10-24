@@ -19,7 +19,7 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
   (notes → Blueprint → waves with `plan-wave` and `otopilot`) and design language (Tarik Base v6 +
   Pantry layer). The stack is still a decision (round below): he named the process, not the stack.
 
-## Open decisions for Blueprint (round 1, for Tarık in the morning; "evet" takes the recommendation)
+## Blueprint decisions, round 1 (Tarık "evet" to the recommendations, 2026-10-24)
 1. **Stack:** PWA like Pantry (vanilla JS, `app/` one script per feature, GitHub Pages, data repo
    sync) — recommended: the Monday deadline, the sync and v4 data already exist, his phone runs
    Pantry the same way. Rejected for v1: Flutter/Kotlin native (the blueprint skill notes Pantry's
@@ -35,7 +35,7 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 - **Look:** round 1 of `design/yonler.html` kept P3 Focus (one exercise big, thumb buttons) and
   P4 Sets (each set its own cell); round 2 in `design/yonler-2.html`. Taste record in `design/DESIGN.md`.
 
-## Open decisions for Blueprint (round 2, Eko's recommendation first; "evet" takes it)
+## Blueprint decisions, round 2 (Tarık "evet" to the recommendations, 2026-10-24)
 5. **Edits and sync:** an edit during a workout goes with Finish; an edit to a finished day or to the
    program pushes at once (rare, and a lost program edit hurts); the 12 h fallback stays.
 6. **New program (e.g. 4 days):** programs are their own objects (v4 already has `plans`). Settings →
@@ -43,13 +43,14 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
    you; the week generator takes the chosen program at Finish week. Two ways in: the in-app editor
    (days, exercises, sets, range, load, step, pairs, order) and importing a program file (JSON) that Eko
    or anyone writes. Tarık: "muhtemelen sana söylerim sen düzenle"; others use the editor or a file.
-7. **Who it is for:** only Tarık in v1 (GitHub sync needs his token); for others, v1 already works
-   local-only with JSON backup, and a starter template plus sync without GitHub go to *After v1*. Open.
+7. **Who it is for:** a public site; anyone who opens it uses it without sync, data on their phone
+   (localStorage, JSON backup); Tarık adds his GitHub key in Settings and syncs (Tarık: "başkası senkronsuz
+   çalışacak ... ben ise github key ile senkronlu"). A starter template for others goes to *After v1*.
 8. **Missed day / week end:** Finish week is manual; a day not done carries its exercises over with no
-   progression. Open.
-9. **Stalled lift:** the same load short three weeks running drops 10 % (StrongLifts' deload). Open.
+   progression.
+9. **Stalled lift:** the same load short three weeks running drops 10 % (StrongLifts' deload).
 10. **Timed and bodyweight rows:** plank tap steps by 5 s; stretch and walk are done/not done; weighted
-   pull-up and dip log the added load (BW + x kg) and progress on it. Open.
+   pull-up and dip log the added load (BW + x kg) and progress on it.
 11. **Rest alert with the screen off:** a web page cannot vibrate or beep reliably while the phone is
    locked in a pocket. This is the riskiest assumption; research before Blueprint (Notification API,
    Samsung Internet, keep-awake as the fallback).

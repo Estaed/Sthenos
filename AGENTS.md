@@ -36,9 +36,17 @@ and `notes.md` keeps a one-line link.
 
 - **Read `docs/blueprint.md` before** planning a task, changing a stage, the screen or a number,
   and whenever code seems to contradict a decision.
-- **Code:** <the directories that matter, one line>.
-- **Commands:** <run, serve, test>.
-- **Gate:** <the one gate command and its directory; what clean means>.
+- **What:** a public workout-log PWA; Tarık syncs to private `Estaed/Calisthenics-Data` with his key. v1 wave 1 due Monday 2026-10-26.
+- **Code:** `index.html` shell, `app/` one script per feature + `app/registry.js`, `tests/`, `design/r6/screens.html` (look), `legacy/` (old app).
+- **Commands:** serve `python -m http.server` from `D:/Projects` and open `/Calisthenics-App/`; test `python tests/acceptance.py`.
+- **Gate:** `python tests/acceptance.py` from the repo root; clean = every check PASS, exit 0.
 
 ## Constraints
-<forbid/require sentences only>
+- localStorage keys start with `cali.`; never write `cali4_*` (the legacy app) or any `pantry.*` key; `pantry.v1` is read only.
+- The GitHub token never enters the synced document or the repo.
+- Reps are entered only by tapping the set cell (tap, tap again, hold); no second input path.
+- Timers are computed from stored start timestamps, never from counted ticks.
+- A set is written only through `Cali.log`; a week copies program values when built, so a program edit never rewrites history.
+- Every visual change follows `D:/TarikOS/.brain/skills/tasarim/SKILL.md` and `design/r6/screens.html`; intended breaks go to `design/deviations.md`.
+- UI text in English; `tokens.css` copied unchanged from Tarik Base v6.
+- Personal data (logs, body weight) never enters this repo; tests use fixtures.
