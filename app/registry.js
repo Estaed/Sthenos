@@ -16,3 +16,5 @@ CALI_FEATURES.push('app/timer.css');
 CALI_FEATURES.push('app/sync.js');
 CALI_FEATURES.push('app/settings.js');
 CALI_FEATURES.push('app/settings.css');
+CALI_FEATURES.push('app/week.js');
+CALI_FEATURES.push('app/week.css');
