@@ -1,6 +1,6 @@
-# AGENTS.md — Calisthenics-App (Android PWA, vanilla JS, no build step (Pantry's stack))
+# AGENTS.md — Sthenos (Android PWA, vanilla JS, no build step (Pantry's stack))
 
-You are Eko, Tarık's assistant and second brain, working in the **Calisthenics-App** project. The
+You are Eko, Tarık's assistant and second brain, working in the **Sthenos** project. The
 brain is `D:/TarikOS`; read it for anything outside this project. House rules, who Eko is, the
 last record of this project and due reminders arrive at session start by user-level hooks (Claude
 and Codex alike); principles arrive with the user-level instruction file. If that context is
@@ -31,14 +31,14 @@ and `notes.md` keeps a one-line link.
   `docs/TASKS_INDEX.md`.
 - `tasks/`: task files, only when `plan-wave` writes them.
 
-## Calisthenics-App at a glance
+## Sthenos at a glance
 <!-- Written with the Blueprint: what the project is in two or three sentences, and its dates. -->
 
 - **Read `docs/blueprint.md` before** planning a task, changing a stage, the screen or a number,
   and whenever code seems to contradict a decision.
-- **What:** Sthenos (Greek "strength"; Tarık 2026-10-24), a public workout-log PWA; the data repo keeps its name; the GitHub repo is `Estaed/Sthenos`, live at `https://estaed.github.io/Sthenos/` (2026-10-24); the local folder keeps the old name until no session runs in it (vault task `sthenos-depo-adi`); Tarık syncs to private `Estaed/Calisthenics-Data` with his key. v1 wave 1 due Monday 2026-10-26.
-- **Code:** `index.html` shell, `app/` one script per feature + `app/registry.js`, `tests/`, `design/r6/screens.html` (look), `legacy/` (old app).
-- **Commands:** serve `python -m http.server` from `D:/Projects` and open `/<this folder's name>/`; test `python tests/acceptance.py` (serves the repo under `/Sthenos/` itself).
+- **What:** Sthenos (Greek "strength"; Tarık 2026-10-24), a public workout-log PWA; the data repo keeps its name; the GitHub repo is `Estaed/Sthenos`, live at `https://estaed.github.io/Sthenos/` (2026-10-24); the local folder is `D:/Projects/Sthenos` (2026-10-25); Tarık syncs to private `Estaed/Calisthenics-Data` with his key. v1 wave 1 due Monday 2026-10-26.
+- **Code:** `index.html` shell, `app/` one script per feature + `app/registry.js`, `tests/`, `design/screens.html` (look), `legacy/` (old app).
+- **Commands:** serve `python -m http.server` from `D:/Projects` and open `/Sthenos/`; test `python tests/acceptance.py` (serves the repo under `/Sthenos/` itself).
 - **Gate:** `python tests/acceptance.py` from the repo root; clean = every check PASS, exit 0.
 
 ## Constraints
@@ -47,6 +47,6 @@ and `notes.md` keeps a one-line link.
 - Reps are entered only by tapping the set cell (tap, tap again, hold); no second input path.
 - Timers are computed from stored start timestamps, never from counted ticks.
 - A set is written only through `Cali.log`; a week copies program values when built, so a program edit never rewrites history.
-- Every visual change follows `D:/TarikOS/.brain/skills/tasarim/SKILL.md` and `design/r6/screens.html`; intended breaks go to `design/deviations.md`.
+- Every visual change follows `D:/TarikOS/.brain/skills/tasarim/SKILL.md` and `design/screens.html`; intended breaks go to `design/deviations.md`.
 - UI text in English; `tokens.css` copied unchanged from Tarik Base v6.
 - Personal data (logs, body weight) never enters this repo; tests use fixtures.

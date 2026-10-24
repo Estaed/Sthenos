@@ -1,5 +1,5 @@
 /* Weeks (app/week.js): the week menu in the day screen's app bar, the Finish week confirmation (route 'finish-week',
-   in the look of design/r6/screens.html screen 6) and the Undo snackbar. Tokens by name (tokens.css, app/base.css);
+   in the look of design/screens.html screen 6) and the Undo snackbar. Tokens by name (tokens.css, app/base.css);
    every class here carries the week- prefix. */
 
 /* the "Week N" button in the 'dayheader' slot: the base .appbar .week label made a menu button */

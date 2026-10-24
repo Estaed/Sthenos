@@ -1,4 +1,4 @@
-/* Settings (app/settings.js): screen 5 of design/r6/screens.html, values from tokens.css and app/base.css. Also the
+/* Settings (app/settings.js): screen 5 of design/screens.html, values from tokens.css and app/base.css. Also the
    confirm dialogs (.settings-dialog) and the sync conflict dialog of app/sync.js (.sync-*), which has no stylesheet
    of its own. Touch targets are at least 44 px even where the drawn control is smaller (stepper, segments, Allow). */
 

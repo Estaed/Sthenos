@@ -1,4 +1,4 @@
-/* The workout day (Task-01): route 'day' { week, dayId, readOnly }, round 6 tap-only look (design/r6/screens.html,
+/* The workout day (Task-01): route 'day' { week, dayId, readOnly }, round 6 tap-only look (design/screens.html,
    screens 1, 2, 7, 8; styles in app/workout.css). The whole day on one screen: day tabs, every exercise with last
    week's sets and a 4-week trend line, a cell per set, and the docked score bug (current set, reps, rest).
 

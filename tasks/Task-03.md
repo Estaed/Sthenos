@@ -39,7 +39,7 @@ The sync keeps a lost phone from losing months of training; the policy is Bluepr
 - [x] Tests run against the mocked GitHub API in both states (no token; token with a v4 file there).
 - [x] Before Monday, the orchestrator runs one real push and pull with Tarık's token on a test path and
   reports the result.
-- [ ] (eye) screen 5 of `design/r6/screens.html`, both modes.
+- [ ] (eye) screen 5 of `design/screens.html`, both modes.
 
 ## Out of scope
 - Programs list and editor (wave 2), sync for people without GitHub (*After v1*).

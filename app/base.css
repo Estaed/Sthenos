@@ -1,4 +1,4 @@
-/* Calisthenics shell styles: Tarik Base v6 (tokens.css, by name) with the round-6 layer (design/r6/screens.html),
+/* Calisthenics shell styles: Tarik Base v6 (tokens.css, by name) with the round-6 layer (design/screens.html),
    shared by every screen. A feature's own classes carry its prefix and live in its own stylesheet (app/<feature>.css,
    listed in app/registry.js). Font sizes are in rem (1rem = 16 px at text size 1.0), spacing in px.
 
@@ -8,7 +8,7 @@
    --p = reps/target, .void), .snack (the snackbar), .banner, .note and the Lucide icon class .i. */
 @font-face { font-family: Manrope; src: url(../fonts/Manrope.woff2) format('woff2'); font-weight: 200 800; font-display: swap; }
 
-/* round-6 colour layer (design/r6/screens.html, design/deviations.md: orange means a done set) */
+/* round-6 colour layer (design/screens.html, design/deviations.md: orange means a done set) */
 :root, [data-theme="dark"] {
   --card: #191919; --card-line: #262626; --divider: #2A2A2A; --tonal: #2E2E2E; --outline: #6B6B6B;
   --hit-bg: #5A2208; --hit-ink: #FF8A4C;

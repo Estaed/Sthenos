@@ -1,4 +1,4 @@
-/* Settings (app/settings.js, styles in app/settings.css): screen 5 of design/r6/screens.html. Route 'settings' (no
+/* Settings (app/settings.js, styles in app/settings.css): screen 5 of design/screens.html. Route 'settings' (no
    args); the way in is a gear in the day screen's top bar, right after the 'topbar' holder (after the timer's
    buttons, before Finish). Every value goes through Cali.settings (core saves it in the document and applies the
    theme app-wide).
@@ -47,7 +47,7 @@
   const PERMISSION_HELP = 'Until notifications are allowed, the rest alert needs the screen kept awake. Tap Allow; if ' +
     'nothing changes, allow notifications for this site in the browser\'s site settings, then come back.';
 
-  // Lucide icons (the set design/r6/screens.html uses)
+  // Lucide icons (the set design/screens.html uses)
   const IC = {
     gear: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
     back: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',

@@ -1,4 +1,4 @@
-/* The independent timer (Task-02): route 'timer' { countdown } (design/r6/screens.html, screen 4) and its pill in the
+/* The independent timer (Task-02): route 'timer' { countdown } (design/screens.html, screen 4) and its pill in the
    day screen's top bar (screen 2). Separate from the rest timer: both live in Cali.timers at once, this one under the
    names 'countdown' (kind 'timer', data { pick }: the length chosen, in seconds) and 'stopwatch'. Every number on
    screen is computed from their start timestamps on each tick, never counted, so it is right after the phone slept.

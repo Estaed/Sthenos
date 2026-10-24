@@ -19,7 +19,7 @@ Done when:
   start to Finish, and the day reaches `Calisthenics-Data`;
 - a set at target is 1 tap, a set one short 2 taps;
 - finishing week 1 builds week 2 with the progression rules below, right on his real numbers;
-- (eye) on the phone the screens match `design/r6/screens.html` (screens 1, 2, 4-8).
+- (eye) on the phone the screens match `design/screens.html` (screens 1, 2, 4-8).
 
 ## Not in v1
 Swapping an exercise when a machine is busy; a starter template and sync without GitHub for other
@@ -116,7 +116,7 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 - Gate: `python tests/acceptance.py` from the repo root; clean = every check PASS, exit 0. Written
   and first run in Task-00.
 - Eye: Tarık on his phone (Samsung Internet, text size 1.0), or the emulator at 360 px, against
-  `design/r6/screens.html`; intended breaks go to `design/deviations.md`.
+  `design/screens.html`; intended breaks go to `design/deviations.md`.
 
 ## Decisions (2026-10-24, Tarık)
 - PWA on Pantry's stack. Rejected: native now (above).

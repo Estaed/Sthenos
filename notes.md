@@ -25,15 +25,15 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
    Pantry the same way. Rejected for v1: Flutter/Kotlin native (the blueprint skill notes Pantry's
    web build fell short in scrolling and feel, 2026-10-21; if the workout app feels the same, native
    goes to *After v1* with the measured complaint).
-2. **Design:** a style from round 4 (`design/r4/index.html`, ten static directions on the Day
+2. **Design:** a style from round 4 (`design/r4/`, deleted, in git; ten static directions on the Day
    sheet's working core); round 3's prototypes were deleted 2026-10-24 (Tarık: none sat right, Day
    sheet closest), git keeps them.
 3. **Data:** same private repo `Estaed/Calisthenics-Data`, a fresh schema v5 file (per-set reps, workout
    start/finish, body weight); the v4 file moves to `archive/`, nothing is migrated (Tarık 2026-10-24).
 4. **Old app:** the new one takes the same URL (his home-screen icon keeps working), the old
    `index.html` moves to `legacy/` until v1 has run a week — recommended. Rejected: a second URL.
-- **Look:** round 1 of `design/yonler.html` kept P3 Focus (one exercise big, thumb buttons) and
-  P4 Sets (each set its own cell); round 2 in `design/yonler-2.html`. Taste record in `design/DESIGN.md`.
+- **Look:** round 1 of `design/yonler.html` (deleted, in git) kept P3 Focus (one exercise big, thumb buttons) and
+  P4 Sets (each set its own cell); round 2 in `design/yonler-2.html` (deleted, in git). Taste record in `design/DESIGN.md`.
 
 ## Blueprint decisions, round 2 (Tarık "evet" to the recommendations, 2026-10-24)
 5. **Edits and sync:** an edit during a workout goes with Finish; an edit to a finished day or to the
@@ -78,13 +78,13 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 - Workout Start and Finish: start time, finish time, duration ("spora başla sporu bitir yapalım ne
   kadar süre geçirdiğimi de hesaplarız").
 - What the old app provides: weeks with double progression on finish, days, program editing,
-  history, rest timer, sync, JSON backup (`design/brief-r3.md`).
+  history, rest timer, sync, JSON backup (`design/brief-r3.md`, deleted, in git).
 - Sync pushes when a day or week is finished, not after every change (already live in the old app,
   `b47cf0c`); Pantry keeps its own policy (Tarık: "pantry kalsın aynen").
 - Deadline: gym reopens Monday 2026-10-26; the app should be ready for that day.
-- Look: round 6 (`design/r6/screens.html`) approved 2026-10-24 ("güzel bence"). One way to change a set's reps, not
+- Look: round 6 (`design/screens.html`) approved 2026-10-24 ("güzel bence"). One way to change a set's reps, not
   two ("1 özellik 2 farklı şekilde yapılmasın"): tapping the cell, StrongLifts style (Tarık: "dokunarak yapalım"): tap =
-  target, tap again = one less, hold = one more; no number strip (`design/r6/screens.html` screens 7-8).
+  target, tap again = one less, hold = one more; no number strip (`design/screens.html` screens 7-8).
 - Body weight is logged here, not in Pantry (Tarık 2026-10-24); Pantry's notes left it an open idea.
 - v1 also has (Tarık 2026-10-24, from Eko's list): body weight with a 7-day average; a lasting note per exercise
   and a pain flag on a set; a weekly summary to Discord by Hermes; Pantry's weekly calories beside body weight

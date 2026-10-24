@@ -1,5 +1,5 @@
 /* The day's summary (Task-01): route 'summary' { dayId, week? } (no week: the current one), screen 6 of
-   design/r6/screens.html; styles in app/summary.css. The workout's Finish opens it after storing the day's finishedAt.
+   design/screens.html; styles in app/summary.css. The workout's Finish opens it after storing the day's finishedAt.
    It shows the duration (startedAt to finishedAt), sets done of the day's sets, short sets, and what moves next week,
    asked of Cali.progress(Cali.weekExercise(...), Cali.history(...)) for each reps and time row (the only source).
    Resume clears finishedAt and goes back to the day; Done keeps it (storing it first if missing), emits 'dayDone'

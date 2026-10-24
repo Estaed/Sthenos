@@ -1,4 +1,4 @@
-/* The day screen (app/workout.js): round 6, screens 1, 2, 7 and 8 of design/r6/screens.html (tap only). Shared
+/* The day screen (app/workout.js): round 6, screens 1, 2, 7 and 8 of design/screens.html (tap only). Shared
    classes (.appbar, .cell, .anchor, .snack, .tag) are in app/base.css; everything here carries the workout- prefix.
    Sized so the whole of day A fits 360 x 740 without scrolling: rows 44 px (cells 44 x 42), cards without inner
    padding, the docked sheet trimmed; a phone shorter than that scrolls the list under the docked sheet. */

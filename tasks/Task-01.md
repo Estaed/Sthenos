@@ -34,7 +34,7 @@ This is v1's main task; everything else supports it.
 - [x] `Cali.go('day', { week, dayId, readOnly: true })` renders a past week's day with no taps.
 - [x] Timed rows (stretch, walk) open `Cali.go('timer', { countdown: seconds })`.
 - [x] Tests drive `Cali.now()`; they read last week's values in both states (none yet, present).
-- [ ] (eye) screens 1, 2, 6, 7, 8 of `design/r6/screens.html`, both modes; at 360×740 the whole of day A
+- [ ] (eye) screens 1, 2, 6, 7, 8 of `design/screens.html`, both modes; at 360×740 the whole of day A
   is visible without scrolling.
 
 ## Out of scope

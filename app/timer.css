@@ -1,4 +1,4 @@
-/* The independent timer (app/timer.js): screen 4 of design/r6/screens.html and the top-bar pill of screen 2. Shared
+/* The independent timer (app/timer.js): screen 4 of design/screens.html and the top-bar pill of screen 2. Shared
    classes (.bar2, .anchor, .btn, .card, .iconbtn, .num, .i) come from app/base.css; these carry the timer- prefix. */
 
 /* top-bar pill: at the bar's start, its right margin pushes the buttons after it to the right */
