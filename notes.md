@@ -35,6 +35,25 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 - **Look:** round 1 of `design/yonler.html` kept P3 Focus (one exercise big, thumb buttons) and
   P4 Sets (each set its own cell); round 2 in `design/yonler-2.html`. Taste record in `design/DESIGN.md`.
 
+## Open decisions for Blueprint (round 2, Eko's recommendation first; "evet" takes it)
+5. **Edits and sync:** an edit during a workout goes with Finish; an edit to a finished day or to the
+   program pushes at once (rare, and a lost program edit hurts); the 12 h fallback stays.
+6. **New program (e.g. 4 days):** programs are their own objects (v4 already has `plans`). Settings →
+   Programs: list, edit, duplicate, and "use from next week", so the running week never changes under
+   you; the week generator takes the chosen program at Finish week. Two ways in: the in-app editor
+   (days, exercises, sets, range, load, step, pairs, order) and importing a program file (JSON) that Eko
+   or anyone writes. Tarık: "muhtemelen sana söylerim sen düzenle"; others use the editor or a file.
+7. **Who it is for:** only Tarık in v1 (GitHub sync needs his token); for others, v1 already works
+   local-only with JSON backup, and a starter template plus sync without GitHub go to *After v1*. Open.
+8. **Missed day / week end:** Finish week is manual; a day not done carries its exercises over with no
+   progression. Open.
+9. **Stalled lift:** the same load short three weeks running drops 10 % (StrongLifts' deload). Open.
+10. **Timed and bodyweight rows:** plank tap steps by 5 s; stretch and walk are done/not done; weighted
+   pull-up and dip log the added load (BW + x kg) and progress on it. Open.
+11. **Rest alert with the screen off:** a web page cannot vibrate or beep reliably while the phone is
+   locked in a pocket. This is the riskiest assumption; research before Blueprint (Notification API,
+   Samsung Internet, keep-awake as the fallback).
+
 ## What we know (2026-10-24)
 - Data lives in private `Estaed/Calisthenics-Data` → `calisthenics-data.json` (v4 schema: plans,
   weeks → days → exercises with sets, reps, weight, status, repMin/repMax/loadStep). Every sync is
