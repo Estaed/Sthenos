@@ -13,8 +13,10 @@
    (empty -> logged) cancels the running rest and, on a running day, starts the next one from Cali.settings (restPair
    inside a pair, restExercise after the pair's last set or a single exercise; none after the day's last set or a
    check row) as the countdown 'rest' in Cali.timers, scheduled at once with Cali.alert.schedule('rest', endAt, 'rest')
-   and 'headsup' (tag 'rest-headsup') headsUp seconds before; an edit of a logged set keeps the rest running; clearing
-   the set the rest belongs to stops it. The first log of a day that was never started starts it. A rest lives only
+   and 'headsup' (tag 'rest-headsup') headsUp seconds before; an edit of a logged set keeps the rest running; tapping
+   the set the rest belongs to down to 0 or clearing it stops it, and a hold back up from 0 starts a new one (a set at
+   0 counts as not done). The first log of a day that was never started starts it; clearing (or undoing) the last
+   logged set of a running day takes it back to not started, which is how a day is reset (Tarık 2026-10-24). A rest lives only
    while its day runs in the current week: Finish (or the summary's Done, a new week) stops it and cancels its alerts,
    and the score bug shows a rest only on its own day; any other day shows the rest its next log will start.
 
@@ -140,6 +142,14 @@
     undoing = true;
     try { Cali.log(u.l.dayId, u.l.exId, u.l.i, u.l.prev); } finally { undoing = false; }
     if (u.rest && restOf(u.l)) stopRest();
+    if (u.l.prev === null) unstartIfEmpty(u.l.week, u.l.dayId);
+  }
+
+  // a running day whose last logged set was cleared goes back to not started (its clock and rest stop with it)
+  function unstartIfEmpty(week, dayId) {
+    const day = dayOf(week, dayId);
+    if (!running(day) || Object.values(day.exercises || {}).some(e => e.sets.some(x => x !== null))) return;
+    setDay(week, dayId, 'unstart', d => { delete d.startedAt; });
   }
 
   Cali.on('log', l => {
@@ -148,13 +158,15 @@
     let day = cur.days[l.dayId];
     if (l.value !== null && day && !day.startedAt) { startDay(l.week, l.dayId); day = dayOf(l.week, l.dayId); }
     const ex = Cali.weekExercise(l.week, l.dayId, l.exId);
+    const did = v => Boolean(v && v.r > 0);   // a set at 0 is not done: it holds no rest
     let rest = false;
-    if (l.prev === null && l.value !== null) {
+    if (!did(l.prev) && did(l.value)) {
       stopRest();
       if (ex.kind !== 'check' && running(day) && Cali.settings.get('restAfterLog') && Cali.nextSet(l.dayId, l.week)) {
         rest = startRest(l.week, l.dayId, l.exId, l.i);
       }
-    } else if (l.value === null && restOf(l)) stopRest();
+    } else if (!did(l.value) && restOf(l)) stopRest();
+    if (l.value === null) unstartIfEmpty(l.week, l.dayId);
     clearTimeout(undoTimer);
     undo = { l, until: Cali.now() + UNDO_MS, rest };
     undoTimer = setTimeout(hideUndo, UNDO_MS);

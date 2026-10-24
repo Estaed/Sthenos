@@ -347,6 +347,25 @@ def main():
         got = ev(f"() => [Cali.week().days[{json.dumps(dayC)}].startedAt, Cali.iso(), Cali.timers.get('rest') && Cali.timers.get('rest').data.dayId]")
         A.check("the first log of a day not started starts it (startedAt) and its rest", got[0] == got[1] and got[2] == dayC, got)
 
+        # a set tapped down to 0 is not done: its rest stops; a hold back up starts one; clearing the day's only set
+        # takes the day back to not started (how a day is reset)
+        c0 = f'[data-set="{dayC}:{first}:0"]'
+        setC = lambda: ev(f"() => Cali.week().days[{json.dumps(dayC)}].exercises[{json.dumps(first)}].sets[0]")
+        while setC()["r"] > 0:
+            step(200)
+            A.touch_tap(page, c0)
+        got = [setC()["r"], ev("() => Cali.timers.get('rest')")]
+        A.check("tapping the set its rest belongs to down to 0 stops that rest", got == [0, None], got)
+        step(200)
+        A.touch_hold(page, ctx, c0)
+        got = [setC()["r"], ev("() => Cali.timers.get('rest') && Cali.timers.get('rest').data.dayId")]
+        A.check("a hold back up from 0 (to 1) starts a new rest", got == [1, dayC], got)
+        for _ in range(2):
+            step(200)
+            A.touch_tap(page, c0)
+        got = ev(f"() => [Cali.week().days[{json.dumps(dayC)}].startedAt || null, Cali.timers.get('rest'), document.querySelector('[data-act=\"session\"]').textContent]")
+        A.check("clearing the day's last logged set resets the day: no startedAt, no rest, Start again", got == [None, None, "Start"], got)
+
         # ── last week present; a past week read-only ──
         ev("(fx) => Cali.replace(fx)", FIXTURE)
         ev("() => Cali.go('day', { week: 2, dayId: 'F' }, { replace: true })")
