@@ -38,8 +38,8 @@ def off_blueprint(doc):
     return out + [f"week {w['n']} {d}: {k}" for w in doc["weeks"] for d, day in w["days"].items() for k in sorted(set(day) - DAY_KEYS)]
 
 
-PULL, DIP, LP, ROW, CALF, PLANK, STRETCH = (ex_id(DAYS[0], n) for n in (
-    "Weighted Pull-up", "Weighted Dip", "Leg Press", "Machine Row", "Standing Calf Raise", "Plank", "Stretch"))
+PULL, DIP, LP, CURL, CALF, PLANK, STRETCH = (ex_id(DAYS[0], n) for n in (
+    "Weighted Pull-up", "Weighted Dip", "Leg Press", "Seated Leg Curl", "Standing Calf Raise", "Plank", "Hamstring Stretch"))
 B_PULL = ex_id(DAYS[1], "Pull-up")
 
 LOG = """([dayId, rows]) => { for (const [exId, sets] of Object.entries(rows)) sets.forEach((r, i) => Cali.log(dayId, exId, i, r)); }"""
@@ -80,7 +80,7 @@ def main():
 
         # ── week 1, Monday: day A done (Tarik's numbers, screen 6), day B started (Pull-up 8, 8, 8, every set at target)
         #    but not done, day C not started ──
-        ev(LOG, [A_ID, {PULL: [6, 6, 6], DIP: [8, 8, 7], LP: [10, 10, 10], CALF: [15, 15], PLANK: [40, 40], STRETCH: [1]}])
+        ev(LOG, [A_ID, {PULL: [6, 6, 6], DIP: [8, 8, 7], LP: [10, 10, 10], CALF: [15, 15, 15], PLANK: [40, 40], STRETCH: [1]}])
         ev(DONE, A_ID)
         ev(LOG, [B_ID, {B_PULL: [8, 8, 8]}])
         ctx.clock.run_for(1000)
@@ -143,12 +143,12 @@ def main():
         A.check("while Finish can be undone, the stored document (pushed at once) holds only the Blueprint's week and "
                 "day fields", off_blueprint(doc) == [], off_blueprint(doc))
         got = {k: (week_ex(doc, 2, d, e)["load"], week_ex(doc, 2, d, e)["target"]) for k, d, e in (
-            ("pull", A_ID, PULL), ("dip", A_ID, DIP), ("lp", A_ID, LP), ("row", A_ID, ROW), ("calf", A_ID, CALF),
+            ("pull", A_ID, PULL), ("dip", A_ID, DIP), ("lp", A_ID, LP), ("curl", A_ID, CURL), ("calf", A_ID, CALF),
             ("plank", A_ID, PLANK), ("stretch", A_ID, STRETCH), ("b-pull", B_ID, B_PULL))}
-        want = {"pull": (2.5, 4), "dip": (0, 8), "lp": (110, 11), "row": (60, 10), "calf": (80, 12), "plank": (0, 45),
+        want = {"pull": (2.5, 4), "dip": (0, 8), "lp": (110, 11), "curl": (35, 12), "calf": (80, 12), "plank": (0, 45),
                 "stretch": (0, 1), "b-pull": (0, 8)}
         A.check("week 2 takes each load and target from Cali.progress: Pull-up BW +2.5 x 4, Dip stays (short), Leg Press 11, "
-                "Row stays (not logged), Calf 80 kg x 12, Plank 45 s, stretch copied, day B not done unchanged "
+                "Leg Curl stays (not logged), Calf 80 kg x 12, Plank 45 s, stretch copied, day B not done unchanged "
                 "(Pull-up 8, 8, 8 stays x 8: a day not done never moves up)", got == want, got)
         A.check("day C (not started) carries over the program's values",
                 all((e["load"], e["target"]) == (x["load"], x["target"]) for x in DAYS[2]["exercises"]

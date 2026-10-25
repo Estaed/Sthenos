@@ -95,7 +95,7 @@ def main():
         R = "all sets at target -> target + 1"
         case(R, "Weighted Dip", [[0, 8, [8, 8, 8], Y]], 0, 9, "target up")
         case(R, "Leg Press", [[110, 10, [10, 11, 12], Y]], 110, 11, "target up")              # above target counts as at it
-        case(R, "Machine Row", [[60, 10, [10, 10], Y]], 60, 11, "target up")
+        case(R, "Seated Leg Curl", [[60, 10, [10, 10, 10], Y]], 60, 11, "target up")
 
         # ── past repMax -> load + loadStep, target back to repMin ──
         R = "past repMax -> load + loadStep, target repMin"
@@ -108,15 +108,15 @@ def main():
         # ── any short set -> no change ──
         R = "a short set -> no change"
         case(R, "Side Lateral Raise", [[5, 12, [12, 9], Y]], 5, 12, "no change")
-        case(R + " (a set not logged in a done day is short)", "Shoulder Press", [[47.5, 10, [10, None], Y]], 47.5, 10, "no change")
+        case(R + " (a set not logged in a done day is short)", "Seated Leg Curl", [[47.5, 10, [10, 10, None], Y]], 47.5, 10, "no change")
         case(R, "Weighted Pull-up", [[0, 6, [6, 6, 5], Y]], 0, 6, "no change")
 
         # ── three short weeks at one load -> -10 % rounded to loadStep; none at 0 added load ──
         R = "three short weeks at one load -> load -10 % rounded to loadStep"
         short_lp = [110, 10, [10, 9, 9], Y]
         case(R, "Leg Press", [short_lp] * 3, 100, 10, "deload")                               # 99 -> 100 (step 5)
-        case(R, "Machine Row", [[60, 10, [10, 8], Y]] * 3, 55, 10, "deload")                  # 54 -> 55 (step 2.5)
-        case(R, "Shoulder Press", [[47.5, 10, [10, 8], Y]] * 3, 42.5, 10, "deload")           # 42.75 -> 42.5
+        case(R, "Seated Leg Curl", [[60, 10, [10, 10, 8], Y]] * 3, 55, 10, "deload")                  # 54 -> 55 (step 2.5)
+        case(R, "Seated Leg Curl", [[47.5, 10, [10, 10, 8], Y]] * 3, 42.5, 10, "deload")           # 42.75 -> 42.5
         case(R + " (4.5 rounds back to 5 at step 1: nothing moves)", "Side Lateral Raise", [[5, 12, [12, 10], Y]] * 3, 5, 12, "no change")
         case(R + ": only two short weeks", "Leg Press", [short_lp] * 2, 110, 10, "no change")
         case(R + ": the load changed inside the three", "Leg Press", [[105, 10, [10, 9, 9], Y], short_lp, short_lp], 110, 10, "no change")
@@ -165,8 +165,8 @@ def main():
 
         # ── check rows copy ──
         R = "check rows copy"
-        case(R, "Stretch", [[0, 1, [1], Y]], 0, 1, "no change")
-        case(R, "Stretch", [[0, 1, [None], Y]], 0, 1, "no change")
+        case(R, "Hamstring Stretch", [[0, 1, [1], Y]], 0, 1, "no change")
+        case(R, "Hamstring Stretch", [[0, 1, [None], Y]], 0, 1, "no change")
 
         # the answer is plain data, never a frozen piece of the document
         got = page.evaluate(f"() => {{ const r = Cali.progress(Cali.weekExercise(null, {json.dumps(D)}, {json.dumps(ex_id('Leg Press'))}), []);"

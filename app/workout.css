@@ -84,6 +84,15 @@ button.workout-ex[aria-expanded="true"] .workout-name { text-decoration: underli
   color: var(--ink-muted); font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums;
 }
 .workout-meta b { color: var(--ink); font-weight: 700; }
+/* an exercise's note (form cue): muted, at most two lines in the row; under the tiles in full */
+.workout-note {
+  margin-top: 1px; font-size: 0.75rem; line-height: 15px; color: var(--ink-subtle); font-weight: 500;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+.workout-notes { padding: 4px 3px 6px 10px; }
+.workout-notes p { margin: 0; font-size: 0.75rem; line-height: 16px; color: var(--ink-muted); font-weight: 500; }
+.workout-notes p + p { margin-top: 4px; }
+.workout-notes b { color: var(--ink); font-weight: 700; }
 .workout-meta .tag { margin-left: 1px; }
 .workout-trend { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
 .workout-spark { display: block; overflow: visible; }

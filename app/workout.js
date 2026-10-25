@@ -310,7 +310,8 @@
     const head = a.readOnly ? '<div class="workout-ex">'
       : `<button type="button" class="workout-ex" data-edit="${esc(ex.id)}" aria-expanded="false" aria-controls="workout-ed-${esc(ex.id)}">`;
     return `<div class="workout-row" data-ex="${esc(ex.id)}">` +
-      `${head}<div class="workout-name">${esc(ex.name)}</div><div class="workout-meta"></div>${a.readOnly ? '</div>' : '</button>'}` +
+      `${head}<div class="workout-name">${esc(ex.name)}</div><div class="workout-meta"></div>` +
+      `${ex.note ? `<div class="workout-note">${esc(ex.note)}</div>` : ''}${a.readOnly ? '</div>' : '</button>'}` +
       '<div class="workout-trend"><span class="workout-spark-box"></span><span class="workout-last"></span></div>' +
       `<div class="workout-cells">${cells.join('')}</div></div>` +
       (a.readOnly ? '' : `<div class="workout-ed" id="workout-ed-${esc(ex.id)}" data-ed="${esc(ex.id)}" hidden></div>`);
@@ -320,6 +321,10 @@
     return `<${tag} ${setAttrs(a, ex, 0)} class="workout-tile">${ic(ex.duration ? 'timer' : 'check')}` +
       `<span><span class="lbl">${esc(ex.name)}</span><span class="val num"></span></span></${tag}>`;
   }
+
+  // a tile's label holds only the name, so its note (how to do it) is written out in full under the tiles
+  const tileNotes = tiles => (tiles.some(ex => ex.note) ? '<div class="workout-notes">' +
+    tiles.filter(ex => ex.note).map(ex => `<p><b>${esc(ex.name)}</b> ${esc(ex.note)}</p>`).join('') + '</div>' : '');
 
   function build(s) {
     const { a, root } = s;
@@ -341,7 +346,8 @@
       '<section class="workout-list" aria-label="Exercises">' +
         '<div class="workout-row workout-cols" aria-hidden="true"><span></span><span>Last wk</span><span>This week</span></div>' +
         cardsOf(s.list).map(c => `<div class="card workout-card">${c.rows.map(ex => rowHtml(a, ex)).join('')}` +
-          (c.tiles.length ? `<div class="workout-timed">${c.tiles.map(ex => tileHtml(a, ex)).join('')}</div>` : '') + '</div>').join('') +
+          (c.tiles.length ? `<div class="workout-timed">${c.tiles.map(ex => tileHtml(a, ex)).join('')}</div>` : '') +
+          tileNotes(c.tiles) + '</div>').join('') +
       '</section>' +
       (a.readOnly ? '' :
         '<section class="workout-sheet" aria-label="Current set">' +

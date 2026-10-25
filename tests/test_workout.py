@@ -62,8 +62,8 @@ def main():
         ev("() => Cali.settings.set('alternatePairs', true)")   # this file checks the pair alternation
         ids = ev("""() => { const d = Cali.program().days[0]; const by = n => d.exercises.find(e => e.name.startsWith(n)).id;
             return { day: d.id, dayB: Cali.program().days[1].id, pull: by('Weighted Pull-up'), dip: by('Weighted Dip'),
-                     lp: by('Leg Press'), lat: by('Side Lateral Raise'), row: by('Machine Row'), plank: by('Plank'),
-                     walk: by('Incline Walk'), stretch: by('Stretch') }; }""")
+                     lp: by('Leg Press'), lat: by('Side Lateral Raise'), curl: by('Seated Leg Curl'), plank: by('Plank'),
+                     walk: by('Incline Walk'), stretch: by('Hamstring Stretch') }; }""")
         D = ids["day"]
         cell = lambda ex, i: f'[data-screen="day"] [data-set="{D}:{ids[ex]}:{i}"]'
         got_set = lambda ex, i: ev(f"() => Cali.week().days[{json.dumps(D)}].exercises[{json.dumps(ids[ex])}].sets[{i}]")
@@ -187,22 +187,22 @@ def main():
         # ── pair order, rest timer, alerts ──
         ev("() => { __alerts.length = 0; }")
         seen = []
-        for ex, i in (("lp", 0), ("lat", 0), ("lp", 1), ("lat", 1), ("lp", 2)):
+        for ex, i in (("lp", 0), ("lat", 0), ("lp", 1), ("lat", 1), ("lp", 2), ("lat", 2)):
             A.touch_tap(page, cell(ex, i))
             t = ev("() => { const t = Cali.timers.get('rest'); return t && [t.duration, t.remaining, t.data.rest]; }")
             seen.append([now_cell(), t])
             step(1000)
-        want_now = [f"{ids['lat']}:0", f"{ids['lp']}:1", f"{ids['lat']}:1", f"{ids['lp']}:2", f"{ids['row']}:0"]
-        A.check("the next set follows the pair (Leg Press 1, Raise 1, Leg Press 2, Raise 2, Leg Press 3, then Machine Row 1)",
+        want_now = [f"{ids['lat']}:0", f"{ids['lp']}:1", f"{ids['lat']}:1", f"{ids['lp']}:2", f"{ids['lat']}:2", f"{ids['curl']}:0"]
+        A.check("the next set follows the pair (Leg Press 1, Raise 1, Leg Press 2, Raise 2, Leg Press 3, Raise 3, then Seated Leg Curl 1)",
                 [s[0] for s in seen] == want_now, [s[0] for s in seen])
         A.check("rest starts from the settings: pair rest 90 s inside the pair, 120 s after the pair's last set",
-                [s[1] for s in seen] == [[90000, 90000, "pair"]] * 4 + [[120000, 120000, "exercise"]], [s[1] for s in seen])
+                [s[1] for s in seen] == [[90000, 90000, "pair"]] * 5 + [[120000, 120000, "exercise"]], [s[1] for s in seen])
         alerts = ev("() => __alerts")
         first = alerts[:4]
         A.check("each new set cancels the rest before and schedules rest at its end plus a heads-up 10 s before",
                 first == [["cancel", "rest"], ["cancel", "rest-headsup"], ["schedule", "rest", "rest", 90000], ["schedule", "headsup", "rest-headsup", 80000]]
                 and alerts[-2:] == [["schedule", "rest", "rest", 120000], ["schedule", "headsup", "rest-headsup", 110000]]
-                and len(alerts) == 20, alerts)
+                and len(alerts) == 24, alerts)
         step(29500)
         got = ev("() => [document.querySelector('[data-big=\"rest\"]').textContent, document.querySelector('[data-lab=\"rest\"]').textContent, document.querySelector('[data-lab=\"of\"]').textContent]")
         A.check("the score bug shows the rest from Cali.timers: 1:30 left of 2:00 after 30.5 s", got == ["1:30", "Rest", "of 2:00"], got)
@@ -210,7 +210,7 @@ def main():
         A.check("the rest bar drains with the time left (screen 1: 1:12 of 1:30 fills 80 %): 89.5 s of 2:00 fills 74.6 % "
                 "(within one 250 ms tick)", abs(bar - 74.6) <= 0.3, bar)
         page.reload()
-        page.wait_for_selector(cell("row", 0))
+        page.wait_for_selector(cell("curl", 0))
         ev(ALERTS)
         step(15000)
         got = ev("() => [document.querySelector('[data-big=\"rest\"]').textContent, Cali.timers.get('rest').remaining]")
@@ -223,7 +223,7 @@ def main():
         step()
         ev("() => Cali.settings.set('restPair', 60)")
         ev("() => Cali.settings.set('headsUp', 0)")
-        A.touch_tap(page, cell("row", 0))
+        A.touch_tap(page, cell("curl", 0))
         got = [ev("() => Cali.timers.get('rest').duration"), ev("() => __alerts")]
         A.check("rest lengths and the heads-up come from Cali.settings at the log (pair rest set to 60 s, heads-up off)",
                 got == [60000, [["cancel", "rest"], ["cancel", "rest-headsup"], ["schedule", "rest", "rest", 60000]]], got)
