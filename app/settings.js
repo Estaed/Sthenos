@@ -11,7 +11,8 @@
                      or a volume plays the test alert; "Test alert" (Cali.alert('test')) and
                      notifications: "Allow" calls Cali.alert.requestPermission(); while Notification.permission is
                      not 'granted' one line says the alert then needs the screen kept awake and how to allow them.
-   Workout           keep screen awake, default load step (1, 1.25, 2.5, 5 kg), theme (system, light, dark).
+   Workout           Programs (this week's program; opens Cali.go('programs'), app/program.js), keep screen awake,
+                     default load step (1, 1.25, 2.5, 5 kg), theme (system, light, dark).
    Data              GitHub sync (app/sync.js through self.CaliSync): its state, the user's own repository
                      (owner/name, kept after Disconnect) and a token to connect, Sync now and Disconnect;
                      "Download backup" saves the whole v5 document as JSON (the token is never in it;
@@ -146,6 +147,9 @@
       `<p class="settings-help" data-perm-help hidden>${esc(PERMISSION_HELP)}</p>` +
       '<h3 class="settings-eyebrow settings-section">Workout</h3>' +
       '<div class="group">' +
+        '<button type="button" class="settings-row" data-act="programs">' +
+          `<span class="settings-t">Programs<small>This week: ${esc((Cali.program(Cali.week().program) || { name: '' }).name)}</small></span>` +
+          '<span class="settings-chev"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span></button>' +
         toggle('keepAwake', 'Keep screen awake', 'While a workout runs') +
         seg('loadStep', 'Load step', 'For an exercise without its own', LOAD_STEPS.map(v => [String(v), String(v)]), 'Default load step in kg') +
         seg('theme', 'Theme', '', THEMES, 'Theme') +
@@ -326,6 +330,7 @@
   async function act(root, b) {
     const name = b.dataset.act;
     if (name === 'back') { Cali.back(); return; }
+    if (name === 'programs') { Cali.go('programs'); return; }
     if (name === 'test') { Cali.alert('test'); return; }
     if (name === 'allow') {
       try { await Cali.alert.requestPermission(); } catch (e) { /* the state below says what holds */ }

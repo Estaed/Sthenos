@@ -1,0 +1,46 @@
+/* Programs (app/program.js): the list (route 'programs') and the program editor (route 'program'). Built from the
+   components Settings and the in-card exercise editor already use, by their classes, so the three stay one look:
+   rows, switches, pills, chevrons, the outlined danger button and the confirm dialog (app/settings.css); steppers,
+   segments, fields and the Done foot (app/workout.css); .bar2, .btn, .ghost, .iconbtn, .group (app/base.css). This
+   file only lays them out; every class here carries the program- prefix. Every control is a 44 px target or more
+   (segments: 36 px drawn, 46 px to touch, as in Settings). Names wrap rather than cut. */
+
+.program-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 0 12px 20px; }
+/* brought into view clear of the docked Use button */
+.program-body :is(button, input, textarea, .program-ed, .program-day) { scroll-margin: 60px 0 104px; }
+.program-list > * + *, .program-day > * + *, .program-exbox > .program-ed { border-top: 1px solid var(--divider); }
+.program-list .pill { flex: none; white-space: nowrap; }
+.program .settings-t { overflow-wrap: anywhere; }
+
+/* the editor's top: Duplicate and Delete at the right of the bar, the name, the line saying where an edit shows */
+.program-bar-end { flex: 1; }
+.program-bar-act { padding: 0 8px; }
+.program-name { padding-top: 0; }
+.program-state { margin: -2px 2px 4px; font-size: 0.8125rem; font-weight: 500; line-height: 18px; color: var(--ink-muted); }
+
+/* a day: its name (a tap opens its panel), its exercises (a tap opens the editor under one), Add exercise */
+.program-dayhead .settings-t > span { font-size: 0.9375rem; font-weight: 800; letter-spacing: -0.1px; }
+.program-add .settings-t { font-weight: 700; }
+.program-addday { width: 100%; }
+
+/* the panel and the exercise editor under a row, aligned with the row's text */
+.program-ed { padding: 0 10px 10px 14px; }
+.program-ed > .settings-row { padding: 0; margin-top: 4px; }
+.program-ed .workout-ed-foot { gap: 8px; }
+.program-acts { display: flex; align-items: center; gap: 4px; margin-left: -10px; min-width: 0; }
+.program-acts .iconbtn { color: var(--ink); }
+.program-acts .iconbtn:disabled { color: var(--ink-subtle); opacity: 0.45; cursor: default; }
+.program-acts .btn { min-height: 44px; padding: 0 14px; font-size: 0.875rem; }
+.program-num { text-align: center; font-family: var(--font-num); font-stretch: var(--num-stretch); font-weight: 700; }
+.program-note { height: auto; min-height: 64px; padding: 10px 12px; line-height: 1.35; resize: none; font-size: 0.9375rem; font-weight: 500; }
+.program-hint { margin: 6px 0 0; font-size: 0.75rem; font-weight: 500; line-height: 16px; color: var(--ink-muted); }
+
+/* the dock: the last line (done or refused) and Use this program */
+.program-dock {
+  position: sticky; bottom: 0; z-index: 2; flex: none; display: flex; flex-direction: column; gap: 8px;
+  padding: 8px 12px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--card-line); background: var(--canvas);
+}
+.program-dock .btn { width: 100%; }
+.program-msg { margin: 0 2px; display: flex; gap: 6px; font-size: 0.8125rem; font-weight: 600; line-height: 18px; color: var(--ink-muted); }
+.program-msg .i { width: 16px; height: 16px; margin-top: 1px; }
+.program-msg.program-err { color: var(--danger); }

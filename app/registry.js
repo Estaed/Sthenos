@@ -18,3 +18,5 @@ CALI_FEATURES.push('app/settings.js');
 CALI_FEATURES.push('app/settings.css');
 CALI_FEATURES.push('app/week.js');
 CALI_FEATURES.push('app/week.css');
+CALI_FEATURES.push('app/program.js');
+CALI_FEATURES.push('app/program.css');
