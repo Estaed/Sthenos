@@ -1,4 +1,5 @@
 # Task-05: Programs: list, editor, import, use now or from next week
+**Status: DONE** — verified 2026-10-26 (0baab64), eye check pending: 1
 > **Execution:** agent `ultracode`
 > *Why:* product code with one owner and no parallel partner: one Opus agent builds it end to end, the main loop gates it.
 
