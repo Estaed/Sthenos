@@ -34,7 +34,7 @@
 /* the day: cards of rows; a pair shares a card; one-off timed rows sit as tiles */
 .workout-list { flex: 1 0 auto; padding: 0 var(--margin) 4px; display: flex; flex-direction: column; gap: 4px; }
 .workout-row {
-  min-height: 44px; display: grid; align-items: center; column-gap: 4px; padding: 0 3px 0 10px;
+  min-height: calc(44px + var(--row-grow, 0px)); display: grid; align-items: center; column-gap: 4px; padding: 0 3px 0 10px;
   grid-template-columns: minmax(0, 1fr) 40px calc(3 * var(--cell-w) + 2 * var(--cell-gap));
 }
 .workout-row + .workout-row, .workout-ed + .workout-row { border-top: 1px solid var(--divider); }
@@ -113,7 +113,6 @@ button.workout-ex[aria-expanded="true"] .workout-name { text-decoration: underli
 }
 .workout-cells { display: grid; grid-template-columns: repeat(3, var(--cell-w)); gap: 1px var(--cell-gap); justify-content: end; }
 .workout-cells .cell { outline-offset: -2px; }
-.workout-cells.fill .cell { width: 100%; }
 .workout-cells .cell.sec small { font-family: var(--font-sans); }
 /* a value too wide for the cell at full size ('11/12', '35/40', '120s'): compact, so it stays inside the ring */
 .workout-cells .cell.workout-fit { font-size: 1rem; font-stretch: 100%; letter-spacing: -0.02em; }

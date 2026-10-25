@@ -33,6 +33,8 @@
   const BOUNCE_MS = 150;    // a touch starting this soon after the last accepted one is ignored
   const SLOP_PX = 12;       // a finger that moves further is scrolling, not tapping
   const UNDO_MS = 8000;
+  const ROW_GROW_MAX = 20;  // px a row may grow to fill a short day
+  const SNACK_ROOM = 60;    // px kept free above the sheet, where Undo floats after a log
   const TICK_MS = 250;
   const esc = Cali.esc;
   const ICONS = {
@@ -307,16 +309,14 @@
   function rowHtml(a, ex) {
     const tag = a.readOnly ? 'span' : 'button';
     const cells = ex.sets.map((_, i) => `<${tag} ${setAttrs(a, ex, i)} class="cell num"><span></span></${tag}>`);
-    // up to 3 sets share the row's whole cell area (2 sets: two wide cells, no empty third); more wrap in lines of 3
-    const fill = cells.length <= 3;
-    if (!fill) while (cells.length % 3) cells.push('<span class="cell void" aria-hidden="true"></span>');
+    while (cells.length % 3) cells.push('<span class="cell void" aria-hidden="true"></span>');
     const head = a.readOnly ? '<div class="workout-ex">'
       : `<button type="button" class="workout-ex" data-edit="${esc(ex.id)}" aria-expanded="false" aria-controls="workout-ed-${esc(ex.id)}">`;
     return `<div class="workout-row" data-ex="${esc(ex.id)}">` +
       `${head}<div class="workout-name"><span>${esc(ex.name)}</span>${ex.note ? ic('info') : ''}</div><div class="workout-meta"></div>` +
       `${a.readOnly ? '</div>' : '</button>'}` +
       '<div class="workout-trend"><span class="workout-spark-box"></span><span class="workout-last"></span></div>' +
-      `<div class="workout-cells${fill ? ' fill' : ''}"${fill ? ` style="grid-template-columns:repeat(${cells.length},1fr)"` : ''}>${cells.join('')}</div></div>` +
+      `<div class="workout-cells">${cells.join('')}</div></div>` +
       (a.readOnly ? '' : `<div class="workout-ed" id="workout-ed-${esc(ex.id)}" data-ed="${esc(ex.id)}" hidden></div>`);
   }
   function tileHtml(a, ex) {
@@ -659,6 +659,7 @@
     editing = open ? null : { week: a.week, dayId: a.dayId, exId };
     if (!screen) return;
     patch(screen);
+    fitRows(screen);
     const box = editing && at(screen.root, `[data-ed="${CSS.escape(exId)}"]`);
     if (box && box.scrollIntoView) box.scrollIntoView({ block: 'nearest' });
   }
@@ -767,7 +768,23 @@
     }
     screen.args = args;
     patch(screen);
+    fitRows(screen);
   }
+
+  // a short day leaves room above the docked sheet: the exercise rows share it (up to ROW_GROW_MAX px each), so the
+  // list reaches the sheet instead of ending in a gap (Tarık 2026-10-26), leaving SNACK_ROOM for Undo; a long day
+  // keeps 44 px rows and scrolls
+  function fitRows(s) {
+    const list = at(s.root, '.workout-list'), sheet = at(s.root, '.workout-sheet');
+    if (!list) return;
+    list.style.setProperty('--row-grow', '0px');
+    const rows = list.querySelectorAll('.workout-row[data-ex]').length;
+    const end = sheet ? sheet.getBoundingClientRect().top : window.innerHeight;
+    const last = list.lastElementChild;
+    const free = last ? end - SNACK_ROOM - last.getBoundingClientRect().bottom : 0;
+    if (rows && free > 0) list.style.setProperty('--row-grow', `${Math.min(ROW_GROW_MAX, Math.floor(free / rows))}px`);
+  }
+  window.addEventListener('resize', () => { if (screen) fitRows(screen); });
 
   Cali.route('day', {
     render(root, args) {
