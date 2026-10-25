@@ -264,7 +264,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2hixx5_3xme",
-          "name": "Incline Bench Press",
+          "name": "Incline Bench",
           "kind": "reps",
           "sets": 3,
           "target": 8,

@@ -38,6 +38,7 @@
   const ICONS = {
     check: '<path d="M20 6 9 17l-5-5"/>',
     timer: '<line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/>',
+    info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   };
   const ic = name => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]}</svg>`;
   const pad = n => String(n).padStart(2, '0');
@@ -310,21 +311,20 @@
     const head = a.readOnly ? '<div class="workout-ex">'
       : `<button type="button" class="workout-ex" data-edit="${esc(ex.id)}" aria-expanded="false" aria-controls="workout-ed-${esc(ex.id)}">`;
     return `<div class="workout-row" data-ex="${esc(ex.id)}">` +
-      `${head}<div class="workout-name">${esc(ex.name)}</div><div class="workout-meta"></div>` +
-      `${ex.note ? `<div class="workout-note">${esc(ex.note)}</div>` : ''}${a.readOnly ? '</div>' : '</button>'}` +
+      `${head}<div class="workout-name"><span>${esc(ex.name)}</span>${ex.note ? ic('info') : ''}</div><div class="workout-meta"></div>` +
+      `${a.readOnly ? '</div>' : '</button>'}` +
       '<div class="workout-trend"><span class="workout-spark-box"></span><span class="workout-last"></span></div>' +
       `<div class="workout-cells">${cells.join('')}</div></div>` +
       (a.readOnly ? '' : `<div class="workout-ed" id="workout-ed-${esc(ex.id)}" data-ed="${esc(ex.id)}" hidden></div>`);
   }
   function tileHtml(a, ex) {
     const tag = a.readOnly ? 'span' : 'button';
-    return `<${tag} ${setAttrs(a, ex, 0)} class="workout-tile">${ic(ex.duration ? 'timer' : 'check')}` +
+    const tile = `<${tag} ${setAttrs(a, ex, 0)} class="workout-tile${ex.note ? ' has-note' : ''}">${ic(ex.duration ? 'timer' : 'check')}` +
       `<span><span class="lbl">${esc(ex.name)}</span><span class="val num"></span></span></${tag}>`;
+    if (!ex.note) return tile;
+    return `<span class="workout-tile-box">${tile}<button type="button" class="workout-info" data-note="${esc(ex.id)}" ` +
+      `aria-label="How to do ${esc(ex.name)}">${ic('info')}</button></span>`;
   }
-
-  // a tile's label holds only the name, so its note (how to do it) is written out in full under the tiles
-  const tileNotes = tiles => (tiles.some(ex => ex.note) ? '<div class="workout-notes">' +
-    tiles.filter(ex => ex.note).map(ex => `<p><b>${esc(ex.name)}</b> ${esc(ex.note)}</p>`).join('') + '</div>' : '');
 
   function build(s) {
     const { a, root } = s;
@@ -347,7 +347,7 @@
         '<div class="workout-row workout-cols" aria-hidden="true"><span></span><span>Last wk</span><span>This week</span></div>' +
         cardsOf(s.list).map(c => `<div class="card workout-card">${c.rows.map(ex => rowHtml(a, ex)).join('')}` +
           (c.tiles.length ? `<div class="workout-timed">${c.tiles.map(ex => tileHtml(a, ex)).join('')}</div>` : '') +
-          tileNotes(c.tiles) + '</div>').join('') +
+          '</div>').join('') +
       '</section>' +
       (a.readOnly ? '' :
         '<section class="workout-sheet" aria-label="Current set">' +
@@ -566,9 +566,25 @@
   }
   const valueOf = (ex, k) => (k === 'sets' ? ex.sets.length : ex[k]);
 
+  // a timed tile's note (how to do it) in a dialog with Settings' look; the tile itself stays tap = done
+  function showNote(a, exId) {
+    const ex = Cali.dayExercises(a.week, a.dayId).find(e => e.id === exId);
+    if (!ex || !ex.note) return;
+    const d = document.createElement('dialog');
+    d.className = 'settings-dialog workout-note-dialog';
+    d.setAttribute('aria-labelledby', 'workout-note-title');
+    d.innerHTML = `<h2 id="workout-note-title">${esc(ex.name)}</h2><p>${esc(ex.note)}</p>` +
+      '<button type="button" class="btn secondary" data-act="note-close">Close</button>';
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-act="note-close"]')) d.close(); });
+    d.addEventListener('close', () => d.remove());
+    document.body.appendChild(d);
+    d.showModal();
+  }
+
   function editorHtml(ex) {
+    const note = ex.note ? `<p class="workout-ed-note">${esc(ex.note)}</p>` : '';
     const steps = LOAD_STEPS.includes(ex.loadStep) || !(ex.loadStep > 0) ? LOAD_STEPS : [...LOAD_STEPS, ex.loadStep].sort((p, q) => p - q);
-    return '<div class="workout-ed-grid">' + fields(ex).map(f =>
+    return note + '<div class="workout-ed-grid">' + fields(ex).map(f =>
       `<div class="workout-ed-f" role="group" aria-labelledby="workout-ed-l-${esc(ex.id)}-${f.k}">` +
         `<span class="workout-ed-l" id="workout-ed-l-${esc(ex.id)}-${f.k}">${f.label}</span><div class="workout-ed-step">` +
         `<button type="button" data-ed-k="${f.k}" data-ed-d="-1" aria-label="${f.label} down"><span>−</span></button>` +
@@ -700,6 +716,8 @@
       }
       if (!screen) return;
       const a = screen.a;
+      const info = e.target.closest('[data-note]');
+      if (info) { showNote(a, info.dataset.note); return; }
       const ed = e.target.closest('[data-edit]');
       if (ed) { toggleEditor(a, ed.dataset.edit); return; }
       const box = e.target.closest('[data-ed]');

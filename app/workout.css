@@ -84,15 +84,20 @@ button.workout-ex[aria-expanded="true"] .workout-name { text-decoration: underli
   color: var(--ink-muted); font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums;
 }
 .workout-meta b { color: var(--ink); font-weight: 700; }
-/* an exercise's note (form cue): muted, at most two lines in the row; under the tiles in full */
-.workout-note {
-  margin-top: 1px; font-size: 0.75rem; line-height: 15px; color: var(--ink-subtle); font-weight: 500;
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+/* an exercise's note (how to do it): an info mark after a row's name (the note opens in its editor) and an info
+   button on a timed tile (the note opens in a dialog), so the day stays on one screen */
+.workout-name { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.workout-name > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.workout-name > .i { flex: none; width: 14px; height: 14px; color: var(--ink-subtle); }
+.workout-ed-note { margin: 0 0 10px; font-size: 0.8125rem; line-height: 18px; color: var(--ink-muted); font-weight: 500; }
+.workout-tile-box { position: relative; display: block; min-width: 0; }
+.workout-tile.has-note { padding-right: 44px; }
+.workout-info {
+  position: absolute; top: 0; right: 0; width: 44px; height: 44px; display: grid; place-items: center;
+  border-radius: var(--radius-cell); color: var(--ink-muted);
 }
-.workout-notes { padding: 4px 3px 6px 10px; }
-.workout-notes p { margin: 0; font-size: 0.75rem; line-height: 16px; color: var(--ink-muted); font-weight: 500; }
-.workout-notes p + p { margin-top: 4px; }
-.workout-notes b { color: var(--ink); font-weight: 700; }
+.workout-info .i { width: 18px; height: 18px; }
+.workout-note-dialog .btn { width: 100%; }
 .workout-meta .tag { margin-left: 1px; }
 .workout-trend { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
 .workout-spark { display: block; overflow: visible; }
