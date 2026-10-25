@@ -8,7 +8,7 @@ and drops what the code now answers; it never appends a dated note (`blueprint` 
 ## What v1 is
 A workout log for the gym on an Android phone, between sets, one hand: the whole day's program on
 one screen, a set logged by tapping its cell, workout start and finish, a rest timer and an
-independent timer, weeks with double progression, program editing, history, body weight. A public
+independent timer, weeks with double progression, program editing, a muscle map, history, body weight. A public
 site: anyone uses it without sync (data on their phone); anyone may add a GitHub token and a private
 repo of their own and sync to it, Tarık to his (2026-10-24: public, so a stranger's sync never points
 at Tarık's repo). English UI. Ships Tarık's current A/B/C program as the built-in default
@@ -54,7 +54,8 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 ## Data (schema v5, one JSON document)
 - **document:** `{ _version: 5, updatedAt, programs, activeProgram, nextProgram, weeks, body, settings }`.
 - **programs:** `{ id, name, days: [{ id, name, exercises: [{ id, name, kind: reps|time|check, sets,
-  repMin, repMax, target, load, loadStep, bodyweight?, pair?, note?, duration? }] }] }`; `activeProgram`,
+  repMin, repMax, target, load, loadStep, bodyweight?, pair?, note?, duration?, muscles? }] }] }` (`muscles`:
+  `{ <muscle>: 1 | 0.5 }`, 1 the muscle it is for, 0.5 a helper; absent → guessed from the name); `activeProgram`,
   `nextProgram` (used from the next week built). Pairs are adjacent exercises with the same `pair`.
 - **weeks:** `{ n, program, startedAt, finishedAt?, days: { <dayId>: { startedAt?, finishedAt?,
   exercises: { <exId>: { name, kind, repMin, repMax, loadStep, …, load, target, sets: [{ r, at, pain? }] } } } } }`.
@@ -128,6 +129,11 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 - New programs: Settings → Programs (edit, duplicate, import a program JSON). Use or edit a program: an empty
   current week (no set stored) is rebuilt at once, else it starts with the next week; the in-card editor stays the
   one way to change the week in hand (Eko, left to him by Tarık 2026-10-25). Default day names `A`, `B`, `C`, editable.
+- Muscle map (Tarık 2026-10-26): front and back body from the week in view, a Week / per-day filter, colour from pale
+  orange to red with the fractional sets (Tarık: "az yoğun ise turuncu çok yoğun ise kırmızı"), bars filling orange
+  with sets done; each exercise's muscles are picked in the program editor (Eko's recommendation, Tarık: "önerini
+  yap"), a name guess fills them when absent. Body paths: react-native-body-highlighter (MIT). Rejected: an anatomy
+  (isometric) figure, which is not an app screen.
   Rejected: editing only by Eko in the data repo (others could not).
 - v1 includes body weight with a 7-day average, a note per exercise and a pain flag per set,
   Pantry's weekly kcal, and Hermes' weekly Discord summary. Rejected: exercise swap in v1.

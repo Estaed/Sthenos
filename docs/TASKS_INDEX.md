@@ -11,6 +11,7 @@ Task-00 runs alone; Task-01 to Task-04 then run in parallel (disjoint OWNS, all 
 
 ## Wave 2 (started 2026-10-25, Tarık: program adding first)
 - [x] Task-05: Programs: list, editor, import, use now or from next week
+- [ ] Task-06: Muscle map: the week's muscles by day, muscles picked per exercise
 
 ## Later waves (draft)
 - Rest of wave 2: history per exercise (needs Task-04's weeks); body weight with a 7-day average and Pantry's weekly kcal;

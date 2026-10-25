@@ -14,8 +14,13 @@
 body { background: #9A9A9A; display: flex; gap: 32px; justify-content: center; padding: 24px; align-items: flex-start; }
 .phone { width: 360px; min-height: 780px; background: var(--canvas); color: var(--ink); border-radius: 28px; overflow: hidden;
   font: 500 1rem/1.5 var(--font-sans); box-shadow: 0 10px 40px #0004; }
-.phone[data-theme="light"] { --m0: #E4E4E4; --m1: #CDCDCD; --m2: #A3A3A3; --m3: #707070; --rest: #EFEFEF; --line: #9A9A9A; }
-.phone[data-theme="dark"] { --m0: #2A2A2A; --m1: #474747; --m2: #707070; --m3: #A6A6A6; --rest: #212121; --line: #5A5A5A; }
+.phone[data-theme="light"] { --m0: #E4E4E4; --lo: #FFD2B3; --mid: #FF5A00; --hi: #B3121B; --rest: #EFEFEF; --line: #9A9A9A; --m2: #A3A3A3; }
+.phone[data-theme="dark"] { --m0: #2A2A2A; --lo: #6B3418; --mid: #FF5A00; --hi: #E5262E; --rest: #212121; --line: #5A5A5A; --m2: #707070; }
+.mm-days { display: flex; gap: 6px; margin: 0 12px 10px; }
+.mm-days button { flex: 1; height: 36px; border-radius: 18px; border: 1px solid var(--outline); font-weight: 700; font-size: 0.875rem; color: var(--ink-muted); }
+.mm-days button[aria-pressed="true"] { background: var(--tonal); color: var(--ink); border-color: var(--tonal); }
+.mm-scale { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; padding: 6px 10px 0; font-size: 0.75rem; color: var(--ink-muted); }
+.mm-scale i { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--lo), var(--mid), var(--hi)); }
 .mm-pill { margin-left: auto; }
 .mm-lede { margin: 0 16px 10px; font-size: 0.8125rem; line-height: 18px; color: var(--ink-muted); }
 .mm-figure { margin: 0 12px; padding: 12px 6px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
@@ -73,7 +78,9 @@ for (const day of PROGRAM.days) for (const e of day.exercises) {
     if (w === 1) (from[m] = from[m] || []).push(`${e.name} ${e.sets} (${day.name})`);
   }
 }
-const tone = n => (!n ? 'var(--m0)' : n < 4 ? 'var(--m1)' : n < 8 ? 'var(--m2)' : 'var(--m3)');
+// a muscle's colour: none = the body grey; then pale orange -> orange (5 sets) -> red (10 sets and up)
+const tone = n => { if (!n) return 'var(--m0)'; const t = Math.min(1, n / 10);
+  return t < .5 ? `color-mix(in oklch, var(--mid) ${Math.round(t * 200)}%, var(--lo))` : `color-mix(in oklch, var(--hi) ${Math.round((t - .5) * 200)}%, var(--mid))`; };
 const fmt = n => (Math.round(n * 2) / 2).toString();
 function svg(side) {
   const vb = side === 'front' ? '0 0 724 1448' : '724 0 724 1448';
@@ -96,10 +103,9 @@ const none = Object.keys(NAMES).filter(m => !plan[m]);
 const max = Math.max(...rows.map(m => plan[m]));
 const html = '<header class="bar2"><span class="iconbtn"><svg class="i" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></span>' +
   '<h2>Muscles</h2><span class="pill mm-pill">Week 1</span></header>' +
-  '<p class="mm-lede">The body shows the sets a week this program plans. The bars fill orange as you do them.</p>' +
+  '<div class="mm-days" role="group" aria-label="Days"><button aria-pressed="true">Week</button><button>A</button><button>B</button><button>C</button></div>' +
   `<figure class="card mm-figure">${svg('front')}${svg('back')}<figcaption>Front</figcaption><figcaption>Back</figcaption>` +
-  '<div class="mm-legend"><span><i style="background:var(--m1)"></i>1–3</span><span><i style="background:var(--m2)"></i>4–7</span>' +
-  '<span><i style="background:var(--m3)"></i>8+ sets a week</span></div></figure>' +
+  '<div class="mm-scale"><span>1 set</span><i></i><span>10+ a week</span></div></figure>' +
   `<div class="anchor mm-pick"><span class="eyebrow">Least worked</span><h3>${NAMES[pick]} · ${fmt(plan[pick])} sets a week</h3>` +
   `<p>${(from[pick] || ['only as a helper']).join(' · ')}${none.length ? `<br>Not worked: ${none.map(m => NAMES[m]).join(', ')}` : ''}</p></div>` +
   '<div class="group mm-list">' + rows.map(m => `<div class="mm-row${plan[m] < 4 ? ' low' : ''}"><b>${NAMES[m]}</b>` +
