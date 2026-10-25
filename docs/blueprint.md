@@ -110,8 +110,8 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   repo after Finish week. No Hermes skill reads a data repo today; whether its GitHub access reaches
   `Calisthenics-Data` is not verified, so that task checks it first.
 - Seams: routes `Cali.go(name, ...args)`; `Cali.log(day, ex, set, value)` is the only writer of a
-  set; `Cali.timers` holds both timers; registry lines and the service worker cache name are bumped
-  by the orchestrator at integration.
+  set; `Cali.timers` holds both timers; registry lines are appended by the orchestrator at integration, and
+  the service worker cache is `cali-app-v` + `CHANGELOG.md`'s newest version, set at every release.
 
 ## Verification
 - Gate: `python tests/acceptance.py` from the repo root; clean = every check PASS, exit 0. Written

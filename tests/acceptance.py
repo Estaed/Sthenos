@@ -267,7 +267,7 @@ def check_files():
           all(i >= 0 for i in order) and order == sorted(order), order)
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
     check("sw.js names a versioned cache, reads the registry and lists no feature by hand",
-          re.search(r"const CACHE = 'cali-app-v\d+';", sw) is not None and "importScripts('app/registry.js')" in sw
+          re.search(r"const CACHE = 'cali-app-v[\d.]+';", sw) is not None and "importScripts('app/registry.js')" in sw
           and not any(f in sw for f in listed), listed)
 
     design = ROOT / "design"
@@ -405,7 +405,7 @@ def check_phone(browser, url, site, errors):
     page.evaluate("""async () => { for (const n of ['pantry-v9', 'cali-legacy-v1', 'cali-app-v0', 'cali-v4', 'other'])
         await (await caches.open(n)).put('probe-' + n, new Response('x')); }""")
     sw = (ROOT / "sw.js").read_bytes()
-    site.overlay[BASE + "sw.js"] = re.sub(rb"const CACHE = 'cali-app-v\d+';", b"const CACHE = 'cali-app-v999';", sw)
+    site.overlay[BASE + "sw.js"] = re.sub(rb"const CACHE = 'cali-app-v[\d.]+';", b"const CACHE = 'cali-app-v999';", sw)
     page.evaluate("async () => { const reg = await navigator.serviceWorker.getRegistration(); await reg.update(); }")
     keys = poll(page, """async () => { const k = await caches.keys();
         return k.includes('cali-app-v999') && !k.includes('cali-app-v0') && !k.includes('cali-v4') && k; }""")
@@ -433,7 +433,7 @@ def check_legacy(browser, url, site, errors):
     regs = regs or page.evaluate("async () => (await navigator.serviceWorker.getRegistrations()).map(x => x.scope)")
     check("legacy/ registers its own worker with scope legacy/, and the app's worker stays",
           f"{origin}{BASE}legacy/" in regs and f"{origin}{BASE}" in regs, regs)
-    cache = re.search(r"const CACHE = '(cali-app-v\d+)';", (ROOT / "sw.js").read_text(encoding="utf-8")).group(1)
+    cache = re.search(r"const CACHE = '(cali-app-v[\d.]+)';", (ROOT / "sw.js").read_text(encoding="utf-8")).group(1)
     keys = page.evaluate("() => caches.keys()")
     check("opening legacy/ deletes no cache of the new app", cache in keys, keys)
     app_urls = page.evaluate("async (c) => (await (await caches.open(c)).keys()).map(r => r.url)", cache)

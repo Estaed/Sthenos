@@ -3,10 +3,10 @@
    so a GitHub Pages deploy shows on the next launch) and falls back to this worker's own cache when offline or after
    3 s without an answer. Install stores the shell below plus every file in app/registry.js, so a new feature needs
    no edit here. legacy/ (the old app, with its own worker) is left to the network.
-   Caches: CACHE is this release's; bump it on every release (the orchestrator does at integration). Activate deletes
+   Caches: CACHE is this release's, 'cali-app-v' + CHANGELOG.md's newest version (set at every release). Activate deletes
    only this app's older caches ('cali-app-*') and 'cali-v4', the cache of the old app's worker that held this scope
    before the old app moved to legacy/. Every other cache on the origin (legacy's 'cali-legacy-*', Pantry's) stays. */
-const CACHE = 'cali-app-v13';
+const CACHE = 'cali-app-v0.2.0';   // CHANGELOG.md's newest version
 const PREFIX = 'cali-app-';
 const REPLACED = ['cali-v4'];
 importScripts('app/registry.js');

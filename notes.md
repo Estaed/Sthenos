@@ -101,6 +101,9 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 <Eko fills it by asking before the Blueprint: v1 main flow, screen list, states>
 
 ## After v1
+Items with a place sit under the version they aim at (`CHANGELOG.md`: one MINOR per wave).
+
+### Later
 - 2026-10-24: link with Pantry (body weight, calories beside training) — Tarık kept the apps separate.
 - 2026-10-24: starting load for an exercise new to a program (Tarık: adding bench when moving to 4 days,
   with dips at 8 × +10 kg). Estimate from his own logged history of the closest movement (incline bench
