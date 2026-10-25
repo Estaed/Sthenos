@@ -63,7 +63,7 @@ def main():
         ids = ev("""() => { const d = Cali.program().days[0]; const by = n => d.exercises.find(e => e.name.startsWith(n)).id;
             return { day: d.id, dayB: Cali.program().days[1].id, pull: by('Weighted Pull-up'), dip: by('Weighted Dip'),
                      lp: by('Leg Press'), lat: by('Side Lateral Raise'), curl: by('Seated Leg Curl'), plank: by('Plank'),
-                     walk: by('Incline Walk'), stretch: by('Hamstring Stretch') }; }""")
+                     walk: by('Incline Walk'), stretch: by('Mobility') }; }""")
         D = ids["day"]
         cell = lambda ex, i: f'[data-screen="day"] [data-set="{D}:{ids[ex]}:{i}"]'
         got_set = lambda ex, i: ev(f"() => Cali.week().days[{json.dumps(D)}].exercises[{json.dumps(ids[ex])}].sets[{i}]")
@@ -255,8 +255,8 @@ def main():
         A.touch_tap(page, f'[data-screen="day"] [data-set="{D}:{ids["stretch"]}:0"]')
         page.wait_for_selector('[data-screen="timer"] [data-probe]')
         got = [ev("() => Cali.current()"), r("stretch", 0)]
-        A.check("a timed row (the 4 min stretch) is marked done and opens Cali.go('timer', { countdown: 240 })",
-                got == [{"name": "timer", "args": {"countdown": 240}}, 1], got)
+        A.check("a timed row (the 7 min mobility tile) is marked done and opens Cali.go('timer', { countdown: 420 })",
+                got == [{"name": "timer", "args": {"countdown": 420}}, 1], got)
         ev("() => Cali.back()")
         page.wait_for_selector(cell("pull", 0))
         step()
@@ -446,7 +446,7 @@ def main():
         page.wait_for_selector(f'[data-screen="day"] [data-set^="{ev("() => Cali.program().days[1].id")}:"]')
         ev("""() => { const D = Cali.program().days[1].id, list = Cali.dayExercises(null, D);
             for (const ex of list) ex.sets.forEach((s, i) => { if (s) Cali.log(D, ex.id, i, null); });
-            Cali.log(D, list[0].id, 0, 1); }""")   # day B again with only its warm-up tile done: Pull-up set 1 in hand
+            Cali.log(D, list[0].id, 0, 1); }""")   # day B again with only its warm-up tile done: Dips set 1 in hand
         step(300)
         bug = "() => [document.querySelector('.workout-bug-name').textContent, document.querySelector('[data-lab=\"rest\"]').textContent, document.querySelector('[data-big=\"rest\"]').textContent]"
         got = [ev(bug)]
@@ -454,7 +454,7 @@ def main():
         step(300)
         got.append(ev(bug))
         A.check("with 'start rest after a log' off the bug promises no rest (–); on, the pair rest that will run (1:30)",
-                got == [["Pull-up", "Rest", "–"], ["Pull-up", "Pair rest", "1:30"]], got)
+                got == [["Dips", "Rest", "–"], ["Dips", "Pair rest", "1:30"]], got)
 
         browser.close()
     srv.shutdown()

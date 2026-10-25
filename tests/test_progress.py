@@ -165,8 +165,8 @@ def main():
 
         # ── check rows copy ──
         R = "check rows copy"
-        case(R, "Hamstring Stretch", [[0, 1, [1], Y]], 0, 1, "no change")
-        case(R, "Hamstring Stretch", [[0, 1, [None], Y]], 0, 1, "no change")
+        case(R, "Mobility", [[0, 1, [1], Y]], 0, 1, "no change")
+        case(R, "Mobility", [[0, 1, [None], Y]], 0, 1, "no change")
 
         # the answer is plain data, never a frozen piece of the document
         got = page.evaluate(f"() => {{ const r = Cali.progress(Cali.weekExercise(null, {json.dumps(D)}, {json.dumps(ex_id('Leg Press'))}), []);"

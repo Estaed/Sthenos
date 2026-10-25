@@ -9,9 +9,11 @@
 
 Task-00 runs alone; Task-01 to Task-04 then run in parallel (disjoint OWNS, all depend only on Task-00).
 
+## Wave 2 (started 2026-10-25, Tarık: program adding first)
+- [ ] Task-05: Programs: list, editor, import, use now or from next week
+
 ## Later waves (draft)
-- Wave 2: programs list and editor with JSON import, "use from next week" (needs Task-04's week builder);
-  history per exercise (needs Task-04's weeks); body weight with a 7-day average and Pantry's weekly kcal;
+- Rest of wave 2: history per exercise (needs Task-04's weeks); body weight with a 7-day average and Pantry's weekly kcal;
   a note per exercise and a pain flag per set (needs Task-01's cells); Hermes' weekly Discord summary
   (needs Task-03's v5 file in the repo; checks Hermes' GitHub access first).
   Pantry kcal comes from `Estaed/Pantry-Data` through sync (Blueprint -> Pantry kcal; Tarık 2026-10-24);

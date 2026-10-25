@@ -1,13 +1,14 @@
-/* Tarik's A/B/C program, the built-in default (schema v5 program): six lifts a day, most at 3 sets, and the
-   hamstring stretch and incline walk as timed tiles (Antrenman.md -> v3, 2026-10-25). Exercise ids are kept
-   from v2 so history lines up. Week 1 is built from it on first open; a phone that already has weeks keeps its own. */
+/* Tarik's A/B/C program, the built-in default (schema v5 program): pull-ups on A and C, dips on A and B, a row on
+   B and C, six lifts a day, then the mobility routine and the incline walk as timed tiles (Antrenman.md -> v4,
+   2026-10-25). Exercise ids are kept where the lift and day are the same, so history lines up. Week 1 is built from
+   it on first open; a phone that already has weeks keeps its own. */
 self.CALI_DEFAULT_PROGRAM = {
   "id": "abc",
   "name": "A/B/C",
   "days": [
     {
       "id": "mh4v24uyz2_gra7",
-      "name": "A Heavy",
+      "name": "A",
       "exercises": [
         {
           "id": "mh4v2qgzri_5zmn",
@@ -20,7 +21,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 0,
           "loadStep": 2.5,
           "bodyweight": true,
-          "pair": "p1"
+          "pair": "p1",
+          "note": "Wrists first: 1 min circles, bend and extend"
         },
         {
           "id": "mh4v2k2kof_j8e0",
@@ -97,7 +99,7 @@ self.CALI_DEFAULT_PROGRAM = {
         },
         {
           "id": "mh4v2crf3j_300t",
-          "name": "Hamstring Stretch",
+          "name": "Mobility",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -105,8 +107,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "Nerve glide 10/leg, then towel hamstring 1 min/leg; stop before the back of the knee burns, foot free",
-          "duration": 240
+          "note": "Nerve slider 10/side · strap hamstring 2 × 30 s/side · seated knee marches 1 min · wall slides 1 min · knee-to-wall ankle 30 s/side. Stop at tingling or a burn behind the knee",
+          "duration": 420
         },
         {
           "id": "mh4v2nzrtm_c05q",
@@ -125,7 +127,7 @@ self.CALI_DEFAULT_PROGRAM = {
     },
     {
       "id": "mh4v2xm2u0_5y8l",
-      "name": "B Volume",
+      "name": "B",
       "exercises": [
         {
           "id": "mh4wrrjxde_juu9",
@@ -137,15 +139,15 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "Circles, then pain-free rocking on all fours",
+          "note": "Circles, active bend and extend, then light wall palm leans if painless",
           "duration": 60
         },
         {
-          "id": "mh4v2olheb_vrf8",
-          "name": "Pull-up",
+          "id": "mh4v26ltkc_ocxn",
+          "name": "Dips",
           "kind": "reps",
           "sets": 3,
-          "target": 8,
+          "target": 10,
           "repMin": 8,
           "repMax": 12,
           "load": 0,
@@ -154,16 +156,17 @@ self.CALI_DEFAULT_PROGRAM = {
           "pair": "p1"
         },
         {
-          "id": "mh9b2sp4ke_r7qd",
-          "name": "Shoulder Press",
+          "id": "mhv4br0w5x_b2m9",
+          "name": "Machine Row",
           "kind": "reps",
           "sets": 3,
           "target": 10,
           "repMin": 8,
           "repMax": 12,
-          "load": 47.5,
+          "load": 60,
           "loadStep": 2.5,
-          "pair": "p1"
+          "pair": "p1",
+          "note": "Chest on the pad"
         },
         {
           "id": "mh4v2mv46a_xarm",
@@ -190,33 +193,32 @@ self.CALI_DEFAULT_PROGRAM = {
           "pair": "p2"
         },
         {
-          "id": "mh4v2aihiq_no4t",
-          "name": "Incline Curl",
+          "id": "mh4v2w8lnr_9tdk",
+          "name": "Side Lateral Raise",
           "kind": "reps",
           "sets": 2,
-          "target": 10,
-          "repMin": 10,
+          "target": 12,
+          "repMin": 12,
+          "repMax": 20,
+          "load": 5,
+          "loadStep": 1,
+          "pair": "p3"
+        },
+        {
+          "id": "mhv4bc4lf7_k3n2",
+          "name": "Standing Calf Raise",
+          "kind": "reps",
+          "sets": 2,
+          "target": 12,
+          "repMin": 12,
           "repMax": 15,
-          "load": 10,
+          "load": 77.5,
           "loadStep": 2.5,
           "pair": "p3"
         },
         {
-          "id": "mh4v2lqmzi_i5r3",
-          "name": "Overhead Triceps",
-          "kind": "reps",
-          "sets": 2,
-          "target": 10,
-          "repMin": 10,
-          "repMax": 15,
-          "load": 15,
-          "loadStep": 2.5,
-          "pair": "p3",
-          "note": "Cable, arms overhead"
-        },
-        {
           "id": "mh4v2l2yvg_acl9",
-          "name": "Hamstring Stretch",
+          "name": "Mobility",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -224,8 +226,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "Nerve glide 10/leg, then towel hamstring 1 min/leg; stop before the back of the knee burns, foot free",
-          "duration": 240
+          "note": "Nerve slider 10/side · strap hamstring 2 × 30 s/side · seated knee marches 1 min · wall slides 1 min · knee-to-wall ankle 30 s/side. Stop at tingling or a burn behind the knee",
+          "duration": 420
         },
         {
           "id": "mh4v2rd5cu_jbph",
@@ -244,20 +246,21 @@ self.CALI_DEFAULT_PROGRAM = {
     },
     {
       "id": "mh4v23fat8_wr8d",
-      "name": "C Legs",
+      "name": "C",
       "exercises": [
         {
-          "id": "mh4v2p22bu_a5ka",
-          "name": "Chin-up",
+          "id": "mhv4cpu1lm_d8w3",
+          "name": "Pull-up",
           "kind": "reps",
           "sets": 3,
-          "target": 6,
-          "repMin": 6,
-          "repMax": 10,
+          "target": 8,
+          "repMin": 8,
+          "repMax": 12,
           "load": 0,
           "loadStep": 2.5,
           "bodyweight": true,
-          "pair": "p1"
+          "pair": "p1",
+          "note": "Wrists first: 1 min circles, bend and extend"
         },
         {
           "id": "mh4v2hixx5_3xme",
@@ -269,7 +272,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 10,
           "load": 45,
           "loadStep": 2.5,
-          "pair": "p1"
+          "pair": "p1",
+          "note": "Low incline, about 30°"
         },
         {
           "id": "mh4v2a3h2r_jbo4",
@@ -298,6 +302,19 @@ self.CALI_DEFAULT_PROGRAM = {
           "note": "Machine or cable"
         },
         {
+          "id": "mhv4cr0w2q_e6t4",
+          "name": "Machine Row",
+          "kind": "reps",
+          "sets": 2,
+          "target": 10,
+          "repMin": 8,
+          "repMax": 12,
+          "load": 60,
+          "loadStep": 2.5,
+          "pair": "p3",
+          "note": "Chest on the pad"
+        },
+        {
           "id": "mh4v2wlxhs_061g",
           "name": "Side Lateral Raise",
           "kind": "reps",
@@ -310,20 +327,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "pair": "p3"
         },
         {
-          "id": "mh4v27yr8y_82dh",
-          "name": "Reverse Pec Deck",
-          "kind": "reps",
-          "sets": 2,
-          "target": 12,
-          "repMin": 12,
-          "repMax": 15,
-          "load": 37.5,
-          "loadStep": 2.5,
-          "pair": "p3"
-        },
-        {
           "id": "mh4v26e2mb_f54j",
-          "name": "Hamstring Stretch",
+          "name": "Mobility",
           "kind": "check",
           "sets": 1,
           "target": 1,
@@ -331,8 +336,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "Nerve glide 10/leg, then towel hamstring 1 min/leg; stop before the back of the knee burns, foot free",
-          "duration": 240
+          "note": "Nerve slider 10/side · strap hamstring 2 × 30 s/side · seated knee marches 1 min · wall slides 1 min · knee-to-wall ankle 30 s/side. Stop at tingling or a burn behind the knee",
+          "duration": 420
         },
         {
           "id": "mh4v2aqrsm_08jg",

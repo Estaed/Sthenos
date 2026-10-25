@@ -39,8 +39,8 @@ def off_blueprint(doc):
 
 
 PULL, DIP, LP, CURL, CALF, PLANK, STRETCH = (ex_id(DAYS[0], n) for n in (
-    "Weighted Pull-up", "Weighted Dip", "Leg Press", "Seated Leg Curl", "Standing Calf Raise", "Plank", "Hamstring Stretch"))
-B_PULL = ex_id(DAYS[1], "Pull-up")
+    "Weighted Pull-up", "Weighted Dip", "Leg Press", "Seated Leg Curl", "Standing Calf Raise", "Plank", "Mobility"))
+B_PULL = ex_id(DAYS[1], "Dips")
 
 LOG = """([dayId, rows]) => { for (const [exId, sets] of Object.entries(rows)) sets.forEach((r, i) => Cali.log(dayId, exId, i, r)); }"""
 DONE = """(dayId) => Cali.change(d => { const day = d.weeks[d.weeks.length - 1].days[dayId];
@@ -146,10 +146,10 @@ def main():
             ("pull", A_ID, PULL), ("dip", A_ID, DIP), ("lp", A_ID, LP), ("curl", A_ID, CURL), ("calf", A_ID, CALF),
             ("plank", A_ID, PLANK), ("stretch", A_ID, STRETCH), ("b-pull", B_ID, B_PULL))}
         want = {"pull": (2.5, 4), "dip": (0, 8), "lp": (110, 11), "curl": (35, 12), "calf": (80, 12), "plank": (0, 45),
-                "stretch": (0, 1), "b-pull": (0, 8)}
+                "stretch": (0, 1), "b-pull": (0, 10)}
         A.check("week 2 takes each load and target from Cali.progress: Pull-up BW +2.5 x 4, Dip stays (short), Leg Press 11, "
                 "Leg Curl stays (not logged), Calf 80 kg x 12, Plank 45 s, stretch copied, day B not done unchanged "
-                "(Pull-up 8, 8, 8 stays x 8: a day not done never moves up)", got == want, got)
+                "(Dips 8, 8, 8 stays x 10: a day not done never moves up)", got == want, got)
         A.check("day C (not started) carries over the program's values",
                 all((e["load"], e["target"]) == (x["load"], x["target"]) for x in DAYS[2]["exercises"]
                     for e in [week_ex(doc, 2, C_ID, x["id"])]))

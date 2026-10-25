@@ -125,7 +125,9 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 - Fresh data, same repo, v5 file. Rejected: migrating v4 ("eski verileri kullanmayacağız").
 - The new app takes the old URL; the old one moves to `legacy/`. Rejected: a second URL.
 - Public, sync optional per person. Rejected: Tarık-only with sync required.
-- New programs: Settings → Programs (edit, duplicate, import a program JSON, use from next week).
+- New programs: Settings → Programs (edit, duplicate, import a program JSON). Use or edit a program: an empty
+  current week (no set stored) is rebuilt at once, else it starts with the next week; the in-card editor stays the
+  one way to change the week in hand (Eko, left to him by Tarık 2026-10-25). Default day names `A`, `B`, `C`, editable.
   Rejected: editing only by Eko in the data repo (others could not).
 - v1 includes body weight with a 7-day average, a note per exercise and a pain flag per set,
   Pantry's weekly kcal, and Hermes' weekly Discord summary. Rejected: exercise swap in v1.

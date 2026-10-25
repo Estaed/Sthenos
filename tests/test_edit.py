@@ -43,8 +43,8 @@ def main():
         # ── the whole program in English ──
         names = ev("() => Cali.program().days.flatMap(d => [d.name, ...d.exercises.map(e => e.name)])")
         turkish = [n for n in names if re.search("[ğüşıöçĞÜŞİÖÇ]", n)]
-        A.check("the built-in program has no Turkish name (days A Heavy, B Volume, C Legs)",
-                not turkish and names[0] == "A Heavy", turkish or names[:1])
+        A.check("the built-in program has no Turkish name (days A, B, C)",
+                not turkish and names[0] == "A", turkish or names[:1])
 
         # ── one exercise at a time ──
         A.touch_tap(page, cell("pull", 0))
