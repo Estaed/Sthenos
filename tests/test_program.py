@@ -183,9 +183,10 @@ def scenario_main(browser, url, errors):
     new_ex = copy["days"][-1]["exercises"]
     A.check("Add day adds day D (the next letter) with an id unused in every program, never with ':'",
             [x["name"] for x in copy["days"]] == ["A", "B", "C", "D"] and D not in old_ids and ":" not in D, [x["name"] for x in copy["days"]])
-    A.check("a new exercise is usable with only its name typed: reps, 3 sets, 8-12, target 8, load 0, the settings' load step",
+    A.check("a new exercise is usable with only its name typed: reps, 3 sets, 8-12, target 8, load 0, the settings' load step, "
+            "and the muscles its name guesses",
             new_ex == [{"id": X, "name": "Hip Thrust", "kind": "reps", "sets": 3, "target": 8, "repMin": 8, "repMax": 12, "load": 0,
-                        "loadStep": 2.5}] and X not in old_ids and ":" not in X and X != D, new_ex)
+                        "loadStep": 2.5, "muscles": {"gluteal": 1, "hamstring": 0.5}}] and X not in old_ids and ":" not in X and X != D, new_ex)
     w = d["weeks"]
     A.check("Use on a week with no set: week 1 is rebuilt from the copy (n and startedAt kept), activeProgram and nextProgram follow",
             len(w) == 1 and w[0]["n"] == 1 and w[0]["startedAt"] == week0["startedAt"] and w[0]["program"] == cid
@@ -348,9 +349,9 @@ def scenario_main(browser, url, errors):
     A.check("the note and the name are saved", x()["note"] == "Squeeze at the top" and x()["name"] == "Barbell Hip Thrust"
             and page.locator(ROW(E["X"])).inner_text().startswith("Barbell Hip Thrust"), x())
     tap(page, EX(E["X"], '[data-act="pair"]'))
-    A.check("every field is in the program as the Blueprint's schema has it", x() == {
+    A.check("every field is in the program as the Blueprint's schema has it (the muscles guessed once, from the first name)", x() == {
         "id": E["X"], "name": "Barbell Hip Thrust", "kind": "reps", "sets": 4, "target": 9, "repMin": 9, "repMax": 11, "load": 42.5,
-        "loadStep": 5, "note": "Squeeze at the top", "pair": pairs()["Y"]} and pairs()["Y"], x())
+        "loadStep": 5, "note": "Squeeze at the top", "pair": pairs()["Y"], "muscles": {"gluteal": 1, "hamstring": 0.5}} and pairs()["Y"], x())
     layout(page, "the program editor with an exercise open")
 
     # ── a week with a set keeps its copy; the edit shows from the next week ──
@@ -581,6 +582,8 @@ def scenario_import(browser, url, errors):
         ("an id with ':'", "c.json", bad(days__0__exercises__0__id="bench:1"), "contains “:”"),
         ("a day id twice", "d.json", json.dumps(twice_day), "day id “up” is used twice"),
         ("an exercise id twice in a day", "e.json", json.dumps(twice_ex), "exercise id “bench” is used twice on day Upper"),
+        ("a muscle counted other than 1 or 0.5", "m.json", bad(days__0__exercises__0__muscles={"chest": 2}), "it must be 1 (main) or 0.5 (helper)"),
+        ("a muscle not in Cali.muscles", "n.json", bad(days__0__exercises__0__muscles={"pecs": 1}), "names the muscle “pecs”"),
         ("a whole document", "backup.json", FIXTURE, "whole backup"),
     ]
     before = raw(page)
@@ -624,13 +627,128 @@ def scenario_sync(browser, url, errors):
     ctx.close()
 
 
+# ── the Muscles field: chips cycling off -> main -> helper -> off, the guess written once, the week that carries it ──
+def scenario_muscles(browser, url, errors):
+    ctx, page = A.phone(browser, errors, "program-muscles", color_scheme="light", reduced_motion="reduce")
+    A.open_day(page, url)
+    ctx.clock.pause_at(A.NOW + datetime.timedelta(seconds=30))
+    builtin = A.stored(page)["programs"][0]
+    day = builtin["days"][0]["id"]
+    lp = next(e["id"] for e in builtin["days"][0]["exercises"] if e["name"] == "Leg Press")
+    chip = lambda ex, m: EX(ex, f'[data-act="muscle"][data-m="{m}"]')
+    states = lambda ex: page.evaluate("""(s) => Object.fromEntries([...document.querySelectorAll(s)].filter(b => b.getAttribute('aria-pressed') !== 'false')
+        .map(b => [b.dataset.m, b.getAttribute('aria-pressed')]))""", EX(ex, '[data-act="muscle"]'))
+    line = lambda ex, v: page.evaluate("""(s) => { const el = document.querySelector(s); return el && !el.hidden ? el.textContent : ''; }""",
+                                       EX(ex, f'[data-v="{v}"]'))
+    pm = lambda ex, pid="abc": (ex_of(A.stored(page), pid, day, ex) or {}).get("muscles", "absent")
+    wm = lambda ex, n=0: A.stored(page)["weeks"][n]["days"][day]["exercises"][ex].get("muscles", "absent")
+
+    go_programs(page)
+    open_program(page, "abc")
+    tap(page, ROW(lp))
+    shown = (states(lp), line(lp, "mline"), line(lp, "mweek"))
+    A.check("the Muscles field shows a chip per muscle: Leg Press main on quads (pressed), helper on glutes and adductors (mixed)",
+            shown == ({"quadriceps": "true", "gluteal": "mixed", "adductors": "mixed"}, "", "")
+            and page.locator(EX(lp, '[data-act="muscle"]')).count() == 16, shown)
+    tap(page, chip(lp, "hamstring"))
+    one = pm(lp)
+    tap(page, chip(lp, "hamstring"))
+    half = pm(lp)
+    tap(page, chip(lp, "hamstring"))
+    A.check("a tap cycles a muscle off -> main (1) -> helper (0.5) -> off, saved in the program; week 1 (no set) carries it at once",
+            one == {"quadriceps": 1, "gluteal": 0.5, "hamstring": 1, "adductors": 0.5}
+            and half == {"quadriceps": 1, "gluteal": 0.5, "hamstring": 0.5, "adductors": 0.5}
+            and pm(lp) == {"quadriceps": 1, "gluteal": 0.5, "adductors": 0.5} and wm(lp) == pm(lp), (one, half, pm(lp)))
+    for m, n in (("quadriceps", 2), ("gluteal", 1), ("adductors", 1)):   # main -> helper -> off; helper -> off
+        for _ in range(n):
+            tap(page, chip(lp, m))
+    off = (pm(lp), wm(lp), states(lp), line(lp, "mline"))
+    tap(page, chip(lp, "quadriceps"))
+    A.check("all off stores {} (counts nothing, and the field says so); a tap then starts from {}, not from the guess",
+            off == ({}, {}, {}, "Counts nothing on the muscle map.") and pm(lp) == {"quadriceps": 1}, (off, pm(lp)))
+    type_into(page, EX(lp, '[data-f="ename"]'), "Leg Press Machine")
+    A.check("renaming an exercise that carries a pick keeps the pick (no guess over it)",
+            pm(lp) == {"quadriceps": 1} and ex_of(A.stored(page), "abc", day, lp)["name"] == "Leg Press Machine", pm(lp))
+    layout(page, "the program editor with the Muscles field open")
+
+    # the guess: written the first time a name is saved, never over a pick, never again on a rename
+    tap(page, DAY(day, '[data-act="addex"]'))
+    page.keyboard.type("Lat Pulldown")
+    page.keyboard.press("Enter")
+    lat = day_of(A.stored(page), "abc", day)["exercises"][-1]["id"]
+    first = pm(lat)
+    type_into(page, EX(lat, '[data-f="ename"]'), "Squat")
+    A.check("naming a new exercise writes its name's guess (Lat Pulldown: upper back, biceps as helper); renaming it does not guess again",
+            first == {"upper-back": 1, "biceps": 0.5} and pm(lat) == first and states(lat) == {"upper-back": "true", "biceps": "mixed"}
+            and line(lat, "mline") == "", (first, pm(lat)))
+    tap(page, DAY(day, '[data-act="addex"]'))
+    page.keyboard.type("Mystery Move")
+    page.keyboard.press("Enter")
+    mys = day_of(A.stored(page), "abc", day)["exercises"][-1]["id"]
+    unknown = (pm(mys), line(mys, "mline"))
+    type_into(page, EX(mys, '[data-f="ename"]'), "Hip Thrust")
+    A.check("a name the table does not know writes nothing and the field says the map does not count it; the first name it knows writes its guess",
+            unknown[0] == "absent" and unknown[1].startswith("No muscle yet, so the muscle map does not count it.")
+            and pm(mys) == {"gluteal": 1, "hamstring": 0.5}, (unknown, pm(mys)))
+    tap(page, EX(mys, '[data-act="exclose"]'))
+    tap(page, '[data-screen="program"] [data-act="back"]')
+    page.wait_for_selector('[data-screen="programs"] .program-list')
+
+    # an exercise without muscles (a program file from before the field): the chips show the guess, a tap starts from it
+    plain = {"id": "old", "name": "Old file", "days": [{"id": "od", "name": "A", "exercises": [
+        {"id": "orow", "name": "Seated Row", "kind": "reps", "sets": 3, "target": 8, "repMin": 8, "repMax": 12, "load": 40, "loadStep": 2.5}]}]}
+    with page.expect_file_chooser() as info:
+        tap(page, '[data-screen="programs"] [data-act="import"]')
+    info.value.set_files(files=[{"name": "old.json", "mimeType": "application/json", "buffer": json.dumps(plain).encode("utf-8")}])
+    page.wait_for_function("() => Cali.current().name === 'program' && Cali.current().args.id === 'old'")
+    tap(page, ROW("orow"))
+    seen = (states("orow"), line("orow", "mline"))
+    stored_before = (ex_of(A.stored(page), "old", "od", "orow") or {}).get("muscles", "absent")
+    tap(page, chip("orow", "biceps"))
+    A.check("an exercise without muscles shows its name's guess, says so, and stores nothing until a tap, which starts from the guess",
+            seen == ({"upper-back": "true", "trapezius": "mixed", "biceps": "mixed", "deltoids": "mixed"},
+                     "Guessed from the name. A tap makes a muscle main, a second tap a helper (½, counts half), a third off.")
+            and stored_before == "absent" and (ex_of(A.stored(page), "old", "od", "orow") or {}).get("muscles")
+            == {"upper-back": 1, "trapezius": 0.5, "deltoids": 0.5}, (seen, stored_before))
+    tap(page, '[data-screen="program"] [data-act="back"]')
+    page.wait_for_selector('[data-screen="programs"] .program-list')
+    tap(page, '[data-screen="programs"] [data-act="back"]')
+    page.wait_for_selector('[data-screen="settings"] .settings-body')
+    tap(page, '[data-screen="settings"] [data-act="back"]')
+    page.wait_for_selector('[data-screen="day"] [data-set]')
+
+    # a week with a set keeps its copy; the field says so; the week Finish builds carries the edit
+    pull = builtin["days"][0]["exercises"][0]["id"]
+    A.touch_tap(page, f'[data-screen="day"] [data-set="{day}:{pull}:0"]')
+    ctx.clock.run_for(1000)
+    week1 = wm(lp)
+    go_programs(page)
+    open_program(page, "abc")
+    tap(page, ROW(lp))
+    said = line(lp, "mweek")
+    tap(page, chip(lp, "calves"))
+    A.check("with a set logged, a Muscles edit changes the program only; week 1 keeps its muscles and the field says so in one line",
+            said == "Week 1 keeps the muscles it was built with; a change shows from week 2."
+            and pm(lp) == {"quadriceps": 1, "calves": 1} and wm(lp) == week1 == {"quadriceps": 1}, (said, pm(lp), wm(lp)))
+    back_to_day(page)
+    tap(page, '[data-screen="day"] [data-slot="dayheader"] .week-btn')
+    tap(page, '.week-menu [data-week-act="finish"]')
+    page.wait_for_selector('[data-screen="finish-week"] [data-week-act="confirm"]')
+    tap(page, '[data-screen="finish-week"] [data-week-act="confirm"]')
+    page.wait_for_function("() => Cali.current().name === 'day' && Cali.week().n === 2")
+    A.check("Finish week builds week 2 carrying the edited muscles; week 1 keeps its own",
+            wm(lp, 1) == {"quadriceps": 1, "calves": 1} and wm(lp, 0) == {"quadriceps": 1}, (wm(lp, 1), wm(lp, 0)))
+    A.check("every tap landed on the control it aimed at", not MISSED, MISSED[:5])
+    ctx.close()
+
+
 def main():
     srv, site, url = A.start_site()
     errors = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for name, fn in (("main", scenario_main), ("zero", scenario_zero), ("progression", scenario_progression),
-                         ("import", scenario_import), ("sync", scenario_sync)):
+                         ("import", scenario_import), ("sync", scenario_sync), ("muscles", scenario_muscles)):
             A.guarded(f"program scenario {name}", fn, browser, url, errors)
         browser.close()
     srv.shutdown()

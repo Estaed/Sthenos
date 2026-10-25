@@ -6,8 +6,9 @@
    Route 'program' { id } (no id: the active program): the editor. Name; one line saying which week runs it and where
      an edit shows; the days in order, each a card: a tap on a day's name opens its panel (name, move up or down,
      remove), a tap on an exercise opens its editor under it (one at a time): name, kind (reps, time, check), sets,
-     target, rep range, load (typed, kg), load step, bodyweight, pair with the next exercise, note, and for a check row
-     its countdown (typed, minutes); move up or down, remove. Add exercise ends each day, Add day ends the list.
+     target, rep range, load (typed, kg), load step, bodyweight, pair with the next exercise, muscles, note, and for a
+     check row its countdown (typed, minutes); move up or down, remove. Add exercise ends each day, Add day ends the list.
+     { id, dayId, exId } opens that exercise's editor at its Muscles field (the muscle map's "Not counted" rows).
      Top bar: Duplicate and Delete. Docked: the last message and "Use this program" (hidden while using it would
      change nothing: it is nextProgram and runs this week too, or this week has a set).
 
@@ -22,6 +23,14 @@
    - Kind: to time or check the rep range becomes null, to check the target and sets become 1 and the pair goes; the
      values a kind had come back when it is chosen again in this visit (to reps the first time: 8-12, target 8; to
      time: 30 s); leaving check drops the countdown.
+   - Muscles (reps and time rows; Blueprint -> Data, the muscle map in app/muscles.js): a chip per key of
+     Cali.muscles, named by CaliMuscles.names; a tap cycles it off -> main (1, filled with a check) -> helper (0.5,
+     "½") -> off and saves the whole object (all off stores {}: counts nothing). An exercise without muscles shows
+     the name table's guess (CaliMuscles.guess) and a tap starts from it. The first time such an exercise gets its
+     name saved here, the guess for that name is written into it: never over a pick ({} included), never again on a
+     rename, and nothing when the table knows no muscle for the name (it stays unguessed, so the map lists it). One
+     line says when it is guessed, counts nothing or has none; another, while the week this program runs has a set
+     stored, that the week keeps the muscles it was built with and a change shows from the next week.
    - Pairs: "Pair with the next exercise" links two adjacent non-check rows; the pair value is one unused elsewhere
      in that day (joining a row already paired joins its group). Unpairing, removing or moving a row out of its group
      clears a pair left with one member, so both lose it; moving a row past another pair jumps the whole pair.
@@ -59,6 +68,7 @@
     up: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
     lower: '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
     alert: '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>',
   };
   const icon = name => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${PATHS[name]}</svg>`;
   const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -258,6 +268,9 @@
     if (/^pair /.test(what)) return `the pair of ${where} must be text`;
     if (/^note /.test(what)) return `the note of ${where} must be text`;
     if (/^duration /.test(what)) return `the countdown of ${where} must be a number above 0`;
+    if (what === 'muscles is not an object') return `the muscles of ${where} must be an object of muscle names`;
+    if ((t = /^muscle (.*) is not a key of Cali\.muscles$/s.exec(what))) return `${where} names the muscle “${t[1]}”, which is not one of ${Cali.muscles.join(', ')}`;
+    if ((t = /^muscle (.*?) counts (.*), not 1 or 0\.5$/s.exec(what))) return `the muscle “${t[1]}” of ${where} counts ${t[2]}; it must be 1 (main) or 0.5 (helper)`;
     return what;
   }
 
@@ -455,6 +468,42 @@
     return `Week ${w.n + 1} carries load and target on from week ${w.n}.`;
   }
 
+  // ── muscles (the muscle map's names and name table are app/muscles.js's CaliMuscles) ──
+  const table = () => self.CaliMuscles || null;
+  const shownMuscles = e => (isObj(e.muscles) ? e.muscles : table().guess(e.name, e.kind) || {});
+  // the first name saved on an exercise without muscles writes the guess for it (see the header)
+  function firstGuess(e) {
+    if (!table() || e.muscles !== undefined || e.kind === 'check') return;
+    const g = table().guess(e.name, e.kind);
+    if (g) e.muscles = g;
+  }
+  // a tap on a muscle: off -> main (1) -> helper (0.5) -> off, from what the chips show; the keys in Cali.muscles order
+  function cycleMuscle(e, key) {
+    const from = shownMuscles(e);
+    const next = { ...from, [key]: from[key] === 1 ? 0.5 : from[key] === 0.5 ? undefined : 1 };
+    e.muscles = {};
+    for (const k of Cali.muscles) if (next[k] === 1 || next[k] === 0.5) e.muscles[k] = next[k];
+  }
+  function muscleLine(e) {
+    const rule = 'A tap makes a muscle main, a second tap a helper (½, counts half), a third off.';
+    if (isObj(e.muscles)) return Object.keys(e.muscles).length ? '' : 'Counts nothing on the muscle map.';
+    return table().guess(e.name, e.kind) ? `Guessed from the name. ${rule}` : `No muscle yet, so the muscle map does not count it. ${rule}`;
+  }
+  function muscleWeekLine(p) {
+    const w = Cali.week();
+    if (w.program !== p.id || !hasSets(w)) return '';
+    return Cali.doc().nextProgram === p.id ? `Week ${w.n} keeps the muscles it was built with; a change shows from week ${w.n + 1}.`
+      : `Week ${w.n} keeps the muscles it was built with.`;
+  }
+  function musclesHtml(e) {
+    if (e.kind === 'check' || !table()) return '';
+    return '<div class="workout-ed-f workout-ed-wide program-muscles" role="group" aria-labelledby="program-l-muscles">' +
+      '<span class="workout-ed-l" id="program-l-muscles">Muscles</span><div class="program-mchips">' +
+      Cali.muscles.map(k => `<button type="button" class="program-mchip" data-act="muscle" data-m="${k}" aria-pressed="false">` +
+        `${icon('check')}<span>${esc(table().names[k])}</span><span class="program-mhalf" aria-hidden="true">½</span></button>`).join('') +
+      '</div><p class="program-hint" data-v="mline" hidden></p><p class="program-hint" data-v="mweek" hidden></p></div>';
+  }
+
   // the steppers of an open exercise: label, value shown, step and bounds
   function steppers(e) {
     const out = [];
@@ -499,6 +548,7 @@
           `<button type="button" data-act="lstep" data-v="${v}" aria-pressed="false">${decimal(v)}</button>`).join('')}</div></div>`) +
       (e.kind === 'check' ? '' : switchHtml('bw', 'Bodyweight', 'The load is added to it')) +
       (pairable(e, next) ? switchHtml('pair', 'Pair with the next exercise', '') : '') +
+      musclesHtml(e) +
       '<label class="workout-ed-f workout-ed-wide"><span class="workout-ed-l">Note</span>' +
         '<textarea class="workout-ed-name program-note" data-f="note" rows="2" maxlength="300" placeholder="A cue under its name"></textarea></label>' +
       '<div class="workout-ed-foot"><div class="program-acts">' +
@@ -603,6 +653,20 @@
         const pair = ed.querySelector('[data-act="pair"]');
         if (pair) pair.setAttribute('aria-checked', String(linked(e, next)));
         put(ed.querySelector('[data-v="pairsub"]'), 'textContent', next ? `With ${next.name}` : '');
+        const chips = ed.querySelectorAll('[data-act="muscle"]');
+        if (chips.length) {
+          const shown = shownMuscles(e);
+          for (const c of chips) {
+            const v = shown[c.dataset.m];
+            const state = v === 1 ? 'true' : v === 0.5 ? 'mixed' : 'false';
+            if (c.getAttribute('aria-pressed') !== state) c.setAttribute('aria-pressed', state);
+          }
+          for (const [v, text] of [['mline', muscleLine(e)], ['mweek', muscleWeekLine(p)]]) {
+            const el = ed.querySelector(`[data-v="${v}"]`);
+            put(el, 'textContent', text);
+            put(el, 'hidden', !text);
+          }
+        }
         setValue(ed.querySelector('[data-f="note"]'), e.note || '');
         const hint = ed.querySelector('[data-v="carry"]');
         const line = carryLine(p, day, e);
@@ -736,6 +800,7 @@
       return;
     }
     if (act === 'lstep') { edit(id, (x, dd, ee) => { ee.loadStep = Number(b.dataset.v); }, 'loadStep', at); return; }
+    if (act === 'muscle') { edit(id, (x, dd, ee) => cycleMuscle(ee, b.dataset.m), 'muscles', at); return; }
     if (act === 'bw') { edit(id, (x, dd, ee) => { if (ee.bodyweight) delete ee.bodyweight; else ee.bodyweight = true; }, 'bodyweight', at); return; }
     if (act === 'pair') {
       edit(id, (x, dd) => { if (linked(dd.exercises[k], dd.exercises[k + 1])) unlink(dd, k); else link(dd, k); }, 'pair', at);
@@ -769,7 +834,7 @@
       const was = f === 'pname' ? p.name : f === 'dname' ? day.name : e.name;
       if (!text) { input.value = was; say(`Not saved: a name is needed; it stays ${was}.`, true); return; }
       if (text === was) { input.value = was; return; }
-      edit(id, (x, dd, ee) => { if (f === 'pname') x.name = text; else if (f === 'dname') dd.name = text; else ee.name = text; }, f, at);
+      edit(id, (x, dd, ee) => { if (f === 'pname') x.name = text; else if (f === 'dname') dd.name = text; else { ee.name = text; firstGuess(ee); } }, f, at);
       return;
     }
     if (!e) return;
@@ -791,6 +856,8 @@
       carry = null;
       screen = { kind: 'editor', root, id: args && typeof args.id === 'string' ? args.id : Cali.doc().activeProgram, key: null, openDay: null, openEx: null,
         msg: start.msg ? { text: start.msg, err: Boolean(start.err) } : null };
+      const at = args && typeof args.dayId === 'string' && typeof args.exId === 'string' ? { dayId: args.dayId, exId: args.exId } : null;
+      if (at) { screen.openEx = at; start.focus = null; }
       root.addEventListener('click', editorClick);
       root.addEventListener('change', editorChange);
       root.addEventListener('keydown', ev => {
@@ -798,6 +865,7 @@
       });
       drawEditor();
       if (start.focus) reveal(start.focus, true);
+      else if (at && screen.openEx) reveal(`#program-ed-${CSS.escape(at.exId)} .program-muscles`);
     },
     update(root) { if (screen && screen.root === root) drawEditor(); },
     leave() { screen = null; closeDialogs(); },

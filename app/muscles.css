@@ -1,0 +1,96 @@
+/* Muscle map (app/muscles.js): route 'muscles' in the look of design/muscles.html, and its top-bar button. Shared
+   classes (.bar2, .iconbtn, .pill, .card, .group, .anchor, .eyebrow, .num, .i) come from app/base.css and the list row
+   (.settings-row, .settings-t, .settings-chev) from app/settings.css; everything here carries the mm- prefix. Every
+   control is a 44 px target (the day chips: 36 px drawn, 44 px to touch). Red is a recorded break
+   (design/deviations.md, 2026-10-26).
+
+   The ramp: a muscle's fill is mixed in OKLCH from --mm-lo (a fraction of a set) through --mm-mid (5) to --mm-hi (10
+   and up); 0 sets is --mm-zero, the body grey. Along it the hue moves from orange to red and the distance from the
+   body grey grows, in both themes (in dark the stops sit a little off the prototype's #FF5A00 / #E5262E, whose red
+   came back toward the grey; measured with OKLab). --mm-rest paints the parts that are no muscle (head, hands,
+   knees, feet), --mm-line the contour, --mm-plan the planned part of a bar. */
+:root, [data-theme="dark"] {
+  --mm-zero: #2A2A2A; --mm-lo: #6B3418; --mm-mid: #EB5200; --mm-hi: #FF3B30;
+  --mm-rest: #212121; --mm-line: #5A5A5A; --mm-plan: #707070;
+}
+[data-theme="light"] {
+  --mm-zero: #E4E4E4; --mm-lo: #FFD2B3; --mm-mid: #FF5A00; --mm-hi: #B3121B;
+  --mm-rest: #EFEFEF; --mm-line: #9A9A9A; --mm-plan: #A3A3A3;
+}
+
+.mm-body { flex: 1; display: flex; flex-direction: column; padding: 0 12px calc(16px + env(safe-area-inset-bottom)); }
+.mm-pill { margin-left: auto; flex: none; }
+
+/* the selection: Week, then the week's days */
+.mm-days { display: flex; flex-wrap: wrap; gap: 8px 6px; margin: 4px 0 10px; }
+.mm-days button {
+  position: relative; flex: 1 0 auto; min-width: 52px; max-width: 100%; height: 36px; padding: 0 12px; border-radius: 18px;
+  box-shadow: inset 0 0 0 1px var(--outline); font-size: 0.875rem; font-weight: 700; color: var(--ink-muted);
+}
+.mm-days button span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mm-days button::after { content: ""; position: absolute; inset: -4px 0; }
+.mm-days button[aria-pressed="true"] { background: var(--tonal); color: var(--ink); box-shadow: none; }
+
+/* the bodies and the scale under them */
+.mm-figure { margin: 0; padding: 12px 6px 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.mm-svg { width: 100%; height: auto; display: block; }
+.mm-m { cursor: pointer; }
+/* a tapped muscle: an ink edge, the other muscles faded back */
+.mm-m[data-on] path { stroke: var(--ink); stroke-width: 1px; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.mm-figure[data-picked] .mm-m:not([data-on]) { opacity: 0.45; }
+.mm-rest { fill: var(--mm-rest); }
+.mm-outline { fill: none; stroke: var(--mm-line); stroke-width: 2px; vector-effect: non-scaling-stroke; pointer-events: none; }
+.mm-figure figcaption { text-align: center; font-size: 0.75rem; font-weight: 600; color: var(--ink-subtle); }
+.mm-scale {
+  grid-column: 1 / -1; display: grid; grid-template-columns: auto auto 1fr auto; gap: 8px; align-items: center;
+  padding: 8px 8px 0; font-size: 0.75rem; color: var(--ink-muted);
+}
+.mm-none { display: inline-flex; align-items: center; gap: 5px; margin-right: 4px; }
+.mm-none i { width: 12px; height: 12px; border-radius: 3px; background: var(--mm-zero); box-shadow: inset 0 0 0 1px var(--mm-line); }
+.mm-ramp {
+  height: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--mm-lo), var(--mm-mid), var(--mm-hi));
+  background: linear-gradient(in oklch 90deg, var(--mm-lo), var(--mm-mid), var(--mm-hi));
+}
+
+/* the box: the least worked main muscle, or the one tapped */
+.mm-pick { position: relative; margin: 10px var(--slab-x) 0 0; padding: 12px 14px 13px; }
+.mm-pick .eyebrow { display: block; color: var(--on-anchor-muted); }
+.mm-pick h3 { margin: 2px 0 6px; font: 700 1.25rem/1.2 var(--font-sans); letter-spacing: -0.3px; overflow-wrap: anywhere; }
+.mm-pick p { margin: 0; font-size: 0.8125rem; line-height: 18px; color: var(--on-anchor-muted); overflow-wrap: anywhere; }
+.mm-pick p + p { margin-top: 2px; }
+.mm-pick .mm-close { position: absolute; top: 2px; right: 2px; color: var(--on-anchor); }
+.mm-pick .mm-close + h3 { padding-right: 36px; }
+
+/* rows that count nothing: one each, to the exercise in the program editor */
+.mm-fix { margin-top: 12px; }
+.mm-fix > * + * { border-top: 1px solid var(--divider); }
+.mm-fixrow .settings-t { overflow-wrap: anywhere; }
+
+/* one row per muscle: planned sets in grey, done sets filling orange, on Week a tick at 4 sets */
+.mm-list { margin: 12px 0 0; padding: 4px 0; }
+.mm-row {
+  width: 100%; display: grid; grid-template-columns: 96px minmax(0, 1fr) minmax(52px, auto); align-items: center; gap: 10px;
+  min-height: 44px; padding: 0 14px; text-align: left; color: var(--ink);
+}
+.mm-row + .mm-row { border-top: 1px solid var(--divider); }
+.mm-row b { font-size: 0.875rem; font-weight: 700; overflow-wrap: anywhere; }
+.mm-row .num { text-align: right; font-size: 0.875rem; white-space: nowrap; }
+.mm-row small { color: var(--ink-subtle); font-weight: 600; }
+.mm-row.low b, .mm-row.idle b { color: var(--ink-muted); }
+.mm-row[aria-pressed="true"] { background: var(--surface-3); }
+.mm-row:active { background: var(--surface-3); }
+.mm-bar { position: relative; height: 8px; border-radius: 4px; background: var(--tonal); }
+.mm-bar .plan, .mm-bar .done { position: absolute; inset: 0 auto 0 0; border-radius: 4px; }
+.mm-bar .plan { background: var(--mm-plan); }
+.mm-bar .done { background: var(--level); }
+.mm-bar .floor { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--ink); opacity: 0.55; }
+
+/* the top-bar button on the day screen, just before the hourglass: the first node on the right takes .slot-end
+   (app/base.css), so the one after it drops its own push. It shrinks instead of running under the next button when
+   the bar is full (a session clock, a running countdown), and below its 44 px it is hidden (app/muscles.js), its
+   leftover width moved to the start of the holder so the buttons on the right stay together */
+.mm-open { flex: 0 1 44px; min-width: 0; overflow: hidden; }
+.mm-open.slot-end ~ .slot-end { margin-left: 0; }
+.mm-open .i { width: 21px; height: 21px; }
+.mm-open.mm-cramped { visibility: hidden; order: -1; }

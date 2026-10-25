@@ -20,3 +20,6 @@ CALI_FEATURES.push('app/week.js');
 CALI_FEATURES.push('app/week.css');
 CALI_FEATURES.push('app/program.js');
 CALI_FEATURES.push('app/program.css');
+CALI_FEATURES.push('app/muscles-data.js');
+CALI_FEATURES.push('app/muscles.js');
+CALI_FEATURES.push('app/muscles.css');

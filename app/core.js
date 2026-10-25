@@ -16,14 +16,16 @@
        body: [{ date: 'YYYY-MM-DD', kg }], settings: { <key>: value } }
      program  { id, name, days: [{ id, name, exercises: [exercise] }] }
      exercise { id, name, kind: 'reps'|'time'|'check', sets: count, target, repMin, repMax, load, loadStep,
-                bodyweight?, pair?, note?, duration? }
+                bodyweight?, pair?, note?, duration?, muscles? }
               reps: target and the range in reps. time: target in seconds, repMin/repMax null. check: target 1,
               repMin/repMax null, duration? = the countdown in seconds of a timed one-off row (stretch, walk).
               load: kg, the added load when bodyweight is true (0 = bodyweight only). pair: adjacent exercises of a
               day with the same pair are done alternately. Day and exercise ids never contain ':'.
+              muscles: { <key of Cali.muscles>: 1 | 0.5 } (1 the muscle it is for, 0.5 a helper; {} counts nothing;
+              absent: app/muscles.js guesses them from the name). A program's are checked here; a week's copy is not.
      week     { n, program: id, startedAt: ISO, finishedAt?: ISO, days: { <dayId>: { startedAt?, finishedAt?,
                 exercises: { <exId>: { name, kind, repMin, repMax, loadStep, bodyweight?, pair?, note?, duration?,
-                load, target, sets: [null | { r, at: ISO, pain?: true }] } } } } }
+                muscles?, load, target, sets: [null | { r, at: ISO, pain?: true }] } } } } }
               Weeks are numbered 1, 2, 3 ... in order; the last one is the current week. sets has one entry per
               set (null = not logged). A week copies its program's exercise rules, load and target when built, so
               a program edit never rewrites history (a week without the copied rules falls back to its program).
@@ -59,6 +61,9 @@
                                      duration) with the week's load, target and sets, plus week and dayId. null
                                      when the week has no such exercise. Frozen.
      Cali.dayExercises(n, dayId)     the day's weekExercises in program order.
+     Cali.muscles                    the muscle keys an exercise's muscles may name (frozen, in body order): the body
+                                     paths' slugs chest, deltoids, biceps, triceps, forearm, abs, obliques, upper-back,
+                                     trapezius, lower-back, gluteal, quadriceps, hamstring, adductors, calves, tibialis.
      Cali.history(dayId, exId, n)    that exercise in the weeks before week n (null n: the current week), newest
                                      first: [{ week, load, target, sets, dayDone }], dayDone = the day has finishedAt.
      Cali.dayArgs(args)              the day route's args made whole: { week, dayId, readOnly }. Unknown or missing
@@ -178,6 +183,8 @@
   const STEP = { reps: 1, time: 5, check: 1 };
   const ALERT_KINDS = ['rest', 'headsup', 'timer', 'test'];
   const SLOTS = ['topbar', 'dayheader'];
+  const MUSCLES = Object.freeze(['chest', 'deltoids', 'biceps', 'triceps', 'forearm', 'abs', 'obliques', 'upper-back',
+    'trapezius', 'lower-back', 'gluteal', 'quadriceps', 'hamstring', 'adductors', 'calves', 'tibialis']);
 
   const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
   const isNum = v => typeof v === 'number' && Number.isFinite(v);
@@ -237,6 +244,13 @@
         if (e.pair !== undefined && typeof e.pair !== 'string') throw new Error(`${at}: pair ${e.pair}`);
         if (e.note !== undefined && typeof e.note !== 'string') throw new Error(`${at}: note is not text`);
         if (e.duration !== undefined && !(isNum(e.duration) && e.duration > 0)) throw new Error(`${at}: duration ${e.duration}`);
+        if (e.muscles !== undefined) {
+          if (!isObj(e.muscles)) throw new Error(`${at}: muscles is not an object`);
+          for (const [k, v] of Object.entries(e.muscles)) {
+            if (!MUSCLES.includes(k)) throw new Error(`${at}: muscle ${k} is not a key of Cali.muscles`);
+            if (v !== 1 && v !== 0.5) throw new Error(`${at}: muscle ${k} counts ${JSON.stringify(v)}, not 1 or 0.5`);
+          }
+        }
       }
     }
   }
@@ -848,7 +862,7 @@
       if (!READ_ONLY.includes(key)) throw new Error(`Cali.readOnly: ${key} is not readable here`);
       try { return localStorage.getItem(key); } catch (e) { return null; }
     },
-    program, week, weekFrom, weekExercise, dayExercises, history: historyOf, dayArgs,
+    program, week, weekFrom, weekExercise, dayExercises, history: historyOf, dayArgs, muscles: MUSCLES,
     log, tap, hold, setOrder, nextSet, progress, settings,
     now, iso, timers: timerApi,
     alert, provide,

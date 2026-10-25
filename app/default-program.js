@@ -22,7 +22,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "loadStep": 2.5,
           "bodyweight": true,
           "pair": "p1",
-          "note": "Wrists first: 1 min circles, bend and extend"
+          "note": "Wrists first: 1 min circles, bend and extend",
+          "muscles": { "upper-back": 1, "biceps": 0.5, "forearm": 0.5 }
         },
         {
           "id": "mh4v2k2kof_j8e0",
@@ -35,7 +36,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 0,
           "loadStep": 2.5,
           "bodyweight": true,
-          "pair": "p1"
+          "pair": "p1",
+          "muscles": { "chest": 1, "triceps": 0.5, "deltoids": 0.5 }
         },
         {
           "id": "mh4v2d0gzq_s2x8",
@@ -47,7 +49,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 12,
           "load": 110,
           "loadStep": 5,
-          "pair": "p2"
+          "pair": "p2",
+          "muscles": { "quadriceps": 1, "gluteal": 0.5, "adductors": 0.5 }
         },
         {
           "id": "mh4v2s67to_35ii",
@@ -59,7 +62,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 20,
           "load": 5,
           "loadStep": 1,
-          "pair": "p2"
+          "pair": "p2",
+          "muscles": { "deltoids": 1 }
         },
         {
           "id": "mh4v216xul_13g8",
@@ -71,7 +75,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 15,
           "load": 35,
           "loadStep": 2.5,
-          "pair": "p3"
+          "pair": "p3",
+          "muscles": { "hamstring": 1 }
         },
         {
           "id": "mh4v2mw6ul_edjz",
@@ -83,7 +88,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 15,
           "load": 77.5,
           "loadStep": 2.5,
-          "pair": "p3"
+          "pair": "p3",
+          "muscles": { "calves": 1 }
         },
         {
           "id": "mh4v2w1p9r_c6tp",
@@ -95,7 +101,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 2.5,
-          "bodyweight": true
+          "bodyweight": true,
+          "muscles": { "abs": 1, "obliques": 0.5 }
         },
         {
           "id": "mh4v2crf3j_300t",
@@ -153,7 +160,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 0,
           "loadStep": 2.5,
           "bodyweight": true,
-          "pair": "p1"
+          "pair": "p1",
+          "muscles": { "chest": 1, "triceps": 0.5, "deltoids": 0.5 }
         },
         {
           "id": "mhv4br0w5x_b2m9",
@@ -166,7 +174,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 60,
           "loadStep": 2.5,
           "pair": "p1",
-          "note": "Chest on the pad"
+          "note": "Chest on the pad",
+          "muscles": { "upper-back": 1, "trapezius": 0.5, "biceps": 0.5, "deltoids": 0.5 }
         },
         {
           "id": "mh4v2mv46a_xarm",
@@ -178,7 +187,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 15,
           "load": 42.5,
           "loadStep": 2.5,
-          "pair": "p2"
+          "pair": "p2",
+          "muscles": { "quadriceps": 1 }
         },
         {
           "id": "mh4v2de4vr_8gwr",
@@ -190,7 +200,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 15,
           "load": 35,
           "loadStep": 2.5,
-          "pair": "p2"
+          "pair": "p2",
+          "muscles": { "hamstring": 1 }
         },
         {
           "id": "mh4v2w8lnr_9tdk",
@@ -202,7 +213,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 20,
           "load": 5,
           "loadStep": 1,
-          "pair": "p3"
+          "pair": "p3",
+          "muscles": { "deltoids": 1 }
         },
         {
           "id": "mhv4bc4lf7_k3n2",
@@ -214,7 +226,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 15,
           "load": 77.5,
           "loadStep": 2.5,
-          "pair": "p3"
+          "pair": "p3",
+          "muscles": { "calves": 1 }
         },
         {
           "id": "mh4v2l2yvg_acl9",
@@ -260,7 +273,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "loadStep": 2.5,
           "bodyweight": true,
           "pair": "p1",
-          "note": "Wrists first: 1 min circles, bend and extend"
+          "note": "Wrists first: 1 min circles, bend and extend",
+          "muscles": { "upper-back": 1, "biceps": 0.5, "forearm": 0.5 }
         },
         {
           "id": "mh4v2hixx5_3xme",
@@ -273,7 +287,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 45,
           "loadStep": 2.5,
           "pair": "p1",
-          "note": "Low incline, about 30°"
+          "note": "Low incline, about 30°",
+          "muscles": { "chest": 1, "deltoids": 0.5, "triceps": 0.5 }
         },
         {
           "id": "mh4v2a3h2r_jbo4",
@@ -286,7 +301,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 95,
           "loadStep": 5,
           "pair": "p2",
-          "note": "Feet high on the platform"
+          "note": "Feet high on the platform",
+          "muscles": { "quadriceps": 1, "gluteal": 0.5, "adductors": 0.5 }
         },
         {
           "id": "mh4v2zwy0v_vby3",
@@ -299,7 +315,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 17.5,
           "loadStep": 2.5,
           "pair": "p2",
-          "note": "Machine or cable"
+          "note": "Machine or cable",
+          "muscles": { "gluteal": 1, "hamstring": 0.5 }
         },
         {
           "id": "mhv4cr0w2q_e6t4",
@@ -312,7 +329,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "load": 60,
           "loadStep": 2.5,
           "pair": "p3",
-          "note": "Chest on the pad"
+          "note": "Chest on the pad",
+          "muscles": { "upper-back": 1, "trapezius": 0.5, "biceps": 0.5, "deltoids": 0.5 }
         },
         {
           "id": "mh4v2wlxhs_061g",
@@ -324,7 +342,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": 20,
           "load": 5,
           "loadStep": 1,
-          "pair": "p3"
+          "pair": "p3",
+          "muscles": { "deltoids": 1 }
         },
         {
           "id": "mh4v26e2mb_f54j",
