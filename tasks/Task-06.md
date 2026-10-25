@@ -1,4 +1,5 @@
 # Task-06: Muscle map: which muscles the week works, by day, with muscles picked per exercise
+**Status: DONE** — verified 2026-10-26 (23c0b31), eye check pending: 1
 > **Execution:** agent `ultracode`
 > *Why:* product code with one owner and no parallel partner: one Opus agent builds it end to end, the main loop gates it.
 

@@ -99,7 +99,7 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 ## Layout
 - `index.html` shell; `app/core.js` (data, state, routing, rules above), one `app/<feature>.js` per
   feature (`workout`, `summary`, `timer`, `alert`, `settings`, `sync`, `week`, `progress`; wave 2:
-  `program`, `history`, `body`),
+  `program`, `muscles`, `history`, `body`),
   listed once each in the append-only `app/registry.js`; `app/base.css` for shared classes, each
   feature's classes carry its prefix. `tokens.css`, `fonts/`, `sw.js`, `manifest.json`, icons at the root.
 - `legacy/`: the old app (`index.html`, its `tests/`) until v1 has run a week; then deleted.

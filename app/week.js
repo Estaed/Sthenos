@@ -185,7 +185,7 @@
   function paint() {
     const a = viewed();
     const past = a.week !== Cali.week().n;
-    label.textContent = `Week ${a.week}`;
+    label.innerHTML = `<span class="week-word">Week </span>${a.week}`;   // 'W2' while the session clock needs the room (week.css)
     pastPill.hidden = !past;
     btn.setAttribute('aria-label', `Week ${a.week}${past ? ', a past week' : ''}. Open the week menu`);
   }

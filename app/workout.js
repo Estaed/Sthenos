@@ -41,6 +41,7 @@
     check: '<path d="M20 6 9 17l-5-5"/>',
     timer: '<line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/>',
     info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+    summary: '<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
   };
   const ic = name => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]}</svg>`;
   const pad = n => String(n).padStart(2, '0');
@@ -432,8 +433,10 @@
     const btn = at(root, '[data-act="session"]');
     const label = day && day.finishedAt ? 'Summary' : a.readOnly ? '' : day && day.startedAt ? 'Finish' : 'Start';
     put(s, btn, 'hidden', !label);
-    put(s, btn, 'text', label);
-    put(s, btn, 'class', `workout-session${label === 'Start' ? ' start' : ''}`);
+    // a finished day shows Summary as an icon (its name stays the button's text for screen readers), so the bar
+    // keeps room for the muscle button beside the day's clock at 360 px
+    put(s, btn, 'html', label === 'Summary' ? `${ic('summary')}<span class="workout-sr">Summary</span>` : esc(label));
+    put(s, btn, 'class', `workout-session${label === 'Start' ? ' start' : label === 'Summary' ? ' icon' : ''}`);
   }
 
   function patchBug(s) {

@@ -17,9 +17,17 @@ to `cali-app-v13` then.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-26
+
 ### Added
-- Muscle map: front and back body for the week in view, a Week / per-day filter, colour from pale orange to red with
-  the sets, bars that fill with sets done; muscles picked per exercise in the program editor (Task-06, in progress).
+- Muscle map, from a button beside the hourglass: front and back body for the week in view, a Week / per-day filter,
+  colour from pale orange to red with the fractional sets, the least worked muscle, bars that fill orange with sets
+  done; a tap on a muscle lists the exercises behind it (Task-06).
+- The program editor's Muscles field: each exercise's muscles as chips (main, helper, off), guessed from its name.
+
+### Changed
+- While the day's clock shows, the top bar says "W1" instead of "Week 1", and a finished day's Summary is an icon,
+  so the bar holds the muscle button at 360 px.
 
 ## [0.2.0] - 2026-10-26
 

@@ -10,6 +10,12 @@
 }
 .week-btn .i { width: 18px; height: 18px; color: var(--ink-muted); stroke-width: 2.2; }
 .week-btn[aria-expanded="true"] .i { transform: rotate(180deg); }
+/* while the day's clock shows (a session running or finished) the bar also holds the muscle button: 'Week 2' becomes
+   'W2' and the clock pill tightens, so every button keeps its 44 px at 360 px */
+.workout-bar:has(.workout-clock:not([hidden])) .week-word { display: none; }
+.workout-bar:has(.workout-clock:not([hidden])) .week-btn-n::before { content: 'W'; }
+.workout-bar:has(.workout-clock:not([hidden])) .week-btn { padding-left: 8px; }
+.workout-bar:has(.workout-clock:not([hidden])) .workout-clock { padding: 0 6px; }
 .week-btn:active { background: var(--surface-3); }
 .week-past { flex: none; }
 
