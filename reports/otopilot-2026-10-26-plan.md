@@ -16,3 +16,13 @@
 
 Integration: the orchestrator gates in the worktree, cherry-picks the one commit, bumps `sw.js` cache, gates main,
 walks the editor at 360 px, then marks DONE with `eye check pending: 1`.
+
+## Closeout (2026-10-26)
+- Task-05: GREEN. Builder commit 4e93b05 (one commit inside OWNS), gate in worktree 56 PASS, cherry-picked as 0baab64,
+  cache v10, gate on main 56 PASS, DONE in f188e1a. Use check on Tarık's real document: Programs list and editor
+  open, week 1 is reported as having sets (one set at 0 from 2026-10-24), so edits show from week 2. Eye check pending: 1.
+- Builder's open point: Finish week carries load and target on from the week before for every exercise the week had,
+  so a load or target typed in the program editor for such an exercise does not reach the next week (app/week.js).
+- Worktree removed (no junctions). Cost: Claude weekly 1 → 3 % (shared with research and program work).
+
+Run closed: the one approved task is green on main, eye check pending.
