@@ -307,14 +307,16 @@
   function rowHtml(a, ex) {
     const tag = a.readOnly ? 'span' : 'button';
     const cells = ex.sets.map((_, i) => `<${tag} ${setAttrs(a, ex, i)} class="cell num"><span></span></${tag}>`);
-    while (cells.length % 3) cells.push('<span class="cell void" aria-hidden="true"></span>');
+    // up to 3 sets share the row's whole cell area (2 sets: two wide cells, no empty third); more wrap in lines of 3
+    const fill = cells.length <= 3;
+    if (!fill) while (cells.length % 3) cells.push('<span class="cell void" aria-hidden="true"></span>');
     const head = a.readOnly ? '<div class="workout-ex">'
       : `<button type="button" class="workout-ex" data-edit="${esc(ex.id)}" aria-expanded="false" aria-controls="workout-ed-${esc(ex.id)}">`;
     return `<div class="workout-row" data-ex="${esc(ex.id)}">` +
       `${head}<div class="workout-name"><span>${esc(ex.name)}</span>${ex.note ? ic('info') : ''}</div><div class="workout-meta"></div>` +
       `${a.readOnly ? '</div>' : '</button>'}` +
       '<div class="workout-trend"><span class="workout-spark-box"></span><span class="workout-last"></span></div>' +
-      `<div class="workout-cells">${cells.join('')}</div></div>` +
+      `<div class="workout-cells${fill ? ' fill' : ''}"${fill ? ` style="grid-template-columns:repeat(${cells.length},1fr)"` : ''}>${cells.join('')}</div></div>` +
       (a.readOnly ? '' : `<div class="workout-ed" id="workout-ed-${esc(ex.id)}" data-ed="${esc(ex.id)}" hidden></div>`);
   }
   function tileHtml(a, ex) {

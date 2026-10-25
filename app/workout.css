@@ -113,6 +113,7 @@ button.workout-ex[aria-expanded="true"] .workout-name { text-decoration: underli
 }
 .workout-cells { display: grid; grid-template-columns: repeat(3, var(--cell-w)); gap: 1px var(--cell-gap); justify-content: end; }
 .workout-cells .cell { outline-offset: -2px; }
+.workout-cells.fill .cell { width: 100%; }
 .workout-cells .cell.sec small { font-family: var(--font-sans); }
 /* a value too wide for the cell at full size ('11/12', '35/40', '120s'): compact, so it stays inside the ring */
 .workout-cells .cell.workout-fit { font-size: 1rem; font-stretch: 100%; letter-spacing: -0.02em; }
