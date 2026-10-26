@@ -114,7 +114,7 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "Nerve slider 10/side · strap hamstring 2 × 30 s/side · seated knee marches 1 min · wall slides 1 min · knee-to-wall ankle 30 s/side. Stop at tingling or a burn behind the knee",
+          "note": "After lifting, before the walk. About 7 min. Stop if you feel tingling or burning behind the knee.\n1. Nerve glide, 10 per leg: lie on your back, hold one thigh up. Straighten the knee, pull the toes up and tip your head back; then bend the knee, point the toes and look at the knee. Smooth, no hold.\n2. Hamstring, 2 × 30 s per leg: on your back, strap round the foot, lift the straight leg to a gentle stretch, hold.\n3. Knee marches, 1 min: sit tall on a bench, lift one knee high without leaning back, lower slowly, switch.\n4. Wall slides, 1 min: back to the wall, arms in a W against it, slide up to a Y and down, keep contact.\n5. Ankle, 30 s per leg: foot a hand's width from the wall, heel down, push the knee forward to touch the wall.",
           "duration": 420
         },
         {
@@ -239,7 +239,7 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "Nerve slider 10/side · strap hamstring 2 × 30 s/side · seated knee marches 1 min · wall slides 1 min · knee-to-wall ankle 30 s/side. Stop at tingling or a burn behind the knee",
+          "note": "After lifting, before the walk. About 7 min. Stop if you feel tingling or burning behind the knee.\n1. Nerve glide, 10 per leg: lie on your back, hold one thigh up. Straighten the knee, pull the toes up and tip your head back; then bend the knee, point the toes and look at the knee. Smooth, no hold.\n2. Hamstring, 2 × 30 s per leg: on your back, strap round the foot, lift the straight leg to a gentle stretch, hold.\n3. Knee marches, 1 min: sit tall on a bench, lift one knee high without leaning back, lower slowly, switch.\n4. Wall slides, 1 min: back to the wall, arms in a W against it, slide up to a Y and down, keep contact.\n5. Ankle, 30 s per leg: foot a hand's width from the wall, heel down, push the knee forward to touch the wall.",
           "duration": 420
         },
         {
@@ -355,7 +355,7 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "Nerve slider 10/side · strap hamstring 2 × 30 s/side · seated knee marches 1 min · wall slides 1 min · knee-to-wall ankle 30 s/side. Stop at tingling or a burn behind the knee",
+          "note": "After lifting, before the walk. About 7 min. Stop if you feel tingling or burning behind the knee.\n1. Nerve glide, 10 per leg: lie on your back, hold one thigh up. Straighten the knee, pull the toes up and tip your head back; then bend the knee, point the toes and look at the knee. Smooth, no hold.\n2. Hamstring, 2 × 30 s per leg: on your back, strap round the foot, lift the straight leg to a gentle stretch, hold.\n3. Knee marches, 1 min: sit tall on a bench, lift one knee high without leaning back, lower slowly, switch.\n4. Wall slides, 1 min: back to the wall, arms in a W against it, slide up to a Y and down, keep contact.\n5. Ankle, 30 s per leg: foot a hand's width from the wall, heel down, push the knee forward to touch the wall.",
           "duration": 420
         },
         {

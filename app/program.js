@@ -550,7 +550,7 @@
       (pairable(e, next) ? switchHtml('pair', 'Pair with the next exercise', '') : '') +
       musclesHtml(e) +
       '<label class="workout-ed-f workout-ed-wide"><span class="workout-ed-l">Note</span>' +
-        '<textarea class="workout-ed-name program-note" data-f="note" rows="2" maxlength="300" placeholder="A cue under its name"></textarea></label>' +
+        '<textarea class="workout-ed-name program-note" data-f="note" rows="2" maxlength="800" placeholder="A cue under its name"></textarea></label>' +
       '<div class="workout-ed-foot"><div class="program-acts">' +
         `<button type="button" class="iconbtn" data-act="exup" aria-label="Move up">${icon('up')}</button>` +
         `<button type="button" class="iconbtn" data-act="exdown" aria-label="Move down">${icon('lower')}</button>` +

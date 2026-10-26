@@ -17,6 +17,14 @@ to `cali-app-v13` then.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-26
+
+### Changed
+- Mobility's note is five numbered steps in plain words, each saying how to do the drill; a note keeps its line
+  breaks in the info dialog, and the program editor takes a note up to 800 characters.
+- The docked sheet keeps the same space under the score card as beside it, so the card no longer sits on the
+  screen's bottom edge.
+
 ## [0.3.0] - 2026-10-26
 
 ### Added

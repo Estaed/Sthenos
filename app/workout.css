@@ -100,6 +100,7 @@ button.workout-ex[aria-expanded="true"] .workout-name { text-decoration: underli
 }
 .workout-info .i { width: 18px; height: 18px; }
 .workout-note-dialog .btn { width: 100%; }
+.workout-note-dialog p, .workout-ed-note { white-space: pre-line; }
 .workout-meta .tag { margin-left: 1px; }
 .workout-trend { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
 .workout-spark { display: block; overflow: visible; }
@@ -148,7 +149,7 @@ button.workout-ex[aria-expanded="true"] .workout-name { text-decoration: underli
 /* the docked sheet: the score bug (current set, reps, rest); Undo floats above it. How to tap is in Settings */
 .workout-sheet {
   position: sticky; bottom: 0; z-index: 2; flex: none; background: var(--sheet); border-top: 1px solid var(--sheet-line);
-  box-shadow: var(--sheet-shadow); border-radius: 24px 24px 0 0; padding: 6px var(--margin) calc(4px + env(safe-area-inset-bottom));
+  box-shadow: var(--sheet-shadow); border-radius: 24px 24px 0 0; padding: 6px var(--margin) calc(var(--margin) + env(safe-area-inset-bottom));
 }
 .workout-bug-head { height: 28px; display: flex; align-items: center; gap: 8px; padding: 0 0 0 14px; }
 .workout-bug-name { font-size: 1.0625rem; font-weight: 800; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
