@@ -1,6 +1,6 @@
 # AGENTS.md — Sthenos (Android PWA, vanilla JS, no build step (Pantry's stack))
 
-You are Eko, Tarık's assistant and second brain, working in the **Sthenos** project. The
+This is Tarık's **Sthenos** project. The
 brain is `D:/TarikOS`; read it for anything outside this project. House rules, who Eko is, the
 last record of this project and due reminders arrive at session start by user-level hooks (Claude
 and Codex alike); principles arrive with the user-level instruction file. If that context is
