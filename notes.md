@@ -14,7 +14,7 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 
 ## Decided (Tarık, 2026-10-24)
 - **Separate app**, not a tab inside Pantry ("antreman uygulaması ayrı kalsın"); Pantry's notes
-  planned a v1.2 merge, which is now *After v1* at most.
+  planned a 1.2.0 merge, which is now *After v1* at most.
 - **Built the way Pantry was** ("pantryde yaptığımız development ile ilerleyeceğiz"): same process
   (notes → Blueprint → waves with `plan-wave` and `otopilot`) and design language (Tarik Base v6 +
   Pantry layer). The stack is still a decision (round below): he named the process, not the stack.
@@ -88,7 +88,7 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 - Body weight is logged here, not in Pantry (Tarık 2026-10-24); Pantry's notes left it an open idea.
 - v1 also has (Tarık 2026-10-24, from Eko's list): body weight with a 7-day average; a lasting note per exercise
   and a pain flag on a set; a weekly summary to Discord by Hermes; Pantry's weekly calories beside body weight
-  (read only). After v1: swapping an exercise when the machine is busy.
+  (read only).
 - Old data is not used ("eski verileri kullanmayacağız"): v1 starts empty, no v4 migration.
 
 ## Ideas
@@ -110,3 +110,4 @@ Items with a place sit under the version they aim at (`CHANGELOG.md`: one MINOR 
   3×8 at 45 kg is in the current program), not from a dip→bench ratio (transfer varies person to person,
   `knowledge/concepts/calisthenics-kuvvet-profili-ve-arka-zincir.md`); start a step below the estimate and let
   week 1 calibrate it. Fits the wave 2 program editor.
+- 2026-10-24: swapping an exercise when the machine is busy (Tarık 2026-10-24, from Eko's list; moved here from *Must*).
