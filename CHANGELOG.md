@@ -17,6 +17,18 @@ to `cali-app-v13` then.
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-10-26
+
+### Added
+- Settings → Body: weight and waist for today (the weight row shows the 7-day average), height, and a body-fat
+  estimate from height and waist (RFM, Woolcott & Bergman 2018).
+- The walk and stretch tiles keep the minutes really done: the first tap logs the planned minutes and opens the
+  countdown, a tap again takes a minute off, a hold adds one, as on a set.
+
+### Changed
+- Mobility's info is a numbered list: each drill's name and dose on top, how to do it below.
+- The score card sits higher, with a gap under its shadow.
+
 ## [0.3.1] - 2026-10-26
 
 ### Changed

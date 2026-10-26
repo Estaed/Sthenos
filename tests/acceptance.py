@@ -236,7 +236,7 @@ def default_program():
 
 DEFAULTS = {"restPair": 90, "restExercise": 120, "restAfterLog": True, "headsUp": 10, "alternatePairs": False,
             "vibrate": True, "buzz": "short", "sound": True, "tone": "beep", "volume": 2, "keepAwake": True,
-            "loadStep": 2.5, "theme": "system"}
+            "loadStep": 2.5, "theme": "system", "height": 0}
 
 
 # ── checks ────────────────────────────────────────────────────────

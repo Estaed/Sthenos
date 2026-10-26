@@ -79,6 +79,17 @@
   background: var(--surface-2); color: var(--ink); font-size: 1rem;
 }
 .settings-gh-form input:focus { outline: none; border-color: var(--primary); }
+/* body: a short number field with its unit; the body-fat estimate as a figure */
+.settings-num { display: flex; align-items: center; gap: 6px; flex: none; font-size: 0.8125rem; font-weight: 600; color: var(--ink-muted); }
+.settings-num input {
+  width: 76px; height: 40px; padding: 0 10px; border: 2px solid transparent; border-radius: var(--r-md);
+  background: var(--surface-2); color: var(--ink); font: inherit; font-size: 1rem; font-weight: 600; text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.settings-num input:focus { outline: none; border-color: var(--primary); }
+.settings-num input::placeholder { color: var(--ink-muted); font-weight: 500; }
+.settings-num > span { width: 20px; }   /* kg and cm take one width, so the fields line up */
+.settings-bf { padding-right: 38px; font-size: 1rem; font-weight: 700; }   /* its figure ends where the fields' numbers end */
 .settings-gh-note { margin: 0 0 4px; font-size: 0.75rem; line-height: 16px; color: var(--ink-muted); }
 .settings-gh-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .settings-gh-actions[hidden], .settings-gh-form[hidden] { display: none; }

@@ -6,7 +6,7 @@
    Caches: CACHE is this release's, 'cali-app-v' + CHANGELOG.md's newest version (set at every release). Activate deletes
    only this app's older caches ('cali-app-*') and 'cali-v4', the cache of the old app's worker that held this scope
    before the old app moved to legacy/. Every other cache on the origin (legacy's 'cali-legacy-*', Pantry's) stays. */
-const CACHE = 'cali-app-v0.3.1';   // CHANGELOG.md's newest version
+const CACHE = 'cali-app-v0.3.2';   // CHANGELOG.md's newest version
 const PREFIX = 'cali-app-';
 const REPLACED = ['cali-v4'];
 importScripts('app/registry.js');

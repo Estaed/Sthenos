@@ -48,7 +48,7 @@ def main():
         got = ev(f"() => [Cali.tap({D}, {ex('plank')}, 0).r, Cali.tap({D}, {ex('plank')}, 0).r, Cali.hold({D}, {ex('plank')}, 0).r, Cali.hold({D}, {ex('plank')}, 0).r]")
         A.check("time: tap = target 40 s, again -5 s, hold +5 s", got == [40, 35, 40, 45], got)
         got = ev(f"() => [Cali.tap({D}, {ex('walk')}, 0), Cali.tap({D}, {ex('walk')}, 0), Cali.hold({D}, {ex('walk')}, 0), Cali.hold({D}, {ex('walk')}, 0)].map(s => s && s.r)")
-        A.check("check: tap and hold toggle between 1 and empty", got == [1, None, 1, None], got)
+        A.check("timed check (walk 22 min): tap = its 1320 s, again -60 s, hold +60 s", got == [1320, 1260, 1320, 1380], got)
 
         # ── Cali.log, its events and Undo ──
         got = ev(f"""() => {{ const seen = [];

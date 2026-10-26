@@ -256,7 +256,7 @@ def main():
         page.wait_for_selector('[data-screen="timer"] [data-probe]')
         got = [ev("() => Cali.current()"), r("stretch", 0)]
         A.check("a timed row (the 7 min mobility tile) is marked done and opens Cali.go('timer', { countdown: 420 })",
-                got == [{"name": "timer", "args": {"countdown": 420}}, 1], got)
+                got == [{"name": "timer", "args": {"countdown": 420}}, 420], got)
         ev("() => Cali.back()")
         page.wait_for_selector(cell("pull", 0))
         step()
@@ -271,10 +271,19 @@ def main():
         A.poll(page, "() => Cali.current().name === 'timer'", timeout=3.0)
         got = [held, ev("() => Cali.current()")]
         A.check("a hold on a timed row (the 22 min walk) marks it done too and opens Cali.go('timer', { countdown: 1320 }) "
-                "when the finger lifts", got == [["day", 1], {"name": "timer", "args": {"countdown": 1320}}], got)
+                "when the finger lifts", got == [["day", 1380], {"name": "timer", "args": {"countdown": 1320}}], got)
         ev("() => { if (Cali.current().name === 'timer') Cali.back(); }")
         page.wait_for_selector(cell("pull", 0))
         step()
+        # the walk ran 21 min: a tap on the logged tile takes a minute off and shows it, with no second countdown
+        walk_tile = f'[data-screen="day"] [data-set="{D}:{ids["walk"]}:0"]'
+        A.touch_tap(page, walk_tile)
+        step()
+        A.touch_tap(page, walk_tile)
+        step()
+        got = [r("walk", 0), ev("() => Cali.current().name"), ev(f"() => document.querySelector('{walk_tile} .val').textContent")]
+        A.check("a tap on a logged timed tile takes a minute off (23 → 21 min after two taps), shows it, opens no countdown",
+                got == [1260, "day", "21 min"], got)
 
         # ── session: Start, the clock, Wake Lock, Finish ──
         dayB = ids["dayB"]

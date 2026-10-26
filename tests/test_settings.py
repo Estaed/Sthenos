@@ -131,6 +131,24 @@ def main():
                 page.evaluate("() => Notification.permission") == "granted" and not help_.is_visible()
                 and page.locator("[data-perm] .pill").inner_text() == "Allowed", page.evaluate("() => Notification.permission"))
 
+        # ── body: weight and waist on today's line, height as a setting, body fat from RFM ──
+        for key, value in (("kg", "75"), ("waist", "93"), ("height", "180")):
+            page.locator(f'[data-body="{key}"]').fill(value)
+            page.locator(f'[data-body="{key}"]').press("Enter")
+        day = page.evaluate("() => { const d = new Date(Cali.now()); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }")
+        got = [page.evaluate("() => Cali.doc().body"), page.evaluate("() => Cali.settings.get('height')"),
+               page.locator("[data-bf]").inner_text(), page.locator('[data-body-sub="kg"]').inner_text()]
+        A.check("Body: 75 kg and 93 cm go on today's line, height 180 into settings; body fat 64 − 20 × 180 / 93 = 25 %; "
+                "the weight row says the 7-day average", got == [[{"date": day, "kg": 75, "waist": 93}], 180, "25 %", "7-day average 75 kg"], got)
+        page.locator('[data-body="kg"]').fill("abc")
+        page.locator('[data-body="kg"]').press("Enter")
+        page.wait_for_selector(".settings-snack")
+        page.locator('[data-body="waist"]').fill("")
+        page.locator('[data-body="waist"]').press("Enter")
+        got = [page.evaluate("() => Cali.doc().body"), page.locator('[data-body="kg"]').input_value(), page.locator("[data-bf]").inner_text()]
+        A.check("a weight that is not a number saves nothing and says so; an emptied waist leaves the line with kg only, body fat –",
+                got == [[{"date": day, "kg": 75}], "75", "–"], got)
+
         # ── GitHub row without a token ──
         tap(page, '[data-act="github"]')
         A.check("without a token the GitHub row says Off and offers a token field, nothing is sent",

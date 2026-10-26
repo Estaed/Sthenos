@@ -13,12 +13,13 @@
 
    The document (schema v5, Blueprint -> Data), deep-frozen: read it, never mutate it.
      { _version: 5, updatedAt: ISO, programs: [program], activeProgram: id, nextProgram: id, weeks: [week],
-       body: [{ date: 'YYYY-MM-DD', kg }], settings: { <key>: value } }
+       body: [{ date: 'YYYY-MM-DD', kg?, waist? }], settings: { <key>: value } }
      program  { id, name, days: [{ id, name, exercises: [exercise] }] }
      exercise { id, name, kind: 'reps'|'time'|'check', sets: count, target, repMin, repMax, load, loadStep,
                 bodyweight?, pair?, note?, duration?, muscles? }
               reps: target and the range in reps. time: target in seconds, repMin/repMax null. check: target 1,
-              repMin/repMax null, duration? = the countdown in seconds of a timed one-off row (stretch, walk).
+              repMin/repMax null, duration? = the countdown in seconds of a timed one-off row (stretch, walk); a logged
+              set of such a row holds the seconds really done (r), else r is 1.
               load: kg, the added load when bodyweight is true (0 = bodyweight only). pair: adjacent exercises of a
               day with the same pair are done alternately. Day and exercise ids never contain ':'.
               muscles: { <key of Cali.muscles>: 1 | 0.5 } (1 the muscle it is for, 0.5 a helper; {} counts nothing;
@@ -77,8 +78,10 @@
                                      Returns the stored set or null; emits 'change' then 'log'. Throws on an unknown
                                      day, exercise or index.
      Cali.tap(dayId, exId, i)        the tap rule: an empty set gets the target; a logged one goes one down (reps 1,
-                                     time 5 s) to 0, then empty; a check toggles between 1 and empty. Calls Cali.log.
-     Cali.hold(dayId, exId, i)       the hold rule: one up (an empty set: target + 1 step); a check toggles.
+                                     time 5 s, a timed check 60 s from its duration) to 0, then empty; a check
+                                     without a duration toggles between 1 and empty. Calls Cali.log.
+     Cali.hold(dayId, exId, i)       the hold rule: one up (an empty set: target + 1 step); a check without a
+                                     duration toggles.
      Cali.setOrder(dayId, n)         the day's sets in doing order: [{ exId, i }]. Each exercise runs through its
                                      sets before the next (A1 A2 A3 B1 B2 B3, Tarık 2026-10-24); with settings
                                      alternatePairs on, a pair alternates set by set (A1 B1 A2 B2 A3, unequal counts
@@ -92,7 +95,7 @@
                                      restExercise 120 (seconds), restAfterLog true, headsUp 10 (seconds before the
                                      end; 0 = off), alternatePairs false, vibrate true, buzz 'short' ('long',
                                      'pulse'), sound true, tone 'beep' ('bell', 'chirp'), volume 2 (1-3),
-                                     keepAwake true, loadStep 2.5 (kg), theme 'system' ('light', 'dark'). An
+                                     keepAwake true, loadStep 2.5 (kg), theme 'system' ('light', 'dark'), height 0 (cm; 0 = not given). An
                                      unknown key throws.
      Cali.settings.set(key, value)   validates and saves it (Cali.change, why 'settings', detail { key, value }).
      Cali.settings.all()             every setting with defaults filled in.
@@ -194,7 +197,7 @@
 
   const DEFAULTS = Object.freeze({
     restPair: 90, restExercise: 120, restAfterLog: true, headsUp: 10, alternatePairs: false, vibrate: true,
-    buzz: 'short', sound: true, tone: 'beep', volume: 2, keepAwake: true, loadStep: 2.5, theme: 'system',
+    buzz: 'short', sound: true, tone: 'beep', volume: 2, keepAwake: true, loadStep: 2.5, theme: 'system', height: 0,
   });
   const VALID = {
     restPair: v => Number.isInteger(v) && v >= 0 && v <= 3600,
@@ -210,6 +213,7 @@
     keepAwake: bool,
     loadStep: v => isNum(v) && v > 0 && v <= 50,
     theme: v => ['system', 'light', 'dark'].includes(v),
+    height: v => Number.isInteger(v) && v >= 0 && v <= 250,
   };
 
   // ── time ──────────────────────────────────────────────────────────
@@ -292,7 +296,9 @@
     d.weeks.forEach((w, i) => checkWeek(w, i, programs));
     if (!Array.isArray(d.body)) throw new Error('body is not a list');
     for (const b of d.body) {
-      if (!isObj(b) || typeof b.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(b.date) || !isNum(b.kg) || b.kg <= 0) throw new Error('a body line without date or kg');
+      const pos = k => b[k] === undefined || (isNum(b[k]) && b[k] > 0);
+      if (!isObj(b) || typeof b.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(b.date) || !pos('kg') || !pos('waist') ||
+        (b.kg === undefined && b.waist === undefined)) throw new Error('a body line without date, kg or waist');
     }
     if (!isObj(d.settings)) throw new Error('settings missing');
     for (const [k, v] of Object.entries(d.settings)) if (VALID[k] && !VALID[k](v)) throw new Error(`setting ${k} = ${JSON.stringify(v)}`);
@@ -552,19 +558,23 @@
       || programExercise(currentWeek().program, dayId, exId);
     return e ? e.kind : 'reps';
   }
+  // a timed check row (walk, stretch) counts its seconds like a set: done at its duration, a minute a tap or hold
+  const stepOf = (ex, kind) => (kind === 'check' ? { target: ex.duration, step: 60 } : { target: ex.target, step: STEP[kind] });
   function tap(dayId, exId, i) {
     const { ex } = cellOf(dayId, exId, i);
     const kind = kindOf(dayId, exId), cur = ex.sets[i];
-    if (kind === 'check') return log(dayId, exId, i, cur ? null : 1);
-    if (!cur) return log(dayId, exId, i, ex.target);
+    if (kind === 'check' && !ex.duration) return log(dayId, exId, i, cur ? null : 1);
+    const { target, step } = stepOf(ex, kind);
+    if (!cur) return log(dayId, exId, i, target);
     if (cur.r <= 0) return log(dayId, exId, i, null);
-    return log(dayId, exId, i, Math.max(0, cur.r - STEP[kind]));
+    return log(dayId, exId, i, Math.max(0, cur.r - step));
   }
   function hold(dayId, exId, i) {
     const { ex } = cellOf(dayId, exId, i);
     const kind = kindOf(dayId, exId), cur = ex.sets[i];
-    if (kind === 'check') return log(dayId, exId, i, cur ? null : 1);
-    return log(dayId, exId, i, (cur ? cur.r : ex.target) + STEP[kind]);
+    if (kind === 'check' && !ex.duration) return log(dayId, exId, i, cur ? null : 1);
+    const { target, step } = stepOf(ex, kind);
+    return log(dayId, exId, i, (cur ? cur.r : target) + step);
   }
 
   function setOrder(dayId, n) {

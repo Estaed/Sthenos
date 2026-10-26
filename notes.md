@@ -104,12 +104,6 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 Items with a place sit under the version they aim at (`CHANGELOG.md`: one MINOR per wave).
 
 ### Later
-- 2026-10-26: the walk's real minutes and distance from the gym's Technogym treadmill (Tarık opens a session by
-  scanning its QR into Mywellness) instead of the tile's own timer: on day A he walked 23 min, the tile only says done.
-  Not checked: the public API (apidocs.mywellness.com) is for partner platforms; a personal route would be Mywellness →
-  Strava (reported unreliable for treadmill sessions) → Strava's API, since a web page cannot read Health Connect.
-  First step: does one walk show up in Mywellness, and does Mywellness push it to Strava. Until then, a minutes
-  field on the walk tile is the cheap fix.
 - 2026-10-24: link with Pantry (body weight, calories beside training) — Tarık kept the apps separate.
 - 2026-10-24: starting load for an exercise new to a program (Tarık: adding bench when moving to 4 days,
   with dips at 8 × +10 kg). Estimate from his own logged history of the closest movement (incline bench

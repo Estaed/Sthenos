@@ -13,6 +13,10 @@
                      not 'granted' one line says the alert then needs the screen kept awake and how to allow them.
    Workout           Programs (this week's program; opens Cali.go('programs'), app/program.js), keep screen awake,
                      default load step (1, 1.25, 2.5, 5 kg), theme (system, light, dark).
+   Body              weight and waist typed for today (a line of the document's body list, saved on change; empty
+                     removes it; the weight row says the 7-day average), height (setting, cm), and body fat
+                     estimated from height and waist: RFM, 64 − 20 × height / waist (Woolcott & Bergman 2018,
+                     validated against DXA; the men's form, as the muscle map's body is male).
    Data              GitHub sync (app/sync.js through self.CaliSync): its state, the user's own repository
                      (owner/name, kept after Disconnect) and a token to connect, Sync now and Disconnect;
                      "Download backup" saves the whole v5 document as JSON (the token is never in it;
@@ -121,6 +125,12 @@
       '</div></div>';
   }
 
+  function bodyField(key, label, unit) {
+    return `<label class="settings-row" for="settings-body-${key}"><span class="settings-t">${esc(label)}<small data-body-sub="${key}"></small></span>` +
+      `<span class="settings-num"><input id="settings-body-${key}" type="text" inputmode="decimal" autocomplete="off" data-body="${key}">` +
+      `<span>${unit}</span></span></label>`;
+  }
+
   function markup() {
     return '<header class="bar2"><button type="button" class="iconbtn" data-act="back" aria-label="Back">' + icon('back') +
       '</button><h2>Settings</h2></header><div class="settings-body">' +
@@ -153,6 +163,14 @@
         toggle('keepAwake', 'Keep screen awake', 'While a workout runs') +
         seg('loadStep', 'Load step', 'For an exercise without its own', LOAD_STEPS.map(v => [String(v), String(v)]), 'Default load step in kg') +
         seg('theme', 'Theme', '', THEMES, 'Theme') +
+      '</div>' +
+      '<h3 class="settings-eyebrow settings-section">Body</h3>' +
+      '<div class="group">' +
+        bodyField('kg', 'Weight', 'kg') +
+        bodyField('waist', 'Waist', 'cm') +
+        bodyField('height', 'Height', 'cm') +
+        '<div class="settings-row"><span class="settings-t">Body fat<small data-bf-sub></small></span>' +
+        '<span class="settings-bf num" data-bf></span></div>' +
       '</div>' +
       '<h3 class="settings-eyebrow settings-section">Data</h3>' +
       '<div class="group">' +
@@ -215,6 +233,7 @@
       b.setAttribute('aria-pressed', String(on));
     }
     root.querySelector('[data-key="restPair"]').closest('.settings-row').classList.toggle('settings-off', !all.alternatePairs);
+    paintBody(root, all.height);
 
     const p = permission();
     root.querySelector('[data-perm]').innerHTML = p === 'granted' ? '<span class="pill">Allowed</span>'
@@ -236,6 +255,55 @@
     root.querySelector('[data-sync-form]').hidden = !s || s.configured;
     root.querySelector('[data-sync-actions]').hidden = !s || !s.configured;
     root.querySelector('[data-act="syncnow"]').disabled = Boolean(s && s.running);
+  }
+
+  // ── body: weight and waist by day (the document's body list), height as a setting ──
+  const today = () => { const d = new Date(Cali.now()); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const daysAgo = (date, n) => { const d = new Date(`${date}T12:00:00`); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
+  const latest = key => [...Cali.doc().body].reverse().find(b => b[key] !== undefined) || null;
+  const dec = v => String(Math.round(v * 10) / 10);
+  const shortDate = date => `${Number(date.slice(8))} ${MONTHS[Number(date.slice(5, 7)) - 1]}`;
+  // Relative fat mass (Woolcott & Bergman 2018, Sci Rep 8:10980), men: 64 − 20 × height / waist, validated against DXA
+  const rfm = (height, waist) => 64 - 20 * height / waist;
+
+  function paintBody(root, height) {
+    const t = today();
+    const fill = (key, v) => {
+      const input = root.querySelector(`[data-body="${key}"]`);
+      if (document.activeElement !== input) input.value = v === null ? '' : dec(v);
+    };
+    const kg = latest('kg'), waist = latest('waist');
+    fill('kg', kg && kg.date === t ? kg.kg : null);
+    root.querySelector('[data-body="kg"]').placeholder = kg ? dec(kg.kg) : '';
+    fill('waist', waist ? waist.waist : null);
+    fill('height', height > 0 ? height : null);
+    const week = Cali.doc().body.filter(b => b.kg !== undefined && b.date >= daysAgo(t, 6) && b.date <= t);
+    root.querySelector('[data-body-sub="kg"]').textContent = week.length
+      ? `7-day average ${dec(week.reduce((s, b) => s + b.kg, 0) / week.length)} kg` : kg ? `Last ${shortDate(kg.date)}` : 'Today, in the morning';
+    root.querySelector('[data-body-sub="waist"]').textContent = waist && waist.date !== t ? `Measured ${shortDate(waist.date)}` : 'At the navel, in the morning';
+    root.querySelector('[data-body-sub="height"]').textContent = '';
+    const bf = height > 0 && waist ? rfm(height, waist.waist) : null;
+    root.querySelector('[data-bf]').textContent = bf === null ? '–' : `${Math.round(bf)} %`;
+    root.querySelector('[data-bf-sub]').textContent = bf === null ? 'Needs height and waist' : 'Estimate from height and waist (RFM)';
+  }
+
+  // a typed value: weight and waist go on today's body line (empty removes it), height into settings
+  function saveBody(input) {
+    const key = input.dataset.body;
+    const text = input.value.trim().replace(',', '.');
+    const v = text === '' ? null : Number(text);
+    const max = { kg: 400, waist: 250, height: 250 }[key];
+    if (v !== null && !(Number.isFinite(v) && v > 0 && v <= max)) { snack(`Enter a number up to ${max}.`); paint(input.closest('.settings')); return; }
+    if (key === 'height') { set('height', v === null ? 0 : Math.round(v)); return; }
+    const t = today();
+    try {
+      Cali.change(d => {
+        let line = d.body.find(b => b.date === t);
+        if (!line) { line = { date: t }; d.body.push(line); d.body.sort((p, q) => (p.date < q.date ? -1 : 1)); }
+        if (v === null) delete line[key]; else line[key] = Math.round(v * 10) / 10;
+        if (line.kg === undefined && line.waist === undefined) d.body.splice(d.body.indexOf(line), 1);
+      }, { why: 'body', detail: { date: t, key } });
+    } catch (e) { snack(Cali.problem() || e.message); }
   }
 
   // ── small pieces of feedback ──────────────────────────────────────
@@ -399,6 +467,10 @@
         e.target.value = '';
         if (file) restore(file);
       });
+      for (const input of root.querySelectorAll('[data-body]')) {
+        input.addEventListener('change', () => saveBody(input));
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
+      }
       root.querySelector('#settings-token').addEventListener('keydown', e => {
         if (e.key === 'Enter') act(root, root.querySelector('[data-act="connect"]'));
       });

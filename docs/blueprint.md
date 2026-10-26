@@ -61,9 +61,13 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   exercises: { <exId>: { name, kind, repMin, repMax, loadStep, …, load, target, sets: [{ r, at, pain? }] } } } } }`.
   A week copies its program's exercise (rules, load, target) when built, so editing a program never
   rewrites history.
-- **body:** `[{ date, kg }]`. **settings:** rest (between sets 120 s, pair 90 s), alternate pairs
+- **body:** `[{ date, kg?, waist? }]` (each line has at least one; Tarık 2026-10-26 asked for waist and a
+  body-fat estimate beside weight). **settings:** rest (between sets 120 s, pair 90 s), alternate pairs
   (off), start rest after a log, heads-up 10 s, vibration (off, short, long, pulse), sound (off, beep,
-  bell, chirp) and volume, keep awake, default load step 2.5, theme.
+  bell, chirp) and volume, keep awake, default load step 2.5, theme, height (cm, 0 = not given).
+- **Body fat** is an estimate shown in Settings → Body, never stored: RFM, 64 − 20 × height / waist (Woolcott &
+  Bergman 2018, Sci Rep, validated against DXA; the men's form). Age is not in it, so the app does not ask for it.
+  Rejected: the US Navy formula (needs the neck), BMI-based formulas (miss muscle).
 - `calisthenics-data.json` with `_version: 5` in the private repo; the v4 file moves to `archive/` untouched. The
   phone keeps a copy in localStorage (`cali.v5`) and works offline; the token, the repo (`owner/name`, set in
   Settings; a token saved before 2026-10-24 without one means `Estaed/Calisthenics-Data`, so Tarık's phone needs no
@@ -72,7 +76,8 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 
 ## Rules
 - **Logging:** tap a cell = target; tap again = one less (down to 0, then empty); hold = one more.
-  `time` steps by 5 s, `check` toggles. The one way to enter reps (Tarık: "1 özellik 2 farklı şekilde
+  `time` steps by 5 s, `check` toggles; a `check` with a duration (walk, stretch) logs its seconds and steps by a
+  minute, so the walk keeps the minutes really walked (Tarık 2026-10-26, instead of importing the Technogym data). The one way to enter reps (Tarık: "1 özellik 2 farklı şekilde
   yapılmasın"). A set at 0 counts as not done (no rest, can be the set in hand); a day with no set done
   goes back to not started. A tap on an exercise's name opens its editor in the card (load, target,
   sets, rep range, load step, name), written to this week and the program, never to reps.

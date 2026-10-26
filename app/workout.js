@@ -26,7 +26,8 @@
    opens 'summary' { week, dayId } (app/summary.js: Resume, Done -> 'dayDone'). The screen stays awake (Wake Lock)
    while a day of the current week runs and the keepAwake setting is on; the lock is taken again when the page
    becomes visible. Timed one-off rows (check rows with a duration: stretch, walk) are tiles: a tap or a hold that marks
-   one done opens Cali.go('timer', { countdown: seconds }) once the finger lifts. A past week (or readOnly: true) shows the same sheet with no taps. */
+   one done opens Cali.go('timer', { countdown: seconds }) once the finger lifts; after that the tile shows the minutes
+   logged, a tap takes one off and a hold adds one, like a set (Tarık 2026-10-26: the walk ran 23 min, not 22). A past week (or readOnly: true) shows the same sheet with no taps. */
 (() => {
   'use strict';
   const HOLD_MS = 500;      // finger down this long = hold (+1)
@@ -242,8 +243,14 @@
       label: `${who}${s.r} of ${ex.target}${sec}, short${hint ? `; tap again for ${Math.max(0, s.r - step)}` : ''}` };
   }
 
+  // a timed tile shows the minutes really done once logged (tap again: a minute less, hold: a minute more)
   function tileView(ex, isNow) {
-    const done = Boolean(ex.sets[0]);
+    const s = ex.sets[0];
+    if (ex.duration && s) {
+      return { cls: s.r > 0 ? 'hit' : isNow ? 'now' : '', val: minutes(s.r),
+        label: `${ex.name}: ${minutes(s.r)} done; tap for a minute less, hold for a minute more` };
+    }
+    const done = Boolean(s);
     const val = done ? 'Done' : ex.duration ? minutes(ex.duration) : 'To do';
     return { cls: done ? 'hit' : isNow ? 'now' : '', val,
       label: `${ex.name}: ${done ? 'done' : ex.duration ? `${minutes(ex.duration)}, starts the countdown` : 'to do'}` };
@@ -475,6 +482,10 @@
     const ex = Cali.weekExercise(l.week, l.dayId, l.exId);
     if (!ex) return '';
     const name = `<span class="workout-snack-name">${esc(ex.name)}</span>`;
+    if (ex.kind === 'check' && ex.duration && l.value) {
+      const r = l.value.r;
+      return `${name}: <b class="num">${minutes(r)}</b>. Tap again: ${r <= 0 ? 'clear' : `<b class="num">${minutes(Math.max(0, r - 60))}</b>`}`;
+    }
     if (ex.kind === 'check') return `${name}: ${l.value ? 'done' : 'not done'}`;
     const where = `${name} set ${l.i + 1}`;
     if (l.value === null) return `${where} cleared`;
@@ -571,6 +582,22 @@
   }
   const valueOf = (ex, k) => (k === 'sets' ? ex.sets.length : ex[k]);
 
+  // a note's lines: "1. Name · dose: how" lines become numbered steps (name and dose on top, how below), others a
+  // paragraph, so a routine of five drills reads as a list, not a block (Tarık 2026-10-26: "wall of text olmuş")
+  function noteHtml(text) {
+    let out = '', steps = '';
+    const flush = () => { if (steps) out += `<ol class="workout-steps">${steps}</ol>`; steps = ''; };
+    for (const line of text.split('\n').map(x => x.trim()).filter(Boolean)) {
+      const m = /^\d+\.\s+([^:]+):\s*(.+)$/.exec(line);
+      if (!m) { flush(); out += `<p>${esc(line)}</p>`; continue; }
+      const [name, dose] = m[1].split(' · ');
+      steps += `<li><div class="workout-step-head"><b>${esc(name)}</b>${dose ? `<span class="num">${esc(dose)}</span>` : ''}</div>` +
+        `<span class="workout-step-how">${esc(m[2])}</span></li>`;
+    }
+    flush();
+    return out;
+  }
+
   // a timed tile's note (how to do it) in a dialog with Settings' look; the tile itself stays tap = done
   function showNote(a, exId) {
     const ex = Cali.dayExercises(a.week, a.dayId).find(e => e.id === exId);
@@ -578,7 +605,7 @@
     const d = document.createElement('dialog');
     d.className = 'settings-dialog workout-note-dialog';
     d.setAttribute('aria-labelledby', 'workout-note-title');
-    d.innerHTML = `<h2 id="workout-note-title">${esc(ex.name)}</h2><p>${esc(ex.note)}</p>` +
+    d.innerHTML = `<h2 id="workout-note-title">${esc(ex.name)}</h2>${noteHtml(ex.note)}` +
       '<button type="button" class="btn secondary" data-act="note-close">Close</button>';
     d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-act="note-close"]')) d.close(); });
     d.addEventListener('close', () => d.remove());
@@ -672,10 +699,12 @@
   // a tap or hold on a set; returns the countdown (seconds) to open when it marked a timed tile done, else 0
   function act(kind, key) {
     const [dayId, exId, i] = key.split(':');
+    const before = Cali.weekExercise(null, dayId, exId);
+    const was = before ? before.sets[Number(i)] : null;
     let set;
     try { set = Cali[kind](dayId, exId, Number(i)); } catch (e) { console.warn('Cali: the set was not saved', e); return 0; }
     const ex = Cali.weekExercise(null, dayId, exId);
-    return ex && ex.kind === 'check' && set && ex.duration ? ex.duration : 0;
+    return ex && ex.kind === 'check' && set && !was && ex.duration ? ex.duration : 0;   // the countdown on the first mark only
   }
   const countdown = seconds => { if (seconds) Cali.go('timer', { countdown: seconds }); };
 

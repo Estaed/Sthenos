@@ -18,7 +18,8 @@ Task-00 runs alone; Task-01 to Task-04 then run in parallel (disjoint OWNS, all 
 - [x] Task-06: Muscle map: the week's muscles by day, muscles picked per exercise
 
 ## Later waves (draft)
-- Wave 4 (0.4.0), what remains of v1: history per exercise (needs Task-04's weeks); body weight with a 7-day average and Pantry's weekly kcal;
+- Wave 4 (0.4.0), what remains of v1: history per exercise (needs Task-04's weeks); Pantry's weekly kcal beside body weight
+  (body weight with its 7-day average, waist and a body-fat estimate came early, 0.3.2, in Settings → Body);
   a note per exercise and a pain flag per set (needs Task-01's cells); Hermes' weekly Discord summary
   (needs Task-03's v5 file in the repo; checks Hermes' GitHub access first).
   Pantry kcal comes from `Estaed/Pantry-Data` through sync (Blueprint -> Pantry kcal; Tarık 2026-10-24);
