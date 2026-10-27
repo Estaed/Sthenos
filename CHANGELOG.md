@@ -10,7 +10,7 @@ All notable changes to Sthenos are written here. The format follows
 - The release string a deploy needs (a service worker cache, a package version) is this file's newest version.
 
 Each wave adds its lines under *Unreleased* as it lands; the closing wave turns *Unreleased* into the new version
-with the date. What later versions will bring lives in `notes.md` → *After v1* and `docs/TASKS_INDEX.md`.
+with the date. What later versions will bring lives in `notes.md` → *Backlog* and `docs/TASKS_INDEX.md`.
 
 Versions before 0.2.0 were numbered afterwards, from the git history; the service worker cache went `cali-app-v2`
 to `cali-app-v13` then.

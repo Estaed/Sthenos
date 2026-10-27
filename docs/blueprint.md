@@ -23,7 +23,7 @@ Done when:
 
 ## Not in v1
 Swapping an exercise when a machine is busy; a starter template and sync without GitHub for other
-people; native app; desktop layout; the old app's data. Full list: `notes.md` → *After v1*.
+people; native app; desktop layout; the old app's data. Full list: `notes.md` → *Backlog*.
 
 ## Riskiest assumption
 The rest timer reaches Tarık when it ends with the phone in his hand or on the bench. A PWA cannot
@@ -48,7 +48,7 @@ Pantry's stack, so both apps share one style (they stay separate apps, Tarık 20
 | Python + Playwright | 3.13.5 / 1.62.0 (this machine) | the acceptance test |
 
 Rejected: native Kotlin or Flutter (Monday deadline; Pantry's PWA, sync and stack already exist; if
-the phone feel falls short as in Pantry, native goes to *After v1* with the measured complaint); a
+the phone feel falls short as in Pantry, native goes to `notes.md` → *Backlog* with the measured complaint); a
 framework or bundler; IndexedDB (years of sets fit localStorage).
 
 ## Data (schema v5, one JSON document)

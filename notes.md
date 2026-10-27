@@ -2,7 +2,7 @@
 
 The first file of the project and the one place for ideas. Nothing here is binding; what holds
 becomes Blueprint. Dump freely, then sort: v1 is the simplest complete version, and everything it
-doesn't need moves to *After v1*. Eko points out when the v1 list grows past that.
+doesn't need moves to *Backlog*. Eko points out when the v1 list grows past that.
 
 Restarted 2026-10-24 from a TarikOS session (Tarık back at the gym after a month off). The old app
 (`index.html`, one 4,000-line file, `tests/acceptance.py`) stays live until the rebuild replaces it.
@@ -14,7 +14,7 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 
 ## Decided (Tarık, 2026-10-24)
 - **Separate app**, not a tab inside Pantry ("antreman uygulaması ayrı kalsın"); Pantry's notes
-  planned a 1.2.0 merge, which is now *After v1* at most.
+  planned a 1.2.0 merge, which is now a *Backlog* item at most.
 - **Built the way Pantry was** ("pantryde yaptığımız development ile ilerleyeceğiz"): same process
   (notes → Blueprint → waves with `plan-wave` and `otopilot`) and design language (Tarik Base v6 +
   Pantry layer). The stack is still a decision (round below): he named the process, not the stack.
@@ -24,7 +24,7 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
    sync) — recommended: the Monday deadline, the sync and v4 data already exist, his phone runs
    Pantry the same way. Rejected for v1: Flutter/Kotlin native (the blueprint skill notes Pantry's
    web build fell short in scrolling and feel, 2026-10-21; if the workout app feels the same, native
-   goes to *After v1* with the measured complaint).
+   goes to the *Backlog* with the measured complaint).
 2. **Design:** a style from round 4 (`design/r4/`, deleted, in git; ten static directions on the Day
    sheet's working core); round 3's prototypes were deleted 2026-10-24 (Tarık: none sat right, Day
    sheet closest), git keeps them.
@@ -45,7 +45,7 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
    or anyone writes. Tarık: "muhtemelen sana söylerim sen düzenle"; others use the editor or a file.
 7. **Who it is for:** a public site; anyone who opens it uses it without sync, data on their phone
    (localStorage, JSON backup); Tarık adds his GitHub key in Settings and syncs (Tarık: "başkası senkronsuz
-   çalışacak ... ben ise github key ile senkronlu"). A starter template for others goes to *After v1*.
+   çalışacak ... ben ise github key ile senkronlu"). A starter template for others goes to the *Backlog*.
 8. **Missed day / week end:** Finish week is manual; a day not done carries its exercises over with no
    progression.
 9. **Stalled lift:** the same load short three weeks running drops 10 % (StrongLifts' deload).
@@ -100,10 +100,10 @@ the top of the rep range. For Tarık only (2026-09-15: "bu sadece benim için ya
 ## Screens
 <Eko fills it by asking before the Blueprint: v1 main flow, screen list, states>
 
-## After v1
-Items with a place sit under the version they aim at (`CHANGELOG.md`: one MINOR per wave).
+## Backlog
+What is not scheduled yet, in order: the first item is the first candidate for the next wave. A scheduled item
+becomes a task under its wave in `docs/TASKS_INDEX.md`; what shipped is in `CHANGELOG.md`.
 
-### Later
 - 2026-10-24: link with Pantry (body weight, calories beside training) — Tarık kept the apps separate.
 - 2026-10-24: starting load for an exercise new to a program (Tarık: adding bench when moving to 4 days,
   with dips at 8 × +10 kg). Estimate from his own logged history of the closest movement (incline bench
