@@ -114,8 +114,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "After lifting, before the walk. Stop at tingling or burning behind the knee.\n1. Nerve glide · 10 per leg: On your back, hold one thigh up. Straighten the knee, toes up, head back; bend it, toes pointed, look at the knee.\n2. Hamstring · 2 × 30 s per leg: On your back, strap round the foot. Raise the straight leg to a gentle stretch, hold.\n3. Knee marches · 1 min: Sit tall on a bench. Lift one knee high without leaning back, then switch.\n4. Wall slides · 1 min: Back and forearms on the wall in a W. Slide up to a Y and down, keep contact.\n5. Ankle · 30 s per leg: Foot a hand's width from the wall, heel down. Push the knee to touch the wall.",
-          "duration": 420
+          "note": "After lifting, before the walk. One long hold each, no reps.\n1. Dead hang · 45 s: Hang from the bar, arms straight, shoulders relaxed.\n2. Hamstring · 45 s per leg: Kneel on one knee, front leg straight, heel down, toes up. Back flat, lean forward from the hips. Halfway, press the heel down for 5 s, relax and lean a little further. Stop at tingling or burning behind the knee.\n3. Calves · 60 s: Balls of both feet on a step edge, hold on for balance. Let both heels sink. Halfway, rise slightly for 5 s, then sink again.",
+          "duration": 240
         },
         {
           "id": "mh4v2nzrtm_c05q",
@@ -239,8 +239,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "After lifting, before the walk. Stop at tingling or burning behind the knee.\n1. Nerve glide · 10 per leg: On your back, hold one thigh up. Straighten the knee, toes up, head back; bend it, toes pointed, look at the knee.\n2. Hamstring · 2 × 30 s per leg: On your back, strap round the foot. Raise the straight leg to a gentle stretch, hold.\n3. Knee marches · 1 min: Sit tall on a bench. Lift one knee high without leaning back, then switch.\n4. Wall slides · 1 min: Back and forearms on the wall in a W. Slide up to a Y and down, keep contact.\n5. Ankle · 30 s per leg: Foot a hand's width from the wall, heel down. Push the knee to touch the wall.",
-          "duration": 420
+          "note": "After lifting, before the walk. One long hold each, no reps.\n1. Dead hang · 45 s: Hang from the bar, arms straight, shoulders relaxed.\n2. Hamstring · 45 s per leg: Kneel on one knee, front leg straight, heel down, toes up. Back flat, lean forward from the hips. Halfway, press the heel down for 5 s, relax and lean a little further. Stop at tingling or burning behind the knee.\n3. Calves · 60 s: Balls of both feet on a step edge, hold on for balance. Let both heels sink. Halfway, rise slightly for 5 s, then sink again.",
+          "duration": 240
         },
         {
           "id": "mh4v2rd5cu_jbph",
@@ -355,8 +355,8 @@ self.CALI_DEFAULT_PROGRAM = {
           "repMax": null,
           "load": 0,
           "loadStep": 0,
-          "note": "After lifting, before the walk. Stop at tingling or burning behind the knee.\n1. Nerve glide · 10 per leg: On your back, hold one thigh up. Straighten the knee, toes up, head back; bend it, toes pointed, look at the knee.\n2. Hamstring · 2 × 30 s per leg: On your back, strap round the foot. Raise the straight leg to a gentle stretch, hold.\n3. Knee marches · 1 min: Sit tall on a bench. Lift one knee high without leaning back, then switch.\n4. Wall slides · 1 min: Back and forearms on the wall in a W. Slide up to a Y and down, keep contact.\n5. Ankle · 30 s per leg: Foot a hand's width from the wall, heel down. Push the knee to touch the wall.",
-          "duration": 420
+          "note": "After lifting, before the walk. One long hold each, no reps.\n1. Dead hang · 45 s: Hang from the bar, arms straight, shoulders relaxed.\n2. Hamstring · 45 s per leg: Kneel on one knee, front leg straight, heel down, toes up. Back flat, lean forward from the hips. Halfway, press the heel down for 5 s, relax and lean a little further. Stop at tingling or burning behind the knee.\n3. Calves · 60 s: Balls of both feet on a step edge, hold on for balance. Let both heels sink. Halfway, rise slightly for 5 s, then sink again.",
+          "duration": 240
         },
         {
           "id": "mh4v2aqrsm_08jg",

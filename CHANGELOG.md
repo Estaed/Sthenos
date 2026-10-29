@@ -17,6 +17,12 @@ to `cali-app-v13` then.
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-10-30
+
+### Changed
+- Mobility is three long holds in 4 minutes, no reps: a dead hang, a kneeling hamstring stretch with a heel press
+  halfway, and both calves on a step edge.
+
 ## [0.3.2] - 2026-10-26
 
 ### Added

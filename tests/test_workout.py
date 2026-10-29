@@ -255,8 +255,8 @@ def main():
         A.touch_tap(page, f'[data-screen="day"] [data-set="{D}:{ids["stretch"]}:0"]')
         page.wait_for_selector('[data-screen="timer"] [data-probe]')
         got = [ev("() => Cali.current()"), r("stretch", 0)]
-        A.check("a timed row (the 7 min mobility tile) is marked done and opens Cali.go('timer', { countdown: 420 })",
-                got == [{"name": "timer", "args": {"countdown": 420}}, 420], got)
+        A.check("a timed row (the 4 min mobility tile) is marked done and opens Cali.go('timer', { countdown: 240 })",
+                got == [{"name": "timer", "args": {"countdown": 240}}, 240], got)
         ev("() => Cali.back()")
         page.wait_for_selector(cell("pull", 0))
         step()
