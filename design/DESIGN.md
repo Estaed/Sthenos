@@ -1,6 +1,6 @@
 # Calisthenics design layer
 
-Follows Tarik Base v6 (`D:/TarikOS/.brain/skills/tasarim/references/DESIGN.md`) and the Pantry layer
+Follows the base `tasarim` (`D:/TarikOS/.brain/skills/tasarim/references/DESIGN.md`) and the Pantry layer
 (`D:/Projects/Pantry/design/DESIGN.md`: grey + one orange, open canvas, English UI, text size 1.0); overrides
 below. None yet.
 

@@ -48,5 +48,5 @@ and `notes.md` keeps a one-line link.
 - Timers are computed from stored start timestamps, never from counted ticks.
 - A set is written only through `Cali.log`; a week copies program values when built, so a program edit never rewrites history.
 - Every visual change follows `D:/TarikOS/.brain/skills/tasarim/SKILL.md` and `design/screens.html`; intended breaks go to `design/deviations.md`.
-- UI text in English; `tokens.css` copied unchanged from Tarik Base v6.
+- UI text in English; `tokens.css` copied unchanged from the base `tasarim`.
 - Personal data (logs, body weight) never enters this repo; tests use fixtures.

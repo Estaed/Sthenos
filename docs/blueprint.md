@@ -41,7 +41,7 @@ Pantry's stack, so both apps share one style (they stay separate apps, Tarık 20
 | Piece | Version | Why |
 |---|---|---|
 | Vanilla JS, HTML, CSS | — | no build step; one script per feature (Layout) |
-| `tokens.css`, Archivo, Manrope | Tarik Base v6, copied unchanged | design language; fonts local, works offline |
+| `tokens.css`, Archivo, Manrope | the base `tasarim`, copied unchanged | design language; fonts local, works offline |
 | Service worker + manifest | — | installable PWA, offline in the gym |
 | Wake Lock, Vibration, Web Audio, Notifications | built in | keep awake, rest and timer alerts (Riskiest assumption) |
 | GitHub Contents API | REST, fine-grained token | sync to the user's own private repo (Tarık's `Estaed/Calisthenics-Data`), the old app's sync carried over |
