@@ -1,5 +1,5 @@
 # Task-03: Settings, sync and backup
-**Status: DONE** — verified 2026-10-24, eye check pending: 1
+**Status: DONE** — verified 2026-10-24, eye checks closed 2026-11-11 (Tarık: in daily use, he reports a problem when he meets one)
 > **Execution:** agent `ultracode`
 > *Why:* Tarık's data must reach his private repo; everyone else needs settings and a backup.
 
@@ -39,7 +39,7 @@ The sync keeps a lost phone from losing months of training; the policy is Bluepr
 - [x] Tests run against the mocked GitHub API in both states (no token; token with a v4 file there).
 - [x] Before Monday, the orchestrator runs one real push and pull with Tarık's token on a test path and
   reports the result.
-- [ ] (eye) screen 5 of `design/screens.html`, both modes.
+- [x] (eye) screen 5 of `design/screens.html`, both modes.
 
 ## Out of scope
 - Programs list and editor (wave 2), sync for people without GitHub (*After v1*).

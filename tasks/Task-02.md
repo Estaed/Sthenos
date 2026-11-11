@@ -1,5 +1,5 @@
 # Task-02: Independent timer and alerts
-**Status: DONE** — verified 2026-10-24, eye check pending: 1
+**Status: DONE** — verified 2026-10-24, eye checks closed 2026-11-11 (Tarık: in daily use, he reports a problem when he meets one)
 > **Execution:** agent `ultracode`
 > *Why:* a rest or a timed stretch that ends unnoticed wastes the session; the alert path is v1's riskiest assumption.
 
@@ -32,7 +32,7 @@ Blueprint → Riskiest assumption: keep-awake is the main path, the service-work
 - [x] A Playwright test registers the real service worker, schedules a 2 s alert, and sees the
   notification with its tag; `cancel` before the end shows none.
 - [x] `Cali.alert.requestPermission()` asks once; never on load (Task-03 puts the button in Settings).
-- [ ] (eye) screen 4 and the top-bar pill (screen 2) of `design/screens.html`, both modes.
+- [x] (eye) screen 4 and the top-bar pill (screen 2) of `design/screens.html`, both modes.
 
 ## Out of scope
 - Push servers, Notification Triggers, periodic sync, the silent-audio keep-alive (it pauses music).

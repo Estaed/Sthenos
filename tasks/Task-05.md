@@ -1,5 +1,5 @@
 # Task-05: Programs: list, editor, import, use now or from next week
-**Status: DONE** — verified 2026-10-26 (0baab64), eye check pending: 1
+**Status: DONE** — verified 2026-10-26 (0baab64), eye checks closed 2026-11-11 (Tarık: in daily use, he reports a problem when he meets one)
 > **Execution:** agent `ultracode`
 > *Why:* product code with one owner and no parallel partner: one Opus agent builds it end to end, the main loop gates it.
 
@@ -62,7 +62,7 @@ yap"). Tarık left how it works to Eko (2026-10-25: "sana bıraktım nasıl olac
   are core's (`Cali.change` throws on a document of the wrong shape), translated, not a second copy.
 - [ ] A program change pushes at once (sync already treats any change to `programs`, `activeProgram` or
   `nextProgram` as urgent); the GitHub token never enters the document.
-- [ ] (eye) Settings → Programs and the program editor at 360 px, both themes, built from the components
+- [x] (eye) Settings → Programs and the program editor at 360 px, both themes, built from the components
   Settings (screen 5 of `design/screens.html`, shot `design/shots/05-settings-*.png`) and the in-card exercise
   editor already use; no new component kind. Walk it as Tarık would: duplicate, add a day D, add two exercises,
   pair them, rename the days, use it; every control a 44 px target; no name cut where a full name fits.

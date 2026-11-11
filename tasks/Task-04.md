@@ -1,5 +1,5 @@
 # Task-04: Weeks and double progression
-**Status: DONE** — verified 2026-10-24, eye check pending: 1
+**Status: DONE** — verified 2026-10-24, eye checks closed 2026-11-11 (Tarık: in daily use, he reports a problem when he meets one)
 > **Execution:** agent `ultracode`
 > *Why:* the numbers that drive Tarık's training decisions; a wrong load next week is the costliest bug.
 
@@ -26,7 +26,7 @@ Double progression is the point of the log; it must be right on his real numbers
 - [x] A week copies program values when built; editing the program afterwards changes no past week.
 - [x] Finish week asks for confirmation, emits `weekFinished`, and can be undone until the next `log` event.
 - [x] Tests check routes and stored state, not Task-01's DOM.
-- [ ] (eye) the week menu, and a past week shown read-only in the day sheet's look.
+- [x] (eye) the week menu, and a past week shown read-only in the day sheet's look.
 
 ## Out of scope
 - Programs list, editor, import (wave 2), deload settings (*After v1*).

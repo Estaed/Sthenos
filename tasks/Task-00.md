@@ -1,5 +1,5 @@
 # Task-00: Shell, data core and the thinnest path
-**Status: DONE** — verified 2026-10-24, eye check pending: 1
+**Status: DONE** — verified 2026-10-24, eye checks closed 2026-11-11 (Tarık: in daily use, he reports a problem when he meets one)
 > **Execution:** agent `ultracode`
 > *Why:* every wave-1 feature builds against the core, the routes, the events and the gate laid here.
 
@@ -42,7 +42,7 @@ gives the wave one green gate to build against.
   `hasTouch`, a mocked GitHub API, runs every `tests/test_*.py`, non-zero on any failure; tests drive
   `Cali.now()`, never real time, and write only to `.tmp/`. Here: no console errors; touch-tap Pull-up
   set 1 → 6 stored; reload → 6; tap again → 5; hold → 6; first open builds week 1.
-- [ ] (eye) day A renders in the round-6 structure (`design/screens.html` screen 7) at 360 px.
+- [x] (eye) day A renders in the round-6 structure (`design/screens.html` screen 7) at 360 px.
 
 ## Out of scope
 - Look polish, rest timer, start/finish, summary (Task-01); timer and alerts (Task-02); settings and

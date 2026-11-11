@@ -1,5 +1,5 @@
 # Task-06: Muscle map: which muscles the week works, by day, with muscles picked per exercise
-**Status: DONE** — verified 2026-10-26 (23c0b31), eye check pending: 1
+**Status: DONE** — verified 2026-10-26 (23c0b31), eye checks closed 2026-11-11 (Tarık: in daily use, he reports a problem when he meets one)
 > **Execution:** agent `ultracode`
 > *Why:* product code with one owner and no parallel partner: one Opus agent builds it end to end, the main loop gates it.
 
@@ -66,7 +66,7 @@ their muscles: "önerini yap" (picked per exercise). Program choices so far rest
 - [ ] The body paths come from react-native-body-highlighter, its MIT licence text in the header comment of
   `app/muscles-data.js`; no other outside asset.
 - [ ] The page loads with no console errors at 360 px in both themes.
-- [ ] (eye) the muscle screen at 360 px, both themes, against `design/muscles.html`; the Muscles field in the program
+- [x] (eye) the muscle screen at 360 px, both themes, against `design/muscles.html`; the Muscles field in the program
   editor in the look of its other fields; every control a 44 px target. Red here is a recorded break
   (`design/deviations.md`, 2026-10-26).
 
