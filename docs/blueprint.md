@@ -107,7 +107,6 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   `program`, `muscles`, `history`, `body`),
   listed once each in the append-only `app/registry.js`; `app/base.css` for shared classes, each
   feature's classes carry its prefix. `tokens.css`, `fonts/`, `sw.js`, `manifest.json`, icons at the root.
-- `legacy/`: the old app (`index.html`, its `tests/`) until v1 has run a week; then deleted.
 - `tests/acceptance.py` (Playwright, 360 px, mocked GitHub API, served under `/Sthenos/`)
   runs every `tests/test_<feature>.py`; a feature's tests reach its screen by route. Every feature
   has tests: a deliberate exception to PRINCIPLES #4's "not by default" (unattended waves, the gate judges).
@@ -130,7 +129,7 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
 - Look: round 6 (02 result colour: done orange, short a partial ring, current an ink ring), tap-only
   logging. Rejected: the number strip, and both ways at once.
 - Fresh data, same repo, v5 file. Rejected: migrating v4 ("eski verileri kullanmayacağız").
-- The new app takes the old URL; the old one moves to `legacy/`. Rejected: a second URL.
+- The new app takes the old URL; the old one sat in `legacy/` until v1 had run a week and was deleted (2026-11-15). Rejected: a second URL.
 - Public, sync optional per person. Rejected: Tarık-only with sync required.
 - New programs: Settings → Programs (edit, duplicate, import a program JSON). Use or edit a program: an empty
   current week (no set stored) is rebuilt at once, else it starts with the next week; the in-card editor stays the

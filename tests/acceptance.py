@@ -288,13 +288,6 @@ def check_files():
           and "sets\": [" not in json.dumps(prog) and all(isinstance(e["sets"], int) for d in days for e in d["exercises"]),
           [d["name"] for d in days])
 
-    legacy = (ROOT / "legacy" / "index.html").read_text(encoding="utf-8")
-    check("legacy/index.html no longer unregisters workers or deletes caches",
-          "getRegistrations" not in legacy and "caches.delete" not in legacy and "caches.keys" not in legacy)
-    check("legacy/index.html registers its own worker inside legacy/",
-          re.search(r"serviceWorker\.register\('sw\.js[^']*'", legacy) is not None and (ROOT / "legacy" / "sw.js").is_file())
-    lsw = (ROOT / "legacy" / "sw.js").read_text(encoding="utf-8")
-    check("legacy/sw.js deletes only its own older caches", "key.startsWith('cali-legacy-')" in lsw)
 
 
 def png_size(data):
@@ -418,55 +411,6 @@ def check_phone(browser, url, site, errors):
     ctx.close()
 
 
-def check_legacy(browser, url, site, errors):
-    legacy_errors = []
-    # 1) the new app is installed; opening legacy/ leaves its worker and caches alone; the new app then loads offline
-    ctx, page = phone(browser, legacy_errors, "legacy-then-app", clock=False)   # legacy's own console is not the app's
-    open_day(page, url)
-    check("the new app's worker controls it before legacy/ is opened", wait_controlled(page))
-    page.goto(url + "legacy/")
-    page.wait_for_selector("#dayTabs button")
-    origin = url.split(BASE)[0]
-    regs = poll(page, f"""async () => {{ const r = await navigator.serviceWorker.getRegistrations();
-        const s = r.filter(x => x.active).map(x => x.scope);
-        return s.includes('{origin}{BASE}legacy/') && s; }}""")
-    regs = regs or page.evaluate("async () => (await navigator.serviceWorker.getRegistrations()).map(x => x.scope)")
-    check("legacy/ registers its own worker with scope legacy/, and the app's worker stays",
-          f"{origin}{BASE}legacy/" in regs and f"{origin}{BASE}" in regs, regs)
-    cache = re.search(r"const CACHE = '(cali-app-v[\d.]+)';", (ROOT / "sw.js").read_text(encoding="utf-8")).group(1)
-    keys = page.evaluate("() => caches.keys()")
-    check("opening legacy/ deletes no cache of the new app", cache in keys, keys)
-    app_urls = page.evaluate("async (c) => (await (await caches.open(c)).keys()).map(r => r.url)", cache)
-    check("the app's worker caches nothing under legacy/", app_urls and not any("/legacy/" in u for u in app_urls),
-          [u for u in app_urls if "/legacy/" in u][:3])
-    go_offline(ctx, site)
-    page.goto(url)
-    page.wait_for_selector('[data-screen="day"] [data-set]', timeout=10000)
-    check("after legacy/ was opened, the new app still loads offline", page.locator("[data-set]").count() > 0)
-    go_online(ctx, site)
-    ctx.close()
-
-    # 2) legacy refuses a v5 document from the data repo: no adoption, no write
-    fixture = (ROOT / "tests" / "fixtures" / "v5-document.json").read_text(encoding="utf-8")
-    gh = MockGitHub(text=fixture, sha="v5sha")
-    ctx, page = phone(browser, legacy_errors, "legacy-v5", gh=gh, clock=False, service_workers="block")
-    page.goto(url + "legacy/")
-    page.wait_for_selector("#dayTabs button")
-    page.evaluate("""() => localStorage.setItem('cali_sync_config', JSON.stringify({ owner: 'Estaed',
-        repo: 'Calisthenics-Data', branch: 'main', path: 'calisthenics-data.json', token: 'TESTTOKEN', deviceName: 'test' }))""")
-    page.reload()
-    page.wait_for_selector("#dayTabs button")
-    err = poll(page, "() => (JSON.parse(localStorage.getItem('cali_sync_state') || '{}').lastError || '')")
-    local = page.evaluate("() => ({ mem: programData._version, saved: JSON.parse(localStorage.getItem('cali4_program_data'))._version })")
-    check("legacy refuses a v5 document (tests/fixtures/v5-document.json): it says a newer version holds the data",
-          "daha yeni" in (err or ""), err)
-    check("legacy neither adopts nor overwrites the v5 document", gh.puts == 0 and gh.text == fixture
-          and local == {"mem": 4, "saved": 4}, (gh.puts, local))
-    real = [e for e in legacy_errors if "pageerror" in e]
-    check("legacy opens without page errors", not real, real[:3])
-    ctx.close()
-
-
 def run_file(path):
     env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"}
     try:
@@ -506,9 +450,6 @@ def main():
         with sync_playwright() as p:
             browser = p.chromium.launch()
             guarded("phone scenario", check_phone, browser, url, site, errors)
-            site.overlay.clear()
-            site.down = False
-            guarded("legacy scenario", check_legacy, browser, url, site, errors)
             browser.close()
         outside = sorted({p for p in site.paths if not p.startswith(BASE) and p != BASE.rstrip("/")})
         check(f"every request stays under {BASE} (relative paths only)", not outside, outside)

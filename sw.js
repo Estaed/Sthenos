@@ -2,10 +2,10 @@
    always gets the newest files. Every same-origin GET goes to the network first (revalidating past the HTTP cache,
    so a GitHub Pages deploy shows on the next launch) and falls back to this worker's own cache when offline or after
    3 s without an answer. Install stores the shell below plus every file in app/registry.js, so a new feature needs
-   no edit here. legacy/ (the old app, with its own worker) is left to the network.
+   no edit here.
    Caches: CACHE is this release's, 'cali-app-v' + CHANGELOG.md's newest version (set at every release). Activate deletes
-   only this app's older caches ('cali-app-*') and 'cali-v4', the cache of the old app's worker that held this scope
-   before the old app moved to legacy/. Every other cache on the origin (legacy's 'cali-legacy-*', Pantry's) stays. */
+   only this app's older caches ('cali-app-*') and 'cali-v4', the cache of the old app's worker that held this scope.
+   Every other cache on the origin (Pantry's) stays. */
 const CACHE = 'cali-app-v0.3.3';   // CHANGELOG.md's newest version
 const PREFIX = 'cali-app-';
 const REPLACED = ['cali-v4'];
@@ -17,8 +17,6 @@ const SHELL = [
   'icon-192.png', 'icon-512.png', 'favicon-32x32.png',
 ];
 const WAIT_MS = 3000;
-const SCOPE = new URL('./', self.location).href;
-const LEGACY = SCOPE + 'legacy/';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -35,7 +33,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
-  if (request.method !== 'GET' || url.origin !== self.location.origin || url.href.startsWith(LEGACY)) return;
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
   let saved = Promise.resolve();
   const network = fetch(request.mode === 'navigate' ? request.url : request, { cache: 'no-cache' }).then(response => {

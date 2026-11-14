@@ -169,7 +169,6 @@ python tests/acceptance.py   # every check PASS, exit 0
 | `tokens.css`, `fonts/` | Design tokens and the Archivo and Manrope fonts (SIL Open Font Licence, `fonts/OFL-*.txt`). |
 | `tests/` | The acceptance gate and one test file per feature. |
 | `docs/`, `design/`, `reports/`, `tasks/`, `notes.md` | How it was planned and designed: the blueprint, design rounds, research and task files. |
-| `legacy/` | The previous version of the app, kept for a short while and then removed. |
 
 </details>
 
