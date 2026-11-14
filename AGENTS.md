@@ -32,11 +32,10 @@ and `notes.md` keeps a one-line link.
 - `tasks/`: task files, only when `plan-wave` writes them.
 
 ## Sthenos at a glance
-<!-- Written with the Blueprint: what the project is in two or three sentences, and its dates. -->
 
 - **Read `docs/blueprint.md` before** planning a task, changing a stage, the screen or a number,
   and whenever code seems to contradict a decision.
-- **What:** Sthenos (Greek "strength"; Tarık 2026-10-24), a public workout-log PWA; the data repo keeps its name; the GitHub repo is `Estaed/Sthenos`, live at `https://estaed.github.io/Sthenos/` (2026-10-24); the local folder is `D:/Projects/Sthenos` (2026-10-25); Tarık syncs to private `Estaed/Calisthenics-Data` with his key. v1 wave 1 due Monday 2026-10-26.
+- **What:** Sthenos (Greek "strength"; Tarık 2026-10-24), a public workout-log PWA; the data repo keeps its name; the GitHub repo is `Estaed/Sthenos`, live at `https://estaed.github.io/Sthenos/` (2026-10-24); the local folder is `D:/Projects/Sthenos` (2026-10-25); Tarık syncs to private `Estaed/Calisthenics-Data` with his key.
 - **Code:** `index.html` shell, `app/` one script per feature + `app/registry.js`, `tests/`, `design/screens.html` (look), `legacy/` (old app).
 - **Commands:** serve `python -m http.server` from `D:/Projects` and open `/Sthenos/`; test `python tests/acceptance.py` (serves the repo under `/Sthenos/` itself).
 - **Gate:** `python tests/acceptance.py` from the repo root; clean = every check PASS, exit 0.
