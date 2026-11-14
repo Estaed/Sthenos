@@ -109,7 +109,8 @@ framework or bundler; IndexedDB (years of sets fit localStorage).
   feature's classes carry its prefix. `tokens.css`, `fonts/`, `sw.js`, `manifest.json`, icons at the root.
 - `legacy/`: the old app (`index.html`, its `tests/`) until v1 has run a week; then deleted.
 - `tests/acceptance.py` (Playwright, 360 px, mocked GitHub API, served under `/Sthenos/`)
-  runs every `tests/test_<feature>.py`; a feature's tests reach its screen by route.
+  runs every `tests/test_<feature>.py`; a feature's tests reach its screen by route. Every feature
+  has tests: a deliberate exception to PRINCIPLES #4's "not by default" (unattended waves, the gate judges).
 - `design/` source of truth; `reports/` research; `references/` inputs.
 - Hermes' weekly summary is a Hermes skill in `D:/TarikOS/.brain/hermes-skills/`, reading the data
   repo after Finish week. No Hermes skill reads a data repo today; whether its GitHub access reaches
